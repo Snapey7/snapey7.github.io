@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IMPURA VIDA — Tropical Taboo Magazine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --card: #111;
+      --pink: #f65c8f;
+      --soft-pink: rgba(246, 92, 143, 0.12);
+      --text: #f5f5f5;
+      --muted: #b3b3b3;
+      --border: rgba(246, 92, 143, 0.25);
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #141414 0%, #000 60%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+    header {
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(10px);
+      background: rgba(0,0,0,0.45);
+      z-index: 10;
+    }
+    .nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .9rem 1.25rem;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .logo-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      background: #000;
+      border: 1px solid var(--pink);
+      display: grid;
+      place-items: center;
+      font-size: .55rem;
+      letter-spacing: 1px;
+    }
+    .logo span {
+      font-weight: 600;
+      letter-spacing: .08em;
+      font-size: .8rem;
+    }
+    .nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: .75rem;
+      margin-left: 1.2rem;
+      opacity: .75;
+    }
+    .hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 4rem 1.25rem 3rem;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 2.4rem;
+    }
+    .hero small {
+      text-transform: uppercase;
+      letter-spacing: .3em;
+      font-size: .7rem;
+      color: var(--muted);
+    }
+    .hero h1 {
+      font-size: clamp(2.6rem, 4vw, 3.3rem);
+      line-height: 1.05;
+      margin: .9rem 0 1rem;
+      letter-spacing: -.02em;
+    }
+    .hero p {
+      max-width: 34rem;
+      opacity: .75;
+    }
+    .cta-row {
+      margin-top: 1.4rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      background: var(--pink);
+      border: none;
+      color: #000;
+      padding: .62rem 1.25rem;
+      border-radius: .9rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      font-size: .8rem;
+    }
+    .btn-secondary {
+      background: rgba(246, 92, 143, 0.06);
+      border: 1px solid rgba(246, 92, 143, 0.2);
+      color: var(--text);
+    }
+    .hero-card {
+      background: linear-gradient(160deg, rgba(246,92,143,.12) 0%, rgba(10,10,10,1) 70%);
+      border: 1px solid rgba(246, 92, 143, .08);
+      border-radius: 1.25rem;
+      padding: 1.4rem 1.25rem 1.25rem;
+    }
+    .hero-card h2 {
+      font-size: 1.05rem;
+      margin-bottom: .4rem;
+    }
+    .hero-card p {
+      font-size: .8rem;
+      opacity: .7;
+      margin-bottom: 1rem;
+    }
+    .hero-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.2rem 0;
+    }
+    .hero-card li {
+      font-size: .75rem;
+      margin-bottom: .4rem;
+      display: flex;
+      gap: .35rem;
+      align-items: flex-start;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--pink);
+      border-radius: 999px;
+      margin-top: .35rem;
+      flex: 0 0 6px;
+    }
+    /* sections */
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 0;
+    }
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.4rem;
+    }
+    .section-title h2 {
+      font-size: 1.15rem;
+      letter-spacing: .02em;
+    }
+    .tiers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+      gap: 1.5rem;
+    }
+    .tier {
+      background: rgba(17,17,17,0.35);
+      border: 1px solid rgba(246, 92, 143, 0.12);
+      border-radius: 1.25rem;
+      padding: 1.25rem 1.15rem 1.35rem;
+    }
+    .tier h3 {
+      font-size: .9rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .price {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: .4rem 0 .8rem;
+    }
+    .tier ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.1rem 0;
+    }
+    .tier li {
+      font-size: .72rem;
+      margin-bottom: .35rem;
+      color: rgba(245,245,245,.85);
+      display: flex;
+      gap: .4rem;
+      align-items: flex-start;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(246, 92, 143, 0.2);
+      border: 1px solid rgba(246, 92, 143, 0.35);
+      padding: .18rem .45rem;
+      border-radius: 999px;
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: .5rem;
+    }
+    .commitment {
+      background: linear-gradient(120deg, rgba(246,92,143,.08) 0%, rgba(10,10,10,1) 60%);
+      border: 1px solid rgba(246,92,143,.03);
+      border-radius: 1.25rem;
+      padding: 1.4rem 1.2rem 1.2rem;
+      margin-top: 2rem;
+    }
+    .commitment ul {
+      columns: 2;
+      column-gap: 1rem;
+      list-style: none;
+      padding: 0;
+      margin: .6rem 0 0;
+    }
+    .commitment li {
+      font-size: .7rem;
+      margin-bottom: .4rem;
+      opacity: .8;
+    }
+    .ig-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .ig-card {
+      background: radial-gradient(circle at top, rgba(246,92,143,.3) 0%, rgba(10,10,10,1) 45%);
+      border: 1px solid rgba(246,92,143,.05);
+      border-radius: 1rem;
+      aspect-ratio: 4/3;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 1rem;
+      font-size: .85rem;
+    }
+    footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 3.5rem;
+      color: #666;
+      font-size: .7rem;
+      text-align: center;
+    }
+    a {
+      color: inherit;
+    }
+    @media (max-width: 850px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .nav {
+        flex-wrap: wrap;
+      }
+      .commitment ul {
+        columns: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header>
+    <div class="nav">
+      <div class="logo">
+        <div class="logo-circle">IV</div>
+        <span>IMPURA VIDA</span>
+      </div>
+      <div>
+        <a href="#tiers">Membership</a>
+        <a href="#mission">Costa Rica</a>
+        <a href="#follow">Instagram</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <small>TROPICAL TABOO • COSTA RICA • DIGITAL MAGAZINE</small>
+      <h1>Where paradise gets primal.</h1>
+      <p>Impura Vida is a sensual, art-driven magazine born in Costa Rica — mixing luxury beach visuals, implied & artistic nude editorials, and travel stories from the jungle to the villas.</p>
+      <div class="cta-row">
+        <a class="btn" href="#tiers">View subscriptions</a>
+        <a class="btn btn-secondary" href="https://instagram.com/impuravidamag" target="_blank">Follow on Instagram</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h2>What's inside</h2>
+      <p>Two-tier access so you can tease newcomers and reward true fans.</p>
+      <ul>
+        <li><span class="dot"></span>Digital magazine issues</li>
+        <li><span class="dot"></span>Sensual SFW & implied-nude editorials</li>
+        <li><span class="dot"></span>Ultra tier for full artistic nudes & BTS</li>
+        <li><span class="dot"></span>Optional hardback collector’s edition</li>
+        <li><span class="dot"></span>Eco-luxe: supports Costa Rican projects</li>
+      </ul>
+      <a class="btn btn-secondary" href="#tiers">Start from $9.99/mo</a>
+    </div>
+  </div>
+
+  <!-- TIERS -->
+  <section id="tiers">
+    <div class="section-title">
+      <h2>Membership tiers</h2>
+      <p style="font-size:.72rem;color:var(--muted);">Choose your level — Standard for the curious, Ultra for the primal.</p>
+    </div>
+    <div class="tiers">
+      <!-- Standard -->
+      <div class="tier">
+        <div class="badge">Standard</div>
+        <h3>Digital Access</h3>
+        <div class="price">$9.99 <span style="font-size:.68rem;font-weight:400;color:var(--muted);">/ month</span></div>
+        <ul>
+          <li>✔ Full digital magazine access</li>
+          <li>✔ Sensual but SFW & implied-nude shoots</li>
+          <li>✔ Written lifestyle / travel features</li>
+          <li>✔ Early access to seasonal drops</li>
+        </ul>
+        <a class="btn btn-secondary" href="#">Subscribe Standard →</a>
+      </div>
+      <!-- Ultra -->
+      <div class="tier" style="background: linear-gradient(170deg, rgba(246,92,143,.25) 0%, rgba(0,0,0,.2) 60%); border-color: rgba(246,92,143,.65);">
+        <div class="badge" style="background:#000;border:1px solid rgba(255,255,255,.06);">Most wanted</div>
+        <h3>Impura Ultra</h3>
+        <div class="price">$24.99 <span style="font-size:.68rem;font-weight:400;color:var(--muted);">/ month</span></div>
+        <ul>
+          <li>✔ Everything in Standard</li>
+          <li>✔ Full artistic nude galleries</li>
+          <li>✔ BTS videos, interviews, model picks</li>
+          <li>✔ Priority access to future retreats/exhibits</li>
+          <li>✔ Discounts on collector’s edition</li>
+        </ul>
+        <a class="btn" href="#">Subscribe Ultra →</a>
+      </div>
+      <!-- Collector -->
+      <div class="tier">
+        <div class="badge">Collector's Edition</div>
+        <h3>Limited Print</h3>
+        <div class="price">$350 <span style="font-size:.68rem;font-weight:400;color:var(--muted);">one-time</span></div>
+        <ul>
+          <li>✔ Luxury A3-style magazine (~200 pages)</li>
+          <li>✔ Eco-friendly FSC paper, Costa Rica print</li>
+          <li>✔ Numbered, exclusive content</li>
+          <li>✔ Perfect for displays & gifts</li>
+        </ul>
+        <a class="btn btn-secondary" href="#">Order Collector’s →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- COSTA RICA COMMITMENT -->
+  <section id="mission">
+    <div class="section-title">
+      <h2>Costa Rica commitment</h2>
+      <p style="font-size:.7rem;color:var(--muted);max-width:26rem;">Every subscription helps keep the paradise that inspires the magazine — reforestation, sustainable print, local creatives.</p>
+    </div>
+    <div class="commitment">
+      <p style="font-size:.78rem;">Impura Vida reinvests into Costa Rican projects:</p>
+      <ul>
+        <li>🌿 Tree planting & habitat restoration</li>
+        <li>🌴 Sustainable, low-carbon print runs</li>
+        <li>📸 Hiring local models & artists</li>
+        <li>🏝 Promoting responsible “tropical taboo” tourism</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- INSTAGRAM / SOCIAL -->
+  <section id="follow">
+    <div class="section-title">
+      <h2>Follow the moodboard</h2>
+      <p style="font-size:.7rem;color:var(--muted);">IG: @impuravidamag — the glossy, sunlit, sensual version.</p>
+    </div>
+    <div class="ig-grid">
+      <div class="ig-card">
+        <div>
+          <p style="font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;margin-bottom:.5rem;">Feature</p>
+          <h3 style="margin:0;font-size:1.1rem;">Beach Siren</h3>
+          <p style="font-size:.65rem;opacity:.7;margin-top:.4rem;">Sun-drenched Costa Rica shoot.</p>
+        </div>
+      </div>
+      <div class="ig-card">
+        <div>
+          <p style="font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;margin-bottom:.5rem;">Villa Nights</p>
+          <h3 style="margin:0;font-size:1.1rem;">Golden Hour Blur</h3>
+          <p style="font-size:.65rem;opacity:.7;margin-top:.4rem;">Luxury property x model runway.</p>
+        </div>
+      </div>
+      <div class="ig-card" style="background:#000;border:1px solid rgba(246,92,143,.4);">
+        <div>
+          <h3 style="margin:0;font-size:1.05rem;">IMPURA VIDA</h3>
+          <p style="font-size:.65rem;opacity:.7;margin-top:.4rem;">Tropical Taboo — Where Paradise Gets Primal.</p>
+          <a class="btn" style="margin-top:.7rem;" href="https://instagram.com/impuravidamag" target="_blank">Open Instagram</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © <span id="y"></span> Impura Vida. Made in Costa Rica energy, by Ben Luke Snape.
+  </footer>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
