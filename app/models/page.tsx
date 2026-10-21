@@ -7,8 +7,8 @@ export default function ModelsPage() {
     <PageShell>
       <main>
         <section className="archive-hero">
-          <p className="eyebrow">MUSES</p>
-          <h1>Models</h1>
+          <p className="eyebrow">THE WOMEN OF IMPURA VIDA</p>
+          <h1>Muse</h1>
           <p className="section-copy">
             Portrait-led profiles from the women shaping the IMPURA VIDA visual world.
           </p>

@@ -79,6 +79,53 @@ a {
   transform: scaleX(1);
 }
 
+.nav-dropdown {
+  position: relative;
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: -0.8rem;
+  z-index: 60;
+  min-width: 180px;
+  padding-top: 0.8rem;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+  visibility: hidden;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.nav-dropdown-menu a {
+  display: block;
+  border: 1px solid rgba(255, 100, 107, 0.2);
+  background: rgba(3, 3, 3, 0.96);
+  padding: 0.9rem 1rem;
+  color: rgba(248, 239, 232, 0.9);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  backdrop-filter: blur(18px);
+}
+
+.nav-dropdown-menu a:hover,
+.nav-dropdown-menu a:focus-visible {
+  color: #ff646b;
+}
+
 .eyebrow {
   margin: 0;
   color: #ff646b;
@@ -503,6 +550,207 @@ a {
     #030303;
 }
 
+.destinations-page {
+  min-height: 100svh;
+  padding: 6.8rem 5vw 1.7rem;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.42) 55%, rgba(0, 0, 0, 0.78)),
+    url('/assets/section-2-background.png') center / cover fixed,
+    #030303;
+}
+
+.london-destinations-page {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58) 58%, rgba(0, 0, 0, 0.82)),
+    url('/assets/london-background.png') center 18% / cover fixed,
+    url('/assets/section-2-background.png') center / cover,
+    #030303;
+}
+
+.destinations-heading {
+  margin: 0 auto 2.4rem;
+  text-align: center;
+}
+
+.destinations-heading .eyebrow {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+}
+
+.destinations-heading h1 {
+  margin: 0.55rem 0 0.8rem;
+  color: #ff7779;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(3.4rem, 6.5vw, 5.8rem);
+  font-weight: 500;
+  line-height: 0.98;
+}
+
+.destinations-heading > p:last-child {
+  margin: 0;
+  color: rgba(248, 239, 232, 0.9);
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
+}
+
+.london-destinations-heading h1 {
+  font-size: clamp(3.5rem, 5.8vw, 5rem);
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+.london-destinations-heading > p:last-child {
+  line-height: 1.55;
+}
+
+.destination-grid {
+  display: grid;
+  width: min(100%, 1128px);
+  margin: 0 auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+
+.destination-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1.42;
+  border: 1px solid rgba(248, 239, 232, 0.14);
+  border-radius: 9px;
+  background: #100e0b;
+  isolation: isolate;
+}
+
+.london-destination-card {
+  aspect-ratio: 1.25;
+  border: 0;
+}
+
+.london-destination-card::after {
+  content: none;
+}
+
+.destination-card::after {
+  position: absolute;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.18) 0%, transparent 38%, rgba(0, 0, 0, 0.78) 100%);
+  content: '';
+  inset: 0;
+}
+
+.destination-card img {
+  position: absolute;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms ease;
+  inset: 0;
+}
+
+.destination-card:hover img {
+  transform: scale(1.045);
+}
+
+.destination-lock {
+  position: absolute;
+  top: 13px;
+  left: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.78);
+  padding: 7px 10px;
+  color: #ff7779;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.destination-name {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.destination-name strong {
+  color: #fffaf6;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  font-weight: 500;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.destination-name small {
+  margin-top: 5px;
+  color: rgba(248, 239, 232, 0.8);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+}
+
+.london-destination-name small {
+  color: #ff7779;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+}
+
+.destination-name i {
+  width: 24px;
+  height: 1px;
+  margin-top: 8px;
+  background: #ff646b;
+}
+
+.mobile-nav-item {
+  display: grid;
+}
+
+.mobile-nav-subitem {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.7rem 0 0.8rem 1rem;
+  color: #ff8b8d;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.destinations-cta {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem auto 0;
+}
+
+.destinations-cta p {
+  margin: 0;
+  color: rgba(248, 239, 232, 0.92);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.45rem, 2vw, 1.8rem);
+}
+
+.destinations-cta .outline-cta {
+  min-width: 305px;
+}
+
+.london-destinations-cta p {
+  font-style: italic;
+}
+
+.london-destinations-cta .outline-cta {
+  min-height: 43px;
+}
+
 .archive-grid,
 .model-grid {
   display: grid;
@@ -656,6 +904,11 @@ a {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .destination-grid {
+    max-width: 720px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .membership-grid,
   .model-grid,
   .gallery-grid {
@@ -702,6 +955,84 @@ a {
   .editorial-grid,
   .archive-grid {
     gap: 10px;
+  }
+
+  .destinations-page {
+    padding: 7rem 1rem 2rem;
+    background-attachment: scroll;
+  }
+
+  .london-destinations-page {
+    background-attachment: scroll;
+  }
+
+  .destinations-heading {
+    margin-bottom: 1.6rem;
+  }
+
+  .destinations-heading h1 {
+    font-size: clamp(3rem, 13vw, 4.3rem);
+  }
+
+  .london-destinations-heading h1 {
+    font-size: clamp(2.65rem, 12vw, 4rem);
+    white-space: normal;
+  }
+
+  .destinations-heading > p:last-child {
+    max-width: 340px;
+    margin: 0 auto;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .destination-grid {
+    gap: 9px;
+  }
+
+  .destination-card {
+    aspect-ratio: 0.95;
+    border-radius: 6px;
+  }
+
+  .london-destination-card {
+    aspect-ratio: 0.95;
+  }
+
+  .destination-lock {
+    top: 8px;
+    left: 7px;
+    gap: 4px;
+    padding: 6px 7px;
+    font-size: 7px;
+  }
+
+  .destination-name {
+    right: 4px;
+    bottom: 7px;
+    left: 4px;
+  }
+
+  .destination-name strong {
+    font-size: clamp(0.9rem, 4vw, 1.2rem);
+  }
+
+  .destination-name small {
+    font-size: 7px;
+  }
+
+  .london-destination-name small {
+    font-size: 7px;
+    letter-spacing: 0.14em;
+  }
+
+  .destinations-cta {
+    margin-top: 1.3rem;
+    text-align: center;
+  }
+
+  .destinations-cta .outline-cta {
+    min-width: min(100%, 305px);
   }
 
   .editorial-card {

@@ -45,9 +45,8 @@ export const assetManifest = [
 
 export const navItems = [
   { label: 'EDITORIALS', href: '/editorials' },
-  { label: 'MODELS', href: '/models' },
-  { label: 'DESTINATIONS', href: '/destinations' },
   { label: 'MEMBERS', href: '/members' },
+  { label: 'DESTINATIONS', href: '/destinations' },
   { label: 'MUSE', href: '/models' },
   { label: 'ABOUT', href: '/about' },
   { label: 'SHOP', href: '/shop' },

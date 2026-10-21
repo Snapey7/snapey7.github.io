@@ -27,7 +27,17 @@ export function Header() {
     >
       <div className="grid h-20 grid-cols-[1fr_auto_1fr] items-center px-5 md:px-8 lg:px-10">
         <nav className="hidden items-center gap-7 lg:flex">
-          {navItems.map((item) => (
+          {navItems.map((item) => item.label === 'DESTINATIONS' ? (
+            <div className="nav-dropdown" key={item.label}>
+              <Link className="nav-link" href={item.href}>
+                {item.label}
+              </Link>
+              <div className="nav-dropdown-menu">
+                <Link href="/destinations/costa-rica">Costa Rica</Link>
+                <Link href="/destinations/london">London</Link>
+              </div>
+            </div>
+          ) : (
             <Link className="nav-link" href={item.href} key={item.label}>
               {item.label}
             </Link>
@@ -82,14 +92,33 @@ export function Header() {
       >
         <nav className="grid gap-1 bg-black/96 px-5 py-5">
           {navItems.map((item) => (
-            <Link
-              className="border-b border-white/8 py-3 text-xs font-semibold tracking-[0.22em] text-ivory/85"
-              href={item.href}
-              key={item.label}
-              onClick={() => setOpen(false)}
-            >
-              {item.label}
-            </Link>
+            <div className="mobile-nav-item" key={item.label}>
+              <Link
+                className="border-b border-white/8 py-3 text-xs font-semibold tracking-[0.22em] text-ivory/85"
+                href={item.href}
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </Link>
+              {item.label === 'DESTINATIONS' && (
+                <>
+                  <Link
+                    className="mobile-nav-subitem"
+                    href="/destinations/costa-rica"
+                    onClick={() => setOpen(false)}
+                  >
+                    Costa Rica
+                  </Link>
+                  <Link
+                    className="mobile-nav-subitem"
+                    href="/destinations/london"
+                    onClick={() => setOpen(false)}
+                  >
+                    London
+                  </Link>
+                </>
+              )}
+            </div>
           ))}
           <Link
             className="mt-3 border border-coral/50 px-4 py-4 text-center text-xs font-semibold tracking-[0.22em] text-coral"
