@@ -15,15 +15,38 @@ const sans = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://puravidamagazine.vercel.app'),
-  title: 'IMPURA VIDA Magazine',
+  metadataBase: new URL('https://www.impuravidamagazine.com'),
+  title: {
+    default: 'IMPURA VIDA Magazine',
+    template: '%s | IMPURA VIDA',
+  },
   description:
-    'A premium nocturnal Costa Rica-inspired digital editorial magazine for members.',
+    'A digital magazine celebrating freedom, beauty, and temptation in Costa Rica and beyond. Discover cinematic editorials, muses, and destinations.',
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'IMPURA VIDA Magazine',
+    type: 'website',
+    siteName: 'IMPURA VIDA',
+    url: 'https://www.impuravidamagazine.com/',
+    title: 'IMPURA VIDA — A Digital Magazine',
     description:
-      'A private world of cinematic tropical editorials, membership, and Costa Rica impact.',
-    images: ['/assets/hero.png'],
+      'A digital magazine celebrating freedom, beauty, and temptation in Costa Rica and beyond. Discover cinematic editorials, muses, and destinations.',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'IMPURA VIDA Magazine — Freedom, beauty, and temptation in Costa Rica and beyond.',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'IMPURA VIDA — A Digital Magazine',
+    description:
+      'A digital magazine celebrating freedom, beauty, and temptation in Costa Rica and beyond.',
+    images: ['/opengraph-image'],
   },
 };
 
