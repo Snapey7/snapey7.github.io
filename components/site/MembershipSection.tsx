@@ -5,14 +5,16 @@ import { SectionHeading } from './SectionHeading';
 
 const icons = [Shell, Eye, MessageCircle, Images, Film];
 
-export function MembershipSection() {
+export function MembershipSection({ showHeading = true }: { showHeading?: boolean }) {
   return (
     <section className="membership-section" id="membership">
-      <SectionHeading
-        copy="It's best enjoyed by someone just like you. Cancel anytime."
-        eyebrow="CHOOSE YOUR TIER"
-        title="Join The Experience"
-      />
+      {showHeading ? (
+        <SectionHeading
+          copy="It's best enjoyed by someone just like you. Cancel anytime."
+          eyebrow="CHOOSE YOUR TIER"
+          title="Join The Experience"
+        />
+      ) : null}
 
       <div className="membership-grid">
         {membershipTiers.map((tier) => (
