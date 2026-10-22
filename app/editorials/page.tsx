@@ -29,7 +29,7 @@ export default function EditorialsPage() {
   return (
     <PageShell>
       <main>
-        <section className="archive-hero">
+        <section className="archive-hero editorials-archive-hero">
           <p className="eyebrow">LATEST DROPS</p>
           <h1>Inspired Vision</h1>
           <p className="section-copy">
@@ -37,7 +37,7 @@ export default function EditorialsPage() {
             experiencing right now.
           </p>
         </section>
-        <section className="archive-grid">
+        <section className="archive-grid editorials-archive-grid">
           {editorials.map((editorial) => (
             <EditorialCard editorial={editorial} key={editorial.slug} />
           ))}
