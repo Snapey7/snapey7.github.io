@@ -4,7 +4,7 @@ import { PageShell } from '@/components/site/PageShell';
 export default function MembersPage() {
   return (
     <PageShell>
-      <main>
+      <main className="members-page">
         <section className="archive-hero">
           <p className="eyebrow">MEMBERS</p>
           <h1>Private Access</h1>
@@ -13,7 +13,7 @@ export default function MembersPage() {
             interviews, and the private world behind each editorial.
           </p>
         </section>
-        <MembershipSection />
+        <MembershipSection showHeading={false} />
       </main>
     </PageShell>
   );

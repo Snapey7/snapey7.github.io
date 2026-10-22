@@ -5,7 +5,7 @@ import { models } from '@/lib/content';
 export default function ModelsPage() {
   return (
     <PageShell>
-      <main>
+      <main className="models-page">
         <section className="archive-hero">
           <p className="eyebrow">THE WOMEN OF IMPURA VIDA</p>
           <h1>Muse</h1>
