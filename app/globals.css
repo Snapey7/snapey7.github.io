@@ -550,6 +550,23 @@ a {
     #030303;
 }
 
+.editorials-archive-hero {
+  min-height: 39svh;
+  padding-bottom: 2rem;
+}
+
+.editorials-archive-hero .section-copy {
+  margin-top: 2.1rem;
+}
+
+.editorials-archive-hero h1 {
+  line-height: 0.98;
+}
+
+.editorials-archive-grid {
+  margin-top: 0;
+}
+
 .destinations-page {
   min-height: 100svh;
   padding: 6.8rem 5vw 1.7rem;
@@ -899,6 +916,15 @@ a {
 }
 
 @media (max-width: 980px) {
+  .editorials-archive-hero {
+    min-height: 58svh;
+    padding-bottom: 4rem;
+  }
+
+  .editorials-archive-grid {
+    margin-top: -2rem;
+  }
+
   .editorial-grid,
   .archive-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
