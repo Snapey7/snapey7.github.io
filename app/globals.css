@@ -305,6 +305,7 @@ a {
 }
 
 .editorial-card {
+  position: relative;
   display: block;
   aspect-ratio: 0.86;
   overflow: hidden;
