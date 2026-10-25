@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { LockKeyhole } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import type { editorials } from '@/lib/content';
 
 type Editorial = (typeof editorials)[number];
@@ -18,12 +18,10 @@ export function EditorialCard({ editorial }: { editorial: Editorial }) {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/82" />
         <div className="absolute inset-0 border border-white/10 transition duration-500 group-hover:border-coral/45 group-hover:shadow-[0_0_28px_rgba(255,99,105,0.16)]" />
-        {editorial.locked ? (
-          <div className="absolute left-4 top-4 flex items-center gap-1.5 text-[9px] font-bold tracking-[0.16em] text-coral">
-            <LockKeyhole size={10} />
-            MEMBERS ONLY
-          </div>
-        ) : null}
+        <div className="absolute left-4 top-4 flex items-center gap-1.5 text-[9px] font-bold tracking-[0.16em] text-coral">
+          <BookOpen aria-hidden="true" size={11} />
+          GALLERY
+        </div>
         <div className="absolute inset-x-0 bottom-0 translate-y-0 px-5 pb-5 text-center transition duration-500 group-hover:-translate-y-1">
           <h3 className="font-serif text-[1.03rem] uppercase tracking-[0.03em] text-ivory">
             {editorial.title}

@@ -563,8 +563,52 @@ a {
   line-height: 0.98;
 }
 
-.editorials-archive-grid {
-  margin-top: 0;
+.archive-grid.editorials-archive-grid {
+  margin-top: 4rem;
+}
+
+.editorial-placeholder {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(248, 239, 232, 0.18);
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(255, 100, 107, 0.12), transparent 58%),
+    linear-gradient(145deg, #14100f, #050505 70%);
+}
+
+.editorial-placeholder-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #ff7779;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.editorial-placeholder-copy {
+  padding: 1rem;
+  text-align: center;
+}
+
+.editorial-placeholder-copy p {
+  margin: 0;
+  color: rgba(248, 239, 232, 0.88);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1rem, 1.4vw, 1.3rem);
+}
+
+.editorial-placeholder-copy span {
+  display: block;
+  margin-top: 0.65rem;
+  color: rgba(248, 239, 232, 0.55);
+  font-size: 8px;
+  letter-spacing: 0.15em;
 }
 
 .destinations-page {
@@ -1069,7 +1113,7 @@ a {
   }
 
   .editorials-archive-grid {
-    margin-top: -2rem;
+    margin-top: 4rem;
   }
 
   .editorial-grid,
