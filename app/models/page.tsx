@@ -1,6 +1,19 @@
 import Link from 'next/link';
+import { LockKeyhole } from 'lucide-react';
 import { PageShell } from '@/components/site/PageShell';
 import { models } from '@/lib/content';
+
+const upcomingMuses = ['New muse', 'New muse', 'New muse'];
+
+function MuseDetails({ name, location }: { name: string; location: string }) {
+  return (
+    <div className="muse-hover-details">
+      <span className="muse-unlock"><LockKeyhole aria-hidden="true" /> UNLOCK</span>
+      <span className="muse-person">{name} | {location}</span>
+      <span className="muse-meta">GALLERY <i>·</i> IMPURA | EXCLUSIVE PHOTOS</span>
+    </div>
+  );
+}
 
 export default function ModelsPage() {
   return (
@@ -21,11 +34,18 @@ export default function ModelsPage() {
           {models.map((model) => (
             <Link className="model-card" href={`/models/${model.slug}`} key={model.slug}>
               <img alt={model.name} src={model.image} />
-              <div>
-                <h3>{model.name}</h3>
-                <p>{model.location}</p>
-              </div>
+              <MuseDetails name={model.name} location={model.location} />
             </Link>
+          ))}
+          <Link className="model-card" href="/models/lucy" aria-label="Lucy, Manzanillo">
+            <img alt="Lucy on the shore at Manzanillo" src="/assets/editorial-manzanillo-cover.jpg" />
+            <MuseDetails name="Lucy" location="Manzanillo" />
+          </Link>
+          {upcomingMuses.map((name, index) => (
+            <article className="model-card model-card-upcoming" key={`${name}-${index}`}>
+              <div className="muse-upcoming-label">MORE MUSES<br />COMING SOON</div>
+              <MuseDetails name="New muse" location="Coming soon" />
+            </article>
           ))}
         </section>
       </main>

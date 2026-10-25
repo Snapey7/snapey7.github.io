@@ -185,8 +185,15 @@ export const models = [
     slug: 'ana',
     name: 'Ana',
     image: '/assets/editorial-ana-cover.jpg',
-    location: 'Costa Rica',
+    location: 'Miami',
     bio: 'An ordinary afternoon becomes something far more tempting in Ana’s intimate portrait.',
+  },
+  {
+    slug: 'lucy',
+    name: 'Lucy',
+    image: '/assets/editorial-manzanillo-cover.jpg',
+    location: 'Manzanillo',
+    bio: 'Lucy finds a private cove at the edge of the jungle in this sunlit coastal story.',
   },
 ] as const;
 

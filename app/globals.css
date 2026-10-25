@@ -942,27 +942,99 @@ a {
 }
 
 .model-card {
-  display: grid;
+  position: relative;
+  display: block;
+  aspect-ratio: 0.62;
   overflow: hidden;
   border: 0;
-  background: transparent;
+  background: #111;
 }
 
 .model-card img {
   width: 100%;
-  aspect-ratio: 0.62;
+  height: 100%;
   object-fit: cover;
+  transition: transform 500ms ease;
 }
 
-.model-card div {
-  padding: 0.85rem 0.15rem;
+.model-card:hover img,
+.model-card:focus-visible img {
+  transform: scale(1.035);
 }
 
-.model-card h3 {
-  margin: 0;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 1.55rem;
-  color: #ff8586;
+.muse-hover-details {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: clamp(0.8rem, 1.4vw, 1.5rem);
+  color: #fff;
+  background: linear-gradient(180deg, transparent 38%, rgba(0, 0, 0, 0.78) 100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.model-card:hover .muse-hover-details,
+.model-card:focus-visible .muse-hover-details {
+  opacity: 1;
+  visibility: visible;
+}
+
+.muse-unlock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.8rem;
+  color: #ff646d;
+  background: #080808;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.muse-unlock svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.muse-person {
+  font-size: clamp(0.95rem, 1.15vw, 1.3rem);
+  font-weight: 600;
+}
+
+.muse-meta {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(0.58rem, 0.7vw, 0.78rem);
+  letter-spacing: 0.035em;
+}
+
+.muse-meta i {
+  padding: 0 0.3rem;
+  color: #ff646d;
+  font-style: normal;
+}
+
+.model-card-upcoming {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 100, 109, 0.28);
+  background: radial-gradient(ellipse at 50% 38%, rgba(255, 100, 109, 0.12), transparent 55%), #0c0b0b;
+}
+
+.muse-upcoming-label {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: clamp(0.7rem, 1vw, 0.95rem);
+  letter-spacing: 0.16em;
+  line-height: 1.9;
+  text-align: center;
+}
+
+.model-card-upcoming .muse-hover-details {
+  background: linear-gradient(180deg, transparent 25%, rgba(0, 0, 0, 0.92) 100%);
 }
 
 .model-card p,
@@ -971,6 +1043,13 @@ a {
 .detail-intro {
   color: rgba(248, 239, 232, 0.72);
   line-height: 1.75;
+}
+
+@media (hover: none) {
+  .model-card .muse-hover-details {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 .about-page {
