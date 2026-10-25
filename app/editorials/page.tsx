@@ -28,8 +28,6 @@ export const metadata: Metadata = {
 };
 
 export default function EditorialsPage() {
-  const newGallerySlots = ['01'];
-
   return (
     <PageShell>
       <main>
@@ -42,21 +40,27 @@ export default function EditorialsPage() {
           </p>
         </section>
         <section className="archive-grid editorials-archive-grid">
-          {newGallerySlots.map((slot) => (
-            <article className="editorial-card editorial-card-captioned editorial-placeholder editorial-placeholder-card" key={slot}>
-              <div className="editorial-card-media editorial-placeholder-media">
-                <div className="editorial-placeholder-badge">
-                  <BookOpen aria-hidden="true" size={11} />
-                  GALLERY
-                </div>
+          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+            <div className="editorial-card-media editorial-featured-gallery-media">
+              <Image
+                alt="Ana on a city balcony for A Private Kind of Summer"
+                className="object-cover"
+                fill
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                src="/assets/editorial-ana-cover.jpg"
+              />
+              <div className="editorial-featured-gallery-shade" />
+              <div className="editorial-placeholder-badge">
+                <BookOpen aria-hidden="true" size={11} />
+                GALLERY
               </div>
-              <div className="editorial-card-caption">
-                <h3>New Gallery {slot}</h3>
-                <p>A new story is coming soon.</p>
-                <span>Impura Vida</span>
-              </div>
-            </article>
-          ))}
+            </div>
+            <div className="editorial-card-caption">
+              <h2>A Private Kind of Summer</h2>
+              <p>Ana’s Little Vice, where temptation turns an ordinary afternoon into something far more sinful.</p>
+              <span>Impura Vida</span>
+            </div>
+          </article>
           <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
