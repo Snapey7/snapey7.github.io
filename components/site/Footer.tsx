@@ -23,7 +23,7 @@ export function Footer() {
           ))}
         </nav>
         <p className="max-w-xl text-xs leading-6 tracking-[0.18em] text-ivory/45">
-          A PRIVATE DIGITAL EDITORIAL WORLD INSPIRED BY COSTA RICA AFTER DARK.
+          A PRIVATE DIGITAL WORLD BY BEN LUKE SNAPE AND INSPIRED BY COSTA RICA AFTER DARK
         </p>
       </div>
     </footer>
