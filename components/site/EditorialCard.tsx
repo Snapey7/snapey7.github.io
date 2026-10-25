@@ -28,8 +28,10 @@ export function EditorialCard({
           fill
           src={editorial.image}
           style={
-            captioned &&
-            ['monica-riviera', 'alexis-noir', 'willow', 'isabella'].includes(
+            captioned && editorial.slug === 'alexis-noir'
+              ? { objectPosition: 'center 50%' }
+              : captioned &&
+            ['monica-riviera', 'willow', 'isabella'].includes(
               editorial.slug,
             )
               ? { objectPosition: 'center 10%' }

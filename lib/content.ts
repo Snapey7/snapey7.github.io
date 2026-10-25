@@ -108,7 +108,7 @@ export const editorials = [
   {
     slug: 'alexis-noir',
     title: 'ALEXIS NOIR',
-    image: '/assets/alexis-noir-new.jpg',
+    image: '/assets/alexis-editorial.jpg',
     location: 'Uvita',
     model: 'Alexis Noir',
     cardDescription: 'An intimate portrait in deep foliage before the storm.',
