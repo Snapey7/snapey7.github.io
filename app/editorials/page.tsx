@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { BookOpen } from 'lucide-react';
-import { EditorialCard } from '@/components/site/EditorialCard';
+import { EditorialCard, GalleryHoverDetails } from '@/components/site/EditorialCard';
 import { PageShell } from '@/components/site/PageShell';
 import { editorials } from '@/lib/content';
 
@@ -28,6 +27,8 @@ export const metadata: Metadata = {
 };
 
 export default function EditorialsPage() {
+  const futureGallerySlots = [13, 14, 15, 16];
+
   return (
     <PageShell>
       <main>
@@ -40,7 +41,10 @@ export default function EditorialsPage() {
           </p>
         </section>
         <section className="archive-grid editorials-archive-grid">
-          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+          <article
+            className="editorial-card editorial-card-captioned editorial-hover-card editorial-featured-gallery"
+            tabIndex={0}
+          >
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
                 alt="Ana on a city balcony for A Private Kind of Summer"
@@ -49,19 +53,13 @@ export default function EditorialsPage() {
                 sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                 src="/assets/editorial-ana-cover.jpg"
               />
-              <div className="editorial-featured-gallery-shade" />
-              <div className="editorial-placeholder-badge">
-                <BookOpen aria-hidden="true" size={11} />
-                GALLERY
-              </div>
-            </div>
-            <div className="editorial-card-caption">
-              <h2>A Private Kind of Summer</h2>
-              <p>Ana’s Little Vice, where temptation turns an ordinary afternoon into something far more sinful.</p>
-              <span>Impura Vida</span>
+              <GalleryHoverDetails location="Miami" name="Ana" />
             </div>
           </article>
-          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+          <article
+            className="editorial-card editorial-card-captioned editorial-hover-card editorial-featured-gallery"
+            tabIndex={0}
+          >
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
                 alt="Lucy at a secluded cove in Manzanillo, Costa Rica"
@@ -70,19 +68,13 @@ export default function EditorialsPage() {
                 sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                 src="/assets/editorial-manzanillo-cover.jpg"
               />
-              <div className="editorial-featured-gallery-shade" />
-              <div className="editorial-placeholder-badge">
-                <BookOpen aria-hidden="true" size={11} />
-                GALLERY
-              </div>
-            </div>
-            <div className="editorial-card-caption">
-              <h2>Manzanillo Part I — Nothing Beyond the Horizon</h2>
-              <p>Lucy’s secret cove at the edge of the jungle.</p>
-              <span>Impura Vida</span>
+              <GalleryHoverDetails location="Manzanillo" name="Lucy" />
             </div>
           </article>
-          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+          <article
+            className="editorial-card editorial-card-captioned editorial-hover-card editorial-featured-gallery"
+            tabIndex={0}
+          >
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
                 alt="Angie and Daya sharing an afternoon beside a green window"
@@ -91,19 +83,13 @@ export default function EditorialsPage() {
                 sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                 src="/assets/editorial-angie-daya-cover.png"
               />
-              <div className="editorial-featured-gallery-shade" />
-              <div className="editorial-placeholder-badge">
-                <BookOpen aria-hidden="true" size={11} />
-                GALLERY
-              </div>
-            </div>
-            <div className="editorial-card-caption">
-              <h2>Where the Green Comes In</h2>
-              <p>A shared afternoon with Angie and Daya.</p>
-              <span>Impura Vida</span>
+              <GalleryHoverDetails location="Costa Rica" name="Angie & Daya" />
             </div>
           </article>
-          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+          <article
+            className="editorial-card editorial-card-captioned editorial-hover-card editorial-featured-gallery"
+            tabIndex={0}
+          >
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
                 alt="Cynthia in warm, low light for The House Keeps the Shadows"
@@ -113,20 +99,26 @@ export default function EditorialsPage() {
                 sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                 src="/assets/editorial-cynthia-cover.jpg"
               />
-              <div className="editorial-featured-gallery-shade" />
-              <div className="editorial-placeholder-badge">
-                <BookOpen aria-hidden="true" size={11} />
-                GALLERY
-              </div>
-            </div>
-            <div className="editorial-card-caption">
-              <h2>The House Keeps the Shadows</h2>
-              <p>An intimate portrait in warm light and deep shadow.</p>
-              <span>Impura Vida</span>
+              <GalleryHoverDetails location="Costa Rica" name="Cynthia" />
             </div>
           </article>
           {editorials.map((editorial) => (
             <EditorialCard captioned editorial={editorial} key={editorial.slug} />
+          ))}
+          {futureGallerySlots.map((slot) => (
+            <article
+              className="editorial-card editorial-card-captioned editorial-hover-card editorial-upcoming-card"
+              key={slot}
+              tabIndex={0}
+            >
+              <div className="editorial-card-media editorial-upcoming-media">
+                <span className="editorial-upcoming-label">COMING SOON</span>
+                <GalleryHoverDetails
+                  location="Coming soon"
+                  name={`New Gallery ${slot}`}
+                />
+              </div>
+            </article>
           ))}
         </section>
       </main>
