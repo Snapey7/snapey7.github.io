@@ -698,6 +698,7 @@ a {
 
 .models-page > .archive-hero .eyebrow {
   margin-bottom: 0.8rem;
+  font-size: clamp(1rem, 1.4vw, 1.35rem);
 }
 
 .models-page > .archive-hero .section-copy {
