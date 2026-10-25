@@ -191,7 +191,7 @@ export const models = [
   {
     slug: 'lucy',
     name: 'Lucy',
-    image: '/assets/editorial-manzanillo-cover.jpg',
+    image: '/assets/lucy-muse.jpg',
     location: 'Manzanillo',
     bio: 'Lucy finds a private cove at the edge of the jungle in this sunlit coastal story.',
   },
