@@ -237,6 +237,13 @@ export const models = [
     location: 'Limon',
     bio: 'Valentina in a golden, tropical portrait from Limon.',
   },
+  {
+    slug: 'gabriela',
+    name: 'Gabriela',
+    image: '/assets/gabriela-muse.jpg',
+    location: 'Jaco',
+    bio: 'Gabriela in a warm, sunlit portrait from Jaco.',
+  },
 ] as const;
 
 export const membershipTiers = [
