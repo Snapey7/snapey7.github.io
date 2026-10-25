@@ -1291,6 +1291,124 @@ a {
   object-fit: cover;
 }
 
+.auth-page {
+  min-height: 100svh;
+  padding: 7.5rem 1.5rem 5rem;
+  color: #222;
+  background: #fff;
+}
+
+.auth-panel {
+  width: min(100%, 700px);
+  margin: 0 auto;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.auth-panel h1 {
+  margin: 0 0 1.6rem;
+  color: #222;
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+  font-weight: 500;
+  text-align: center;
+}
+
+.auth-socials {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.auth-socials button,
+.auth-submit {
+  min-height: 46px;
+  border: 0;
+  color: #fff;
+  background: #191919;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 160ms ease;
+}
+
+.auth-socials button:hover,
+.auth-submit:hover {
+  background: #353535;
+}
+
+.auth-divider {
+  margin: 1.2rem 0 1rem;
+  color: #444;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.auth-panel form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.auth-panel label {
+  display: grid;
+  gap: 0.35rem;
+  color: #333;
+  font-size: 0.82rem;
+}
+
+.auth-panel input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  padding: 0.65rem 0.75rem;
+  color: #222;
+  background: #fff;
+}
+
+.auth-panel input:focus-visible {
+  outline: 2px solid #536d2e;
+  outline-offset: 1px;
+}
+
+.auth-forgot,
+.auth-switch button {
+  border: 0;
+  padding: 0;
+  color: #536d2e;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.auth-forgot {
+  justify-self: center;
+  margin-top: -0.4rem;
+  font-size: 0.8rem;
+}
+
+.auth-submit {
+  margin-top: 0.3rem;
+  background: #080808;
+}
+
+.auth-notice {
+  margin: 1rem 0 0;
+  border-left: 3px solid #536d2e;
+  padding: 0.65rem 0.8rem;
+  color: #555;
+  background: #f3f5f0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.auth-switch {
+  margin: 1.35rem 0 0;
+  color: #444;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.auth-switch button {
+  font-weight: 600;
+}
+
 @media (max-width: 700px) {
   .model-entry-page {
     padding: 7.5rem 1.25rem 3rem;
