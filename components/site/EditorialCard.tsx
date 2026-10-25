@@ -27,6 +27,11 @@ export function EditorialCard({
           className="object-cover transition duration-700 group-hover:scale-[1.045]"
           fill
           src={editorial.image}
+          style={
+            captioned && editorial.slug === 'monica-riviera'
+              ? { objectPosition: 'center 10%' }
+              : undefined
+          }
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/82" />
