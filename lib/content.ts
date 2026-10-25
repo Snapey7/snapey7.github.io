@@ -181,6 +181,13 @@ export const models = [
     location: 'Papagayo, Costa Rica',
     bio: 'A bold, sun-warmed presence shaped by resort architecture and coastal evenings.',
   },
+  {
+    slug: 'ana',
+    name: 'Ana',
+    image: '/assets/editorial-ana-cover.jpg',
+    location: 'Costa Rica',
+    bio: 'An ordinary afternoon becomes something far more tempting in Ana’s intimate portrait.',
+  },
 ] as const;
 
 export const membershipTiers = [

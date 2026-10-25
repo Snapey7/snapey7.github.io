@@ -693,30 +693,45 @@ a {
 .models-page > .archive-hero {
   min-height: 0;
   padding-bottom: 1rem;
+  text-align: center;
+}
+
+.models-page > .archive-hero .eyebrow {
+  margin-bottom: 0.8rem;
+}
+
+.models-page > .archive-hero .section-copy {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .models-page .model-grid {
-  max-width: 1500px;
+  max-width: 1900px;
   margin-top: 0;
   gap: 12px;
 }
 
 .muse-categories {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
   gap: clamp(1rem, 2vw, 2rem);
-  max-width: 1500px;
-  margin: 0 auto 1rem;
-  padding: 0 5vw;
+  max-width: 1900px;
+  margin: 0 auto 1.25rem;
+  padding: 0 2vw;
   color: rgba(248, 239, 232, 0.62);
   font-size: 0.7rem;
   letter-spacing: 0.08em;
 }
 
-.muse-categories .is-current {
+.muse-categories a {
+  transition: color 180ms ease;
+}
+
+.muse-categories a:hover,
+.muse-categories a:focus-visible {
   color: #ff8586;
-  text-decoration: underline;
-  text-underline-offset: 0.35rem;
 }
 
 .london-destinations-page {
@@ -922,7 +937,7 @@ a {
 }
 
 .model-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .model-card {
@@ -934,7 +949,7 @@ a {
 
 .model-card img {
   width: 100%;
-  aspect-ratio: 0.66;
+  aspect-ratio: 0.62;
   object-fit: cover;
 }
 
@@ -1251,7 +1266,7 @@ a {
   }
 
   .models-page .model-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .muse-categories {
