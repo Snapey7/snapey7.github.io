@@ -216,6 +216,13 @@ export const models = [
     location: 'Playa Carmen',
     bio: 'Daya in a quiet balcony portrait framed by the deep greens of Playa Carmen.',
   },
+  {
+    slug: 'rachel',
+    name: 'Rachel',
+    image: '/assets/rachel-muse.png',
+    location: 'San Jose',
+    bio: 'Rachel in a warm, intimate portrait.',
+  },
 ] as const;
 
 export const membershipTiers = [
