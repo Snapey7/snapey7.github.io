@@ -230,6 +230,13 @@ export const models = [
     location: 'Santa Teresa',
     bio: 'Chloe in a dreamy, after-dark portrait from Santa Teresa.',
   },
+  {
+    slug: 'valentina',
+    name: 'Valentina',
+    image: '/assets/valentina-muse.jpg',
+    location: 'Limon',
+    bio: 'Valentina in a golden, tropical portrait from Limon.',
+  },
 ] as const;
 
 export const membershipTiers = [
