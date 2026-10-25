@@ -195,6 +195,13 @@ export const models = [
     location: 'Manzanillo',
     bio: 'Lucy finds a private cove at the edge of the jungle in this sunlit coastal story.',
   },
+  {
+    slug: 'angie',
+    name: 'Angie',
+    image: '/assets/angie-muse.jpg',
+    location: 'Playa Carmen',
+    bio: 'A sunlit portrait of Angie surrounded by the lush greens of Playa Carmen.',
+  },
 ] as const;
 
 export const membershipTiers = [
