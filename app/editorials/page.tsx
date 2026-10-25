@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export default function EditorialsPage() {
-  const newGallerySlots = ['01', '02', '03'];
+  const newGallerySlots = ['01', '02'];
 
   return (
     <PageShell>
@@ -57,6 +57,27 @@ export default function EditorialsPage() {
               </div>
             </article>
           ))}
+          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+            <div className="editorial-card-media editorial-featured-gallery-media">
+              <Image
+                alt="Angie and Daya sharing an afternoon beside a green window"
+                className="object-cover"
+                fill
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                src="/assets/editorial-angie-daya-cover.png"
+              />
+              <div className="editorial-featured-gallery-shade" />
+              <div className="editorial-placeholder-badge">
+                <BookOpen aria-hidden="true" size={11} />
+                GALLERY
+              </div>
+            </div>
+            <div className="editorial-card-caption">
+              <h2>Where the Green Comes In</h2>
+              <p>A shared afternoon with Angie and Daya.</p>
+              <span>Impura Vida</span>
+            </div>
+          </article>
           <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
