@@ -32,8 +32,7 @@ export default function EditorialsPage() {
     <PageShell>
       <main>
         <section className="archive-hero editorials-archive-hero">
-          <p className="eyebrow">EDITORIALS</p>
-          <h1>Inspired Vision</h1>
+          <h1>Editorials</h1>
           <p className="section-copy">
             Creativity's whisper, captured after dark. Here is a peak into what
             members are experiencing right now, subscribe to go all the way.
