@@ -69,7 +69,6 @@ export default function EditorialsPage() {
               GALLERY
             </div>
             <div className="editorial-featured-gallery-copy">
-              <p>EDITORIAL 01 · CYNTHIA</p>
               <h2>The House Keeps the Shadows</h2>
             </div>
           </article>
