@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { BookOpen } from 'lucide-react';
 import { EditorialCard } from '@/components/site/EditorialCard';
 import { PageShell } from '@/components/site/PageShell';
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export default function EditorialsPage() {
-  const newGallerySlots = ['01', '02', '03', '04'];
+  const newGallerySlots = ['01', '02', '03'];
 
   return (
     <PageShell>
@@ -53,6 +54,25 @@ export default function EditorialsPage() {
               </div>
             </article>
           ))}
+          <article className="editorial-card editorial-placeholder editorial-featured-gallery">
+            <Image
+              alt="Cynthia in warm, low light for The House Keeps the Shadows"
+              className="object-cover"
+              fill
+              priority
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+              src="/assets/editorial-cynthia-cover.jpg"
+            />
+            <div className="editorial-featured-gallery-shade" />
+            <div className="editorial-placeholder-badge">
+              <BookOpen aria-hidden="true" size={11} />
+              GALLERY
+            </div>
+            <div className="editorial-featured-gallery-copy">
+              <p>EDITORIAL 01 · CYNTHIA</p>
+              <h2>The House Keeps the Shadows</h2>
+            </div>
+          </article>
           {editorials.map((editorial) => (
             <EditorialCard editorial={editorial} key={editorial.slug} />
           ))}

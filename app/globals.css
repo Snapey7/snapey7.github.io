@@ -611,6 +611,50 @@ a {
   letter-spacing: 0.15em;
 }
 
+.editorial-featured-gallery {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  align-items: flex-end;
+  border-color: rgba(248, 239, 232, 0.18);
+  background: #080605;
+}
+
+.editorial-featured-gallery > img {
+  z-index: -2;
+  object-position: center 38%;
+}
+
+.editorial-featured-gallery-shade {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 18%, rgba(0, 0, 0, 0.1) 42%, rgba(0, 0, 0, 0.82) 100%);
+}
+
+.editorial-featured-gallery-copy {
+  width: 100%;
+  padding: 1rem 0.8rem 1.25rem;
+  text-align: center;
+}
+
+.editorial-featured-gallery-copy p {
+  margin: 0 0 0.45rem;
+  color: #ff7779;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.editorial-featured-gallery-copy h2 {
+  margin: 0;
+  color: rgba(248, 239, 232, 0.96);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1rem, 1.45vw, 1.35rem);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
 .destinations-page {
   min-height: 100svh;
   padding: 6.8rem 5vw 1.7rem;
