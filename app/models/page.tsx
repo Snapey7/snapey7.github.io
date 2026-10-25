@@ -3,7 +3,7 @@ import { LockKeyhole } from 'lucide-react';
 import { PageShell } from '@/components/site/PageShell';
 import { models } from '@/lib/content';
 
-const upcomingMuses = ['New muse', 'New muse'];
+const upcomingMuses = ['New muse'];
 
 function MuseDetails({ name, location }: { name: string; location: string }) {
   return (

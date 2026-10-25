@@ -161,32 +161,18 @@ export const editorials = [
 
 export const models = [
   {
-    slug: 'monica-riviera',
-    name: 'Monica Riviera',
-    image: '/assets/editorial-monica-riviera.png',
-    location: 'Nosara, Costa Rica',
-    bio: 'Monica brings a cinematic stillness to humid interiors and late-night coastal stories.',
-  },
-  {
-    slug: 'alexis-noir',
-    name: 'Alexis Noir',
-    image: '/assets/editorial-alexis-noir.png',
-    location: 'Uvita, Costa Rica',
-    bio: 'A jungle muse whose editorials lean into shadow, strength, and quiet sensuality.',
-  },
-  {
-    slug: 'isabella',
-    name: 'Isabella',
-    image: '/assets/editorial-isabella.png',
-    location: 'Papagayo, Costa Rica',
-    bio: 'A bold, sun-warmed presence shaped by resort architecture and coastal evenings.',
-  },
-  {
     slug: 'ana',
     name: 'Ana',
     image: '/assets/editorial-ana-cover.jpg',
     location: 'Miami',
     bio: 'An ordinary afternoon becomes something far more tempting in Ana’s intimate portrait.',
+  },
+  {
+    slug: 'monica-riviera',
+    name: 'Monica Riviera',
+    image: '/assets/editorial-monica-riviera.png',
+    location: 'Nosara, Costa Rica',
+    bio: 'Monica brings a cinematic stillness to humid interiors and late-night coastal stories.',
   },
   {
     slug: 'lucy',
@@ -196,11 +182,32 @@ export const models = [
     bio: 'Lucy finds a private cove at the edge of the jungle in this sunlit coastal story.',
   },
   {
+    slug: 'isabella',
+    name: 'Isabella',
+    image: '/assets/editorial-isabella.png',
+    location: 'Papagayo, Costa Rica',
+    bio: 'A bold, sun-warmed presence shaped by resort architecture and coastal evenings.',
+  },
+  {
     slug: 'angie',
     name: 'Angie',
     image: '/assets/angie-muse.jpg',
     location: 'Playa Carmen',
     bio: 'A sunlit portrait of Angie surrounded by the lush greens of Playa Carmen.',
+  },
+  {
+    slug: 'alexis-noir',
+    name: 'Alexis Noir',
+    image: '/assets/editorial-alexis-noir.png',
+    location: 'Uvita, Costa Rica',
+    bio: 'A jungle muse whose editorials lean into shadow, strength, and quiet sensuality.',
+  },
+  {
+    slug: 'daya',
+    name: 'Daya',
+    image: '/assets/daya-muse.jpg',
+    location: 'Playa Carmen',
+    bio: 'Daya in a quiet balcony portrait framed by the deep greens of Playa Carmen.',
   },
 ] as const;
 
