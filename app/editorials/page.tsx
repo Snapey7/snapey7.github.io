@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export default function EditorialsPage() {
-  const newGallerySlots = ['01', '02'];
+  const newGallerySlots = ['01'];
 
   return (
     <PageShell>
@@ -57,6 +57,27 @@ export default function EditorialsPage() {
               </div>
             </article>
           ))}
+          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+            <div className="editorial-card-media editorial-featured-gallery-media">
+              <Image
+                alt="Lucy at a secluded cove in Manzanillo, Costa Rica"
+                className="object-cover"
+                fill
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                src="/assets/editorial-manzanillo-cover.jpg"
+              />
+              <div className="editorial-featured-gallery-shade" />
+              <div className="editorial-placeholder-badge">
+                <BookOpen aria-hidden="true" size={11} />
+                GALLERY
+              </div>
+            </div>
+            <div className="editorial-card-caption">
+              <h2>Manzanillo Part I — Nothing Beyond the Horizon</h2>
+              <p>Lucy’s secret cove at the edge of the jungle.</p>
+              <span>Impura Vida</span>
+            </div>
+          </article>
           <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
