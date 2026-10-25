@@ -638,13 +638,10 @@ a {
 }
 
 .editorial-card-caption p {
-  overflow: hidden;
   margin: 0.45rem 0 0;
   color: rgba(248, 239, 232, 0.58);
-  font-size: 0.82rem;
-  line-height: 1.35;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 0.72rem;
+  line-height: 1.4;
 }
 
 .editorial-card-caption span {
