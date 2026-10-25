@@ -223,6 +223,13 @@ export const models = [
     location: 'San Jose',
     bio: 'Rachel in a warm, intimate portrait.',
   },
+  {
+    slug: 'chloe',
+    name: 'Chloe',
+    image: '/assets/chloe-muse.jpg',
+    location: 'Santa Teresa',
+    bio: 'Chloe in a dreamy, after-dark portrait from Santa Teresa.',
+  },
 ] as const;
 
 export const membershipTiers = [
