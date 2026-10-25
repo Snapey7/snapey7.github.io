@@ -59,6 +59,7 @@ export const editorials = [
     image: '/assets/editorial-the-haven.png',
     location: 'Santa Teresa',
     model: 'Valeria Sol',
+    cardDescription: 'A candlelit jungle refuge shaped by salt air and still water.',
     photographer: 'Matteo Cruz',
     date: 'September 2026',
     intro:
@@ -71,6 +72,7 @@ export const editorials = [
     image: '/assets/editorial-monica-riviera.png',
     location: 'Nosara',
     model: 'Monica Riviera',
+    cardDescription: 'A muse moves between ceremony and escape in rain-lit interiors.',
     photographer: 'Isla Monroe',
     date: 'August 2026',
     intro:
@@ -83,6 +85,7 @@ export const editorials = [
     image: '/assets/editorial-coastal-escape.png',
     location: 'Mal Pais',
     model: 'The Coast Muses',
+    cardDescription: 'Linen, night breeze, and slow light shape this coastal story.',
     photographer: 'Rafael Stone',
     date: 'August 2026',
     intro:
@@ -95,6 +98,7 @@ export const editorials = [
     image: '/assets/editorial-golden-horizons.png',
     location: 'Guanacaste',
     model: 'Lucia Mar',
+    cardDescription: 'A private postcard from Costa Rica’s sunlit dry coast.',
     photographer: 'Camille Reyes',
     date: 'July 2026',
     intro:
@@ -107,6 +111,7 @@ export const editorials = [
     image: '/assets/editorial-alexis-noir.png',
     location: 'Uvita',
     model: 'Alexis Noir',
+    cardDescription: 'An intimate portrait in deep foliage before the storm.',
     photographer: 'Nico Vale',
     date: 'July 2026',
     intro:
@@ -119,6 +124,7 @@ export const editorials = [
     image: '/assets/editorial-willow.png',
     location: 'Dominical',
     model: 'Willow',
+    cardDescription: 'A portrait study in shadow, texture, and tropical warmth.',
     photographer: 'Sofia Lune',
     date: 'June 2026',
     intro:
@@ -131,6 +137,7 @@ export const editorials = [
     image: '/assets/editorial-sanctuary.png',
     location: 'Arenal',
     model: 'Casa Muses',
+    cardDescription: 'Still water and volcanic stone create a hidden refuge.',
     photographer: 'Adrian Hale',
     date: 'June 2026',
     intro:
@@ -143,6 +150,7 @@ export const editorials = [
     image: '/assets/editorial-isabella.png',
     location: 'Papagayo',
     model: 'Isabella',
+    cardDescription: 'A sunlit silhouette meets palms and after-dark confidence.',
     photographer: 'Mara Voss',
     date: 'May 2026',
     intro:

@@ -47,7 +47,7 @@ export function EditorialCard({
       {captioned && (
         <div className="editorial-card-caption">
           <h3>{displayTitle}</h3>
-          <p>{editorial.intro}</p>
+          <p>{captioned ? editorial.cardDescription : editorial.intro}</p>
           <span>Impura Vida</span>
         </div>
       )}
