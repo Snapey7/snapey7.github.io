@@ -3,8 +3,6 @@ import { LockKeyhole } from 'lucide-react';
 import { PageShell } from '@/components/site/PageShell';
 import { models } from '@/lib/content';
 
-const upcomingMuses = ['New muse'];
-
 function MuseDetails({ name, location }: { name: string; location: string }) {
   return (
     <div className="muse-hover-details">
@@ -36,12 +34,6 @@ export default function ModelsPage() {
               <img alt={model.name} src={model.image} />
               <MuseDetails name={model.name} location={model.location} />
             </Link>
-          ))}
-          {upcomingMuses.map((name, index) => (
-            <article className="model-card model-card-upcoming" key={`${name}-${index}`}>
-              <div className="muse-upcoming-label">MORE MUSES<br />COMING SOON</div>
-              <MuseDetails name="New muse" location="Coming soon" />
-            </article>
           ))}
         </section>
       </main>

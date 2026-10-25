@@ -196,6 +196,13 @@ export const models = [
     bio: 'A sunlit portrait of Angie surrounded by the lush greens of Playa Carmen.',
   },
   {
+    slug: 'cynthia',
+    name: 'Cynthia',
+    image: '/assets/cynthia-muse.jpg',
+    location: 'Santa Teresa',
+    bio: 'An intimate, firelit portrait of Cynthia in Santa Teresa.',
+  },
+  {
     slug: 'alexis-noir',
     name: 'Alexis Noir',
     image: '/assets/editorial-alexis-noir.png',
