@@ -37,10 +37,6 @@ export default function ModelsPage() {
               <MuseDetails name={model.name} location={model.location} />
             </Link>
           ))}
-          <Link className="model-card" href="/models/lucy" aria-label="Lucy, Manzanillo">
-            <img alt="Lucy on the shore at Manzanillo" src="/assets/editorial-manzanillo-cover.jpg" />
-            <MuseDetails name="Lucy" location="Manzanillo" />
-          </Link>
           {upcomingMuses.map((name, index) => (
             <article className="model-card model-card-upcoming" key={`${name}-${index}`}>
               <div className="muse-upcoming-label">MORE MUSES<br />COMING SOON</div>
