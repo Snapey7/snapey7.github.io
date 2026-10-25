@@ -108,7 +108,7 @@ export const editorials = [
   {
     slug: 'alexis-noir',
     title: 'ALEXIS NOIR',
-    image: '/assets/editorial-alexis-noir.png',
+    image: '/assets/alexis-noir-new.jpg',
     location: 'Uvita',
     model: 'Alexis Noir',
     cardDescription: 'An intimate portrait in deep foliage before the storm.',
@@ -205,7 +205,7 @@ export const models = [
   {
     slug: 'alexis-noir',
     name: 'Alexis Noir',
-    image: '/assets/editorial-alexis-noir.png',
+    image: '/assets/alexis-noir-new.jpg',
     location: 'Uvita, Costa Rica',
     bio: 'A jungle muse whose editorials lean into shadow, strength, and quiet sensuality.',
   },
