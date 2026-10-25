@@ -182,11 +182,11 @@ export const models = [
     bio: 'Lucy finds a private cove at the edge of the jungle in this sunlit coastal story.',
   },
   {
-    slug: 'isabella',
-    name: 'Isabella',
-    image: '/assets/editorial-isabella.png',
-    location: 'Papagayo, Costa Rica',
-    bio: 'A bold, sun-warmed presence shaped by resort architecture and coastal evenings.',
+    slug: 'alexis-noir',
+    name: 'Alexis',
+    image: '/assets/alexis-noir-new.jpg',
+    location: 'Uvita, Costa Rica',
+    bio: 'A jungle muse whose editorials lean into shadow, strength, and quiet sensuality.',
   },
   {
     slug: 'angie',
@@ -203,11 +203,11 @@ export const models = [
     bio: 'An intimate, firelit portrait of Cynthia in Santa Teresa.',
   },
   {
-    slug: 'alexis-noir',
-    name: 'Alexis Noir',
-    image: '/assets/alexis-noir-new.jpg',
-    location: 'Uvita, Costa Rica',
-    bio: 'A jungle muse whose editorials lean into shadow, strength, and quiet sensuality.',
+    slug: 'isabella',
+    name: 'Isabella',
+    image: '/assets/editorial-isabella.png',
+    location: 'Papagayo, Costa Rica',
+    bio: 'A bold, sun-warmed presence shaped by resort architecture and coastal evenings.',
   },
   {
     slug: 'daya',
