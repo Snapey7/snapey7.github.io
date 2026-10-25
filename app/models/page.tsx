@@ -13,6 +13,11 @@ export default function ModelsPage() {
             Portrait-led profiles from the women shaping the IMPURA VIDA visual world.
           </p>
         </section>
+        <div className="muse-categories" aria-label="Muse features">
+          <span className="is-current">BEYOND</span>
+          <span>BEHIND THE SCENES</span>
+          <span>INTERVIEWS</span>
+        </div>
         <section className="model-grid">
           {models.map((model) => (
             <Link className="model-card" href={`/models/${model.slug}`} key={model.slug}>
