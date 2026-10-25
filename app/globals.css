@@ -569,10 +569,38 @@ a {
 
 .editorial-placeholder {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border: 1px solid rgba(248, 239, 232, 0.18);
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(255, 100, 107, 0.12), transparent 58%),
+    linear-gradient(145deg, #14100f, #050505 70%);
+}
+
+.editorial-card-captioned {
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: auto;
+  overflow: visible;
+  background: transparent;
+  text-align: left;
+}
+
+.editorial-placeholder-card {
+  border: 0;
+  background: transparent;
+}
+
+.editorial-card-captioned .editorial-card-media {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.6;
+  flex: none;
+  overflow: hidden;
+  border: 1px solid rgba(248, 239, 232, 0.12);
+  border-radius: 14px;
+  background: #0b0908;
+}
+
+.editorial-placeholder-card .editorial-card-media {
   background:
     radial-gradient(ellipse at 50% 38%, rgba(255, 100, 107, 0.12), transparent 58%),
     linear-gradient(145deg, #14100f, #050505 70%);
@@ -580,6 +608,7 @@ a {
 
 .editorial-placeholder-badge {
   position: absolute;
+  z-index: 2;
   top: 1rem;
   left: 1rem;
   display: flex;
@@ -591,60 +620,54 @@ a {
   letter-spacing: 0.16em;
 }
 
-.editorial-placeholder-copy {
-  padding: 1rem;
-  text-align: center;
+.editorial-card-caption {
+  min-width: 0;
+  padding: 0.8rem 0.25rem 0;
 }
 
-.editorial-placeholder-copy p {
+.editorial-card-caption h2,
+.editorial-card-caption h3 {
   margin: 0;
-  color: rgba(248, 239, 232, 0.88);
+  color: rgba(248, 239, 232, 0.96);
   font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(1rem, 1.4vw, 1.3rem);
+  font-size: clamp(1rem, 1.5vw, 1.22rem);
+  font-weight: 400;
+  line-height: 1.25;
+  text-transform: none;
 }
 
-.editorial-placeholder-copy span {
+.editorial-card-caption p {
+  overflow: hidden;
+  margin: 0.45rem 0 0;
+  color: rgba(248, 239, 232, 0.58);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editorial-card-caption span {
   display: block;
-  margin-top: 0.65rem;
-  color: rgba(248, 239, 232, 0.55);
+  margin-top: 0.7rem;
+  color: rgba(255, 119, 121, 0.84);
   font-size: 8px;
-  letter-spacing: 0.15em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
 }
 
 .editorial-featured-gallery {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  align-items: flex-end;
-  border-color: rgba(248, 239, 232, 0.18);
-  background: #080605;
+  border: 0;
 }
 
-.editorial-featured-gallery > img {
-  z-index: -2;
+.editorial-featured-gallery-media > img {
   object-position: center 38%;
 }
 
 .editorial-featured-gallery-shade {
   position: absolute;
-  z-index: -1;
+  z-index: 1;
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 18%, rgba(0, 0, 0, 0.1) 42%, rgba(0, 0, 0, 0.82) 100%);
-}
-
-.editorial-featured-gallery-copy {
-  width: 100%;
-  padding: 1rem 0.8rem 1.25rem;
-  text-align: center;
-}
-
-.editorial-featured-gallery-copy h2 {
-  margin: 0;
-  color: rgba(248, 239, 232, 0.96);
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(1rem, 1.45vw, 1.35rem);
-  font-weight: 400;
-  line-height: 1.15;
 }
 
 .destinations-page {

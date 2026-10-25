@@ -43,37 +43,44 @@ export default function EditorialsPage() {
         </section>
         <section className="archive-grid editorials-archive-grid">
           {newGallerySlots.map((slot) => (
-            <article className="editorial-card editorial-placeholder" key={slot}>
+            <article className="editorial-card editorial-card-captioned editorial-placeholder editorial-placeholder-card" key={slot}>
+              <div className="editorial-card-media editorial-placeholder-media">
+                <div className="editorial-placeholder-badge">
+                  <BookOpen aria-hidden="true" size={11} />
+                  GALLERY
+                </div>
+              </div>
+              <div className="editorial-card-caption">
+                <h3>New Gallery {slot}</h3>
+                <p>A new story is coming soon.</p>
+                <span>Impura Vida</span>
+              </div>
+            </article>
+          ))}
+          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+            <div className="editorial-card-media editorial-featured-gallery-media">
+              <Image
+                alt="Cynthia in warm, low light for The House Keeps the Shadows"
+                className="object-cover"
+                fill
+                priority
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                src="/assets/editorial-cynthia-cover.jpg"
+              />
+              <div className="editorial-featured-gallery-shade" />
               <div className="editorial-placeholder-badge">
                 <BookOpen aria-hidden="true" size={11} />
                 GALLERY
               </div>
-              <div className="editorial-placeholder-copy">
-                <p>NEW GALLERY</p>
-                <span>PHOTO TO BE ADDED</span>
-              </div>
-            </article>
-          ))}
-          <article className="editorial-card editorial-placeholder editorial-featured-gallery">
-            <Image
-              alt="Cynthia in warm, low light for The House Keeps the Shadows"
-              className="object-cover"
-              fill
-              priority
-              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-              src="/assets/editorial-cynthia-cover.jpg"
-            />
-            <div className="editorial-featured-gallery-shade" />
-            <div className="editorial-placeholder-badge">
-              <BookOpen aria-hidden="true" size={11} />
-              GALLERY
             </div>
-            <div className="editorial-featured-gallery-copy">
+            <div className="editorial-card-caption">
               <h2>The House Keeps the Shadows</h2>
+              <p>An intimate portrait in warm light and deep shadow.</p>
+              <span>Impura Vida</span>
             </div>
           </article>
           {editorials.map((editorial) => (
-            <EditorialCard editorial={editorial} key={editorial.slug} />
+            <EditorialCard captioned editorial={editorial} key={editorial.slug} />
           ))}
         </section>
       </main>
