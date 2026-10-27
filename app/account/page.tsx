@@ -3,10 +3,12 @@ import { PageShell } from '@/components/site/PageShell';
 import { signOut } from '@/app/actions/auth';
 import { getSupabaseConfig } from '@/lib/supabase/config';
 import { createClient } from '@/lib/supabase/server';
+import { getCurrentMembership } from '@/lib/membership';
+import { createCancelSubscriptionUrl } from '@/lib/billing/verotel';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AccountPage({ searchParams }: { searchParams: Promise<{ passwordUpdated?: string }> }) {
+export default async function AccountPage({ searchParams }: { searchParams: Promise<{ passwordUpdated?: string; checkout?: string; membership?: string }> }) {
   if (!getSupabaseConfig()) {
     return (
       <PageShell>
@@ -26,6 +28,10 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
 
   const params = await searchParams;
   const displayName = typeof user.user_metadata?.display_name === 'string' ? user.user_metadata.display_name : '';
+  const membership = await getCurrentMembership();
+  const cancelUrl = membership?.status === 'active'
+    ? createCancelSubscriptionUrl(membership.provider_subscription_id)
+    : null;
 
   return (
     <PageShell>
@@ -35,7 +41,23 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <p>{displayName ? `Welcome, ${displayName}.` : 'You are signed in.'}</p>
           <p className="account-email">{user.email}</p>
           {params.passwordUpdated === '1' && <p className="auth-notice is-success" role="status">Your password has been updated.</p>}
-          <p className="account-membership-note">Membership access will appear here once subscriptions are connected.</p>
+          {membership ? (
+            <div className="account-membership-note">
+              <p><strong>{membership.tier === 'impura' ? 'IMPURA' : 'STANDARD'} MEMBERSHIP</strong></p>
+              <p>Status: {membership.status === 'canceled' ? 'Canceled; access remains until the paid period ends.' : 'Active'}</p>
+              {membership.current_period_end && <p>Access through {new Date(membership.current_period_end).toLocaleDateString('en-GB', { dateStyle: 'long', timeZone: 'UTC' })}.</p>}
+              <a className="under-link" href="/library">OPEN YOUR PRIVATE LIBRARY</a>
+              {cancelUrl && <a className="under-link" href={cancelUrl}>MANAGE OR CANCEL MEMBERSHIP</a>}
+            </div>
+          ) : (
+            <p className="account-membership-note">
+              {params.checkout === 'returned'
+                ? 'Your payment page returned. We are waiting for the provider’s verified confirmation before enabling membership access.'
+                : 'No active membership yet.'}{' '}
+              <a className="under-link" href="/members">VIEW MEMBERSHIPS</a>
+            </p>
+          )}
+          {params.membership === 'active' && <p className="auth-notice" role="status">You already have an active membership. Contact support if you need help changing your tier.</p>}
           <form action={signOut}>
             <button className="auth-submit" type="submit">Sign out</button>
           </form>
