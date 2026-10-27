@@ -1312,12 +1312,6 @@ a {
   text-align: center;
 }
 
-.auth-socials {
-  display: grid;
-  gap: 0.9rem;
-}
-
-.auth-socials button,
 .auth-submit {
   min-height: 46px;
   border: 0;
@@ -1328,7 +1322,6 @@ a {
   transition: background 160ms ease;
 }
 
-.auth-socials button:hover,
 .auth-submit:hover {
   background: #353535;
 }
@@ -1388,6 +1381,11 @@ a {
   background: #080808;
 }
 
+.auth-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .auth-notice {
   margin: 1rem 0 0;
   border-left: 3px solid #536d2e;
@@ -1396,6 +1394,29 @@ a {
   background: #f3f5f0;
   font-size: 0.85rem;
   line-height: 1.5;
+}
+
+.auth-notice.is-error {
+  border-left-color: #d34854;
+  background: #fff2f2;
+}
+
+.auth-notice.is-success {
+  border-left-color: #536d2e;
+}
+
+.account-panel > p {
+  color: #444;
+  text-align: center;
+}
+
+.account-panel .account-email {
+  margin-top: 0.35rem;
+  color: #777;
+}
+
+.account-panel .account-membership-note {
+  margin: 2rem 0;
 }
 
 .auth-switch {
