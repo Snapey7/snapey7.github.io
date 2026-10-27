@@ -1,11 +1,14 @@
 import Image from 'next/image';
 import { BadgeCheck, Eye, Film, Images, MessageCircle, Shell } from 'lucide-react';
 import { membershipTiers } from '@/lib/content';
+import { beginMembershipCheckout } from '@/app/actions/auth';
+import { isMembershipCheckoutReady } from '@/lib/billing/verotel';
 import { SectionHeading } from './SectionHeading';
 
 const icons = [Shell, Eye, MessageCircle, Images, Film];
 
 export function MembershipSection({ showHeading = true }: { showHeading?: boolean }) {
+  const checkoutReady = isMembershipCheckoutReady();
   return (
     <section className="membership-section" id="membership">
       {showHeading ? (
@@ -47,13 +50,12 @@ export function MembershipSection({ showHeading = true }: { showHeading?: boolea
                 })}
               </ul>
               <div className="mt-auto space-y-3">
-                <a className={`buy-button ${tier.featured ? 'featured' : ''}`} href="/members">
-                  BUY NOW · {'$'}
-                  {tier.price}
-                </a>
-                <a className="annual-button" href="/members">
-                  SAVE 17% · SIGN UP FOR ANNUAL NOW
-                </a>
+                <form action={beginMembershipCheckout}>
+                  <input type="hidden" name="tier" value={tier.name.toLowerCase()} />
+                  <button className={`buy-button ${tier.featured ? 'featured' : ''}`} disabled={!checkoutReady} type="submit">
+                    {checkoutReady ? `JOIN ${tier.name} · $${tier.price}` : 'CHECKOUT OPENING SOON'}
+                  </button>
+                </form>
               </div>
             </div>
           </article>

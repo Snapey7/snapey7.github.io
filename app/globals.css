@@ -454,6 +454,22 @@ a {
   color: #ff8e8f;
 }
 
+.membership-card .buy-button {
+  display: block;
+  border: 1px solid rgba(255, 100, 107, 0.55);
+  padding: 0.8rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.membership-card .buy-button:disabled {
+  border-color: rgba(248, 239, 232, 0.2);
+  color: rgba(248, 239, 232, 0.62);
+  cursor: not-allowed;
+}
+
 .impact-section {
   position: relative;
   min-height: 720px;
@@ -1475,6 +1491,48 @@ a {
   margin: 2rem 0;
 }
 
+.account-membership-note .under-link {
+  display: inline-block;
+  margin: 0.3rem 0.45rem;
+}
+
+.member-library {
+  width: min(100%, 1180px);
+}
+
+.member-library .eyebrow {
+  color: #536d2e;
+  text-align: center;
+}
+
+.member-library-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.member-library-card h2 {
+  margin: 0.65rem 0 0;
+  color: #222;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.member-library-image {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #e9e7e2;
+}
+
+.member-library-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .auth-switch {
   margin: 1.35rem 0 0;
   color: #444;
@@ -1487,6 +1545,9 @@ a {
 }
 
 @media (max-width: 700px) {
+  .member-library-grid {
+    grid-template-columns: 1fr;
+  }
   .model-entry-page {
     padding: 7.5rem 1.25rem 3rem;
   }

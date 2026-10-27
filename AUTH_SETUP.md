@@ -1,6 +1,6 @@
 # Account setup
 
-The site now uses Supabase Auth for email registration, sign-in, sign-out, email confirmation, and password reset. It does not yet grant paid membership access or protect the existing editorial image files.
+The site uses Supabase Auth for email registration, sign-in, sign-out, email confirmation, and password reset. Paid membership state and a private media library are implemented in the `supabase/migrations/202610270001_memberships_and_private_media.sql` migration. Complete the payment/storage setup in `BACKEND_SETUP.md` before selling memberships.
 
 ## Connect Supabase
 
@@ -14,6 +14,4 @@ The account page is at `/account`. It checks the authenticated user server-side.
 
 ## Payments and members-only media
 
-Stripe was requested for Billing, Tax, Payments, Radar, and Connect, but creating a Stripe account is not the same as receiving approval for a particular business or content category. Confirm eligibility for the real site and subscriber-only content with Stripe before enabling live charges. Keep any secret API keys in Vercel/server environment variables; never put them in browser code or chat.
-
-The current gallery images live in `public/`, which makes them publicly retrievable by URL. Before selling access, move paid media into private storage and issue short-lived, authorized URLs only after checking a verified active subscription. A client-side blur or hidden button is not a security barrier. Billing webhooks must update server-side membership entitlements, and access checks must validate them on every protected request.
+See `BACKEND_SETUP.md` for the processor, migration, credentials, callback, and private media setup. The editorial cover images currently in `public/` remain public previews; put full subscriber releases in the private `member-media` bucket instead.

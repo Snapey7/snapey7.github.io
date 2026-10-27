@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseConfig } from '@/lib/supabase/config';
+import { startMembershipCheckout } from '@/lib/billing/verotel';
 
 export type AuthFormState = { type?: 'error' | 'success'; message?: string };
 
@@ -70,4 +71,9 @@ export async function signOut() {
     await supabase.auth.signOut();
   }
   redirect('/login');
+}
+
+export async function beginMembershipCheckout(formData: FormData) {
+  const tier = String(formData.get('tier') || '');
+  await startMembershipCheckout(tier);
 }
