@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import { BookOpen } from 'lucide-react';
 import { EditorialCard } from '@/components/site/EditorialCard';
 import { PageShell } from '@/components/site/PageShell';
@@ -32,15 +33,14 @@ export default function EditorialsPage() {
     <PageShell>
       <main>
         <section className="archive-hero editorials-archive-hero">
-          <p className="eyebrow">LATEST DROPS</p>
-          <h1>Inspired Vision</h1>
+          <h1>Editorials</h1>
           <p className="section-copy">
             Creativity's whisper, captured after dark. Here is a peak into what
             members are experiencing right now, subscribe to go all the way.
           </p>
         </section>
         <section className="archive-grid editorials-archive-grid">
-          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+          <Link href="/models/ana" className="editorial-card group editorial-card-captioned editorial-featured-gallery">
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
                 alt="Ana on a city balcony for A Private Kind of Summer"
@@ -59,9 +59,10 @@ export default function EditorialsPage() {
               <h2>A Private Kind of Summer</h2>
               <p>Ana’s Little Vice, where temptation turns an ordinary afternoon into something far more sinful.</p>
               <span>Impura Vida</span>
+              <span className="editorial-hover-cta">VIEW STORY <b aria-hidden="true">→</b></span>
             </div>
-          </article>
-          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+          </Link>
+          <Link href="/models/lucy" className="editorial-card group editorial-card-captioned editorial-featured-gallery">
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
                 alt="Lucy at a secluded cove in Manzanillo, Costa Rica"
@@ -80,9 +81,10 @@ export default function EditorialsPage() {
               <h2>Manzanillo Part I — Nothing Beyond the Horizon</h2>
               <p>Lucy’s secret cove at the edge of the jungle.</p>
               <span>Impura Vida</span>
+              <span className="editorial-hover-cta">VIEW STORY <b aria-hidden="true">→</b></span>
             </div>
-          </article>
-          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+          </Link>
+          <Link href="/models/angie" className="editorial-card group editorial-card-captioned editorial-featured-gallery">
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
                 alt="Angie and Daya sharing an afternoon beside a green window"
@@ -101,9 +103,10 @@ export default function EditorialsPage() {
               <h2>Where the Green Comes In</h2>
               <p>A shared afternoon with Angie and Daya.</p>
               <span>Impura Vida</span>
+              <span className="editorial-hover-cta">VIEW STORY <b aria-hidden="true">→</b></span>
             </div>
-          </article>
-          <article className="editorial-card editorial-card-captioned editorial-featured-gallery">
+          </Link>
+          <Link href="/models/cynthia" className="editorial-card group editorial-card-captioned editorial-featured-gallery">
             <div className="editorial-card-media editorial-featured-gallery-media">
               <Image
                 alt="Cynthia in warm, low light for The House Keeps the Shadows"
@@ -123,8 +126,9 @@ export default function EditorialsPage() {
               <h2>The House Keeps the Shadows</h2>
               <p>An intimate portrait in warm light and deep shadow.</p>
               <span>Impura Vida</span>
+              <span className="editorial-hover-cta">VIEW STORY <b aria-hidden="true">→</b></span>
             </div>
-          </article>
+          </Link>
           {editorials.map((editorial) => (
             <EditorialCard captioned editorial={editorial} key={editorial.slug} />
           ))}

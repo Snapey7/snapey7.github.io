@@ -51,6 +51,7 @@ export function EditorialCard({
           <h3>{displayTitle}</h3>
           <p>{captioned ? editorial.cardDescription : editorial.intro}</p>
           <span>Impura Vida</span>
+          <span className="editorial-hover-cta">VIEW STORY <b aria-hidden="true">→</b></span>
         </div>
       )}
       {!captioned && (
