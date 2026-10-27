@@ -1,26 +1,40 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { useActionState, useState } from 'react';
+import { submitAuth, type AuthFormState } from '@/app/actions/auth';
 
-export function AuthPanel() {
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
-  const [notice, setNotice] = useState('');
-  const isSignup = mode === 'signup';
+type AuthMode = 'login' | 'signup' | 'forgot';
 
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setNotice('Secure account access is not connected yet. Choose an authentication provider to enable sign-up and login.');
-  }
+export function AuthPanel({ initialError = false }: { initialError?: boolean }) {
+  const [mode, setMode] = useState<AuthMode>('login');
+  const heading = mode === 'signup' ? 'SIGN UP' : mode === 'forgot' ? 'RESET PASSWORD' : 'LOGIN';
 
   return (
     <section className="auth-panel" aria-labelledby="auth-heading">
-      <h1 id="auth-heading">{isSignup ? 'SIGN UP' : 'LOGIN'}</h1>
-      <div className="auth-socials">
-        <button type="button" onClick={() => setNotice('Google sign-in will be available once authentication is connected.')}>Google</button>
-        <button type="button" onClick={() => setNotice('Social sign-in will be available once authentication is connected.')}>Continue with X</button>
-      </div>
-      <p className="auth-divider">Or, {isSignup ? 'create an account' : 'log in'} using email</p>
-      <form onSubmit={submit}>
+      <h1 id="auth-heading">{heading}</h1>
+      {initialError && <p className="auth-notice is-error" role="status">That sign-in link expired or could not be verified. Request a new link and try again.</p>}
+      <p className="auth-divider">
+        {mode === 'signup' ? 'Create your member account using email' : mode === 'forgot' ? 'We will email you a secure password reset link' : 'Log in using your member email'}
+      </p>
+      <AuthForm key={mode} mode={mode} onForgot={() => setMode('forgot')} />
+      <p className="auth-switch">
+        {mode === 'signup' ? 'Already have an account?' : mode === 'forgot' ? 'Remembered your password?' : "Don't have an account?"}{' '}
+        <button type="button" onClick={() => setMode(mode === 'signup' || mode === 'forgot' ? 'login' : 'signup')}>
+          {mode === 'signup' || mode === 'forgot' ? 'Log in' : 'Sign up'}
+        </button>
+      </p>
+    </section>
+  );
+}
+
+function AuthForm({ mode, onForgot }: { mode: AuthMode; onForgot: () => void }) {
+  const [state, action, pending] = useActionState<AuthFormState, FormData>(submitAuth, {});
+  const isSignup = mode === 'signup';
+
+  return (
+    <>
+      <form action={action}>
+        <input type="hidden" name="mode" value={mode} />
         {isSignup && (
           <label>
             Name
@@ -31,20 +45,22 @@ export function AuthPanel() {
           Email address
           <input autoComplete="email" name="email" placeholder="you@example.com" required type="email" />
         </label>
-        <label>
-          Password
-          <input autoComplete={isSignup ? 'new-password' : 'current-password'} minLength={8} name="password" placeholder="At least 8 characters" required type="password" />
-        </label>
-        {!isSignup && <button className="auth-forgot" type="button" onClick={() => setNotice('Password recovery will be available once authentication is connected.')}>Forgot your password?</button>}
-        <button className="auth-submit" type="submit">{isSignup ? 'Create account' : 'Sign in with email'}</button>
-      </form>
-      {notice && <p className="auth-notice" role="status">{notice}</p>}
-      <p className="auth-switch">
-        {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
-        <button type="button" onClick={() => { setMode(isSignup ? 'login' : 'signup'); setNotice(''); }}>
-          {isSignup ? 'Log in' : 'Sign up'}
+        {mode !== 'forgot' && (
+          <label>
+            Password
+            <input autoComplete={isSignup ? 'new-password' : 'current-password'} minLength={8} name="password" placeholder={isSignup ? 'At least 8 characters' : 'Your password'} required type="password" />
+          </label>
+        )}
+        {mode === 'login' && (
+          <button className="auth-forgot" type="button" onClick={onForgot}>
+            Forgot your password?
+          </button>
+        )}
+        <button className="auth-submit" disabled={pending} type="submit">
+          {pending ? 'Please wait…' : mode === 'signup' ? 'Create account' : mode === 'forgot' ? 'Send reset link' : 'Sign in with email'}
         </button>
-      </p>
-    </section>
+      </form>
+      {state.message && <p className={`auth-notice ${state.type === 'error' ? 'is-error' : 'is-success'}`} role="status">{state.message}</p>}
+    </>
   );
 }
