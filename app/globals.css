@@ -613,6 +613,48 @@ a {
   border: 1px solid rgba(248, 239, 232, 0.12);
   border-radius: 14px;
   background: #0b0908;
+  transition: border-color 350ms ease, box-shadow 350ms ease, transform 350ms ease;
+}
+
+.editorial-card-captioned .editorial-card-media img {
+  transition: transform 700ms ease;
+}
+
+.editorial-card-captioned:hover .editorial-card-media,
+.editorial-card-captioned:focus-visible .editorial-card-media {
+  border-color: rgba(255, 100, 107, 0.65);
+  box-shadow: 0 0 28px rgba(255, 99, 105, 0.16);
+  transform: translateY(-3px);
+}
+
+.editorial-card-captioned:hover .editorial-card-media img,
+.editorial-card-captioned:focus-visible .editorial-card-media img {
+  transform: scale(1.045);
+}
+
+.editorial-card-captioned:focus-visible {
+  outline: 2px solid #ff646b;
+  outline-offset: 5px;
+}
+
+.editorial-hover-cta {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.65rem !important;
+  color: #ff7779 !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.16em !important;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 250ms ease, transform 250ms ease;
+}
+
+.editorial-card-captioned:hover .editorial-hover-cta,
+.editorial-card-captioned:focus-visible .editorial-hover-cta {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .editorial-placeholder-card .editorial-card-media {
