@@ -1007,6 +1007,20 @@ button.under-link {
   display: grid;
 }
 
+.mobile-destinations-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.75rem 0;
+  color: rgba(248, 239, 232, 0.85);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-align: left;
+}
+
 .mobile-nav-subitem {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding: 0.7rem 0 0.8rem 1rem;
