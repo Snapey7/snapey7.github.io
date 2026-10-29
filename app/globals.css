@@ -479,7 +479,7 @@ button.under-link {
 
 .membership-card.is-featured .buy-button.featured:not(:disabled) {
   border: 1px solid #ff646b;
-  background: rgba(3, 3, 3, 0.72);
+  background: linear-gradient(135deg, #ff646b, #e65e5e);
   color: #fff5ef;
 }
 
@@ -489,6 +489,12 @@ button.under-link {
   box-shadow: 0 0 28px rgba(255, 100, 107, 0.28);
   color: #fff5ef;
   transform: translateY(-1px);
+}
+
+.membership-card.is-featured .buy-button.featured:hover:not(:disabled) {
+  border-color: #fff5ef;
+  box-shadow: 0 0 34px rgba(255, 100, 107, 0.5);
+  filter: brightness(1.08);
 }
 
 .featured-editorial-gallery-label {
