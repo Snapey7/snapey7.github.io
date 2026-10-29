@@ -3,11 +3,15 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseConfig } from '@/lib/supabase/config';
-import { createStripePortal, startCatalogueCheckout, startMembershipCheckout, startPortfolioCheckout } from '@/lib/billing/stripe';
+import { createStripePortal, startCatalogueCheckout, startMembershipCheckout, startPortfolioCheckout, startShopProductCheckout } from '@/lib/billing/stripe';
 
 export type AuthFormState = { type?: 'error' | 'success'; message?: string };
 
 const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.impuravidamagazine.com').replace(/\/$/, '');
+const safeNextPath = (value: FormDataEntryValue | null) => {
+  const next = typeof value === 'string' ? value : '';
+  return next.startsWith('/') && !next.startsWith('//') && !next.includes('\\') ? next : '/account';
+};
 
 export async function submitAuth(_previousState: AuthFormState, formData: FormData): Promise<AuthFormState> {
   if (!getSupabaseConfig()) {
@@ -15,6 +19,7 @@ export async function submitAuth(_previousState: AuthFormState, formData: FormDa
   }
 
   const mode = String(formData.get('mode') || '');
+  const next = safeNextPath(formData.get('next'));
   const email = String(formData.get('email') || '').trim().toLowerCase();
   if (!email || !email.includes('@')) return { type: 'error', message: 'Enter a valid email address.' };
 
@@ -38,18 +43,18 @@ export async function submitAuth(_previousState: AuthFormState, formData: FormDa
       password,
       options: {
         data: { display_name: name },
-        emailRedirectTo: `${siteUrl()}/auth/callback?next=%2Faccount`,
+        emailRedirectTo: `${siteUrl()}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     });
     if (error) return { type: 'error', message: 'We could not create your account. Check your details and try again.' };
-    if (data.session) redirect('/account');
+    if (data.session) redirect(next);
     return { type: 'success', message: 'Check your inbox for a confirmation link to finish creating your account.' };
   }
 
   if (mode !== 'login') return { type: 'error', message: 'Choose sign in or create an account.' };
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { type: 'error', message: 'Those sign-in details did not work. Check them and try again.' };
-  redirect('/account');
+  redirect(next);
 }
 
 export async function updatePassword(_previousState: AuthFormState, formData: FormData): Promise<AuthFormState> {
@@ -87,6 +92,11 @@ export async function beginPortfolioCheckout(formData: FormData) {
 export async function beginCatalogueCheckout(formData: FormData) {
   const catalogueId = String(formData.get('catalogueId') || '');
   await startCatalogueCheckout(catalogueId);
+}
+
+export async function beginShopProductCheckout(formData: FormData) {
+  const productId = String(formData.get('productId') || '');
+  await startShopProductCheckout(productId);
 }
 
 export async function manageStripeSubscription() {

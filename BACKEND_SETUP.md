@@ -1,6 +1,6 @@
 # Backend and Stripe setup
 
-The site supports Supabase accounts and private media, Stripe-hosted membership checkout, and one-time purchases for complete model catalogues and magazine editions. Stripe only grants purchase access after a signed webhook is received. Stripe Checkout keeps card details off the website and can present supported payment methods such as Apple Pay and Link.
+The site supports Supabase accounts and private media, Stripe-hosted membership checkout, individual Muse catalogue purchases, and physical Shop orders. Stripe only grants digital purchase access after a signed webhook is received. Stripe Checkout keeps card details off the website and can present supported payment methods such as Apple Pay and Link.
 
 Photographic art is not automatically the same as sexually explicit material. Stripe reviews each merchant and its actual content; approval is up to Stripe. Describe the business and the content accurately in your Stripe application and ask Stripe to confirm eligibility before relying on live payments.
 
@@ -11,8 +11,9 @@ In Supabase, open **SQL Editor** and run these files in order:
 1. `supabase/migrations/202610270001_memberships_and_private_media.sql`
 2. `supabase/migrations/202610280001_stripe_checkout.sql`
 3. `supabase/migrations/202610290001_catalogue_publishing.sql`
+4. `supabase/migrations/202610290002_separate_shop_products.sql`
 
-The last migration creates the catalogue records from the seven Stripe Price IDs already supplied, attaches image records to catalogues, and adds catalogue-level purchase entitlements. All seven releases start as drafts.
+The catalogue migration creates records from the seven Stripe Price IDs already supplied and adds catalogue-level entitlements. The next migration separates public physical Shop products from private digital releases: the existing Edition 1 product is carried into the Shop, its private magazine release remains in the subscriber vault, and shop checkouts are recorded as orders without granting digital access. Standard and Impura subscribers can access published magazine issues; Impura subscribers also get Muse catalogues; an individual Muse purchase unlocks only that model's catalogue.
 
 ## 2. Create Stripe products and prices
 
@@ -25,7 +26,7 @@ In Stripe Dashboard, create two products: **STANDARD Membership** and **IMPURA M
 
 The annual amounts are 17% below twelve monthly payments. Copy each Stripe `price_...` ID into the matching Vercel Production environment variable below. These are GBP prices for your UK audience.
 
-The seven catalogue products are Ana, Cynthia, Lucy, Alexis, Angie, Daya, and Impura Vida Magazine Edition 1. Their Stripe Price IDs are seeded by the publishing migration. Add or change prices in Stripe, then update the matching `catalogues.stripe_price_id` if needed. Checkout reads the price from the server-side catalogue record; it never trusts a price ID from the browser. The Stripe amount and currency are fetched from Stripe and shown on the site.
+The six Muse catalogue products are Ana, Cynthia, Lucy, Alexis, Angie, and Daya. Their Stripe Price IDs are seeded by the publishing migration. Add or change prices in Stripe, then update the matching `catalogues.stripe_price_id` if needed. Checkout reads the price from the server-side catalogue record; it never trusts a price ID from the browser. The Stripe amount and currency are fetched from Stripe and shown on the site. Physical Shop products have separate product records, photos, orders, and Stripe prices.
 
 ## 3. Set up payment methods and domain
 
@@ -63,18 +64,22 @@ Add these in **Project Settings → Environment Variables** for Production. Use 
 - `CONTENT_ADMIN_EMAILS` — comma-separated email(s) of Supabase accounts allowed to upload and publish releases
 - Existing Supabase variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_SITE_URL=https://www.impuravidamagazine.com`
+- `SHOP_SHIPPING_COUNTRIES` — comma-separated ISO-2 country codes customers may select for physical Shop deliveries (for example, `GB`)
+- `SHOP_SHIPPING_RATE_IDS` — comma-separated Stripe shipping-rate IDs (`shr_...`) in the same Stripe mode as `STRIPE_SECRET_KEY`
 
 Redeploy after setting variables. Checkout buttons stay disabled until all required Stripe and Supabase settings exist. Configure the Stripe Billing Portal in Dashboard so subscribers can manage or cancel; the account page opens the portal for Stripe subscriptions.
 
 ## 6. Upload and publish releases
 
-After the migrations and environment variables are deployed, sign in with the Supabase account whose email is in `CONTENT_ADMIN_EMAILS` and open `/studio`. Select a catalogue, add a customer description, upload its full-resolution images, then choose **Publish**. Uploads go directly to the private `member-media` Storage bucket using short-lived upload tokens. The site displays only published catalogues; unpublished files are not delivered even to members. Model catalogues appear on their Muse model page and Edition 1 appears in Shop.
+After the migrations and environment variables are deployed, sign in with the Supabase account whose email is in `CONTENT_ADMIN_EMAILS` and open `/studio`. The **Shop products** section is for public preview/product photos only. Full-resolution subscriber content belongs in **Subscriber vault**. Uploads to the private `member-media` Storage bucket use short-lived upload tokens. Only published catalogues can be served to entitled members. Model catalogues appear on the matching Muse page and in the member library.
 
-Create one sample release first: upload one approved test image to a catalogue, publish it, check its page as a visitor, buy it using Stripe test mode, and confirm the paid image appears in the buyer's library. Use Stripe test mode keys and test price IDs in Vercel Preview; use live keys only after the live webhook and account eligibility are confirmed.
+Create one sample release first: upload an approved test image to a Muse catalogue, publish it, check its page as a visitor, buy it using Stripe test mode, and confirm only that model's images appear in the buyer's library. Then publish a sample magazine issue and confirm it is available to both active membership tiers. Use Stripe test mode keys and test price IDs in Vercel Preview; use live keys only after the live webhook and account eligibility are confirmed.
+
+For a physical Shop order, create matching shipping rates in Stripe and set the shipping variables above. Shop checkout remains unavailable until countries and at least one shipping rate are configured. Orders, customer email, and delivery addresses appear in the restricted `/studio` orders section after Stripe's paid webhook arrives.
 
 ## 7. Private content
 
-Keep full paid files in the private `member-media` Supabase Storage bucket. Do not put paid originals in `public/`. The app issues short-lived signed URLs only after checking membership or a recorded one-time purchase. For monthly and annual membership checkout, use the matching configured Stripe Price ID. Account entitlements update through webhooks, not a client-side success redirect.
+Keep full paid files in the private `member-media` Supabase Storage bucket. Do not put paid originals in `public/` or the public `shop-product-images` bucket. The app issues short-lived signed URLs only after checking membership or a recorded one-time purchase. For monthly and annual membership checkout, use the matching configured Stripe Price ID. Account entitlements update through webhooks, not a client-side success redirect. Public Shop product images are intentionally accessible without signing in and must be selected as previews/product photos only.
 
 The project retains the prior Verotel endpoint and membership records for continuity, but new checkout buttons use Stripe. Remove old Verotel credentials only after confirming no existing Verotel memberships depend on them.
 

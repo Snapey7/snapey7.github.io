@@ -5,7 +5,7 @@ import { submitAuth, type AuthFormState } from '@/app/actions/auth';
 
 type AuthMode = 'login' | 'signup' | 'forgot';
 
-export function AuthPanel({ initialError = false }: { initialError?: boolean }) {
+export function AuthPanel({ initialError = false, redirectTo = '/account' }: { initialError?: boolean; redirectTo?: string }) {
   const [mode, setMode] = useState<AuthMode>('login');
   const heading = mode === 'signup' ? 'SIGN UP' : mode === 'forgot' ? 'RESET PASSWORD' : 'LOGIN';
 
@@ -16,7 +16,7 @@ export function AuthPanel({ initialError = false }: { initialError?: boolean }) 
       <p className="auth-divider">
         {mode === 'signup' ? 'Create your member account using email' : mode === 'forgot' ? 'We will email you a secure password reset link' : 'Log in using your member email'}
       </p>
-      <AuthForm key={mode} mode={mode} onForgot={() => setMode('forgot')} />
+      <AuthForm key={mode} mode={mode} redirectTo={redirectTo} onForgot={() => setMode('forgot')} />
       <p className="auth-switch">
         {mode === 'signup' ? 'Already have an account?' : mode === 'forgot' ? 'Remembered your password?' : "Don't have an account?"}{' '}
         <button type="button" onClick={() => setMode(mode === 'signup' || mode === 'forgot' ? 'login' : 'signup')}>
@@ -27,7 +27,7 @@ export function AuthPanel({ initialError = false }: { initialError?: boolean }) 
   );
 }
 
-function AuthForm({ mode, onForgot }: { mode: AuthMode; onForgot: () => void }) {
+function AuthForm({ mode, redirectTo, onForgot }: { mode: AuthMode; redirectTo: string; onForgot: () => void }) {
   const [state, action, pending] = useActionState<AuthFormState, FormData>(submitAuth, {});
   const isSignup = mode === 'signup';
 
@@ -35,6 +35,7 @@ function AuthForm({ mode, onForgot }: { mode: AuthMode; onForgot: () => void }) 
     <>
       <form action={action}>
         <input type="hidden" name="mode" value={mode} />
+        <input type="hidden" name="next" value={redirectTo} />
         {isSignup && (
           <label>
             Name
