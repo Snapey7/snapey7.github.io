@@ -47,7 +47,7 @@ export async function saveCatalogueMedia(catalogueId: string, paths: string[]) {
   }
   const admin = createAdminClient();
   const { data: catalogue, error: catalogueError } = await admin.from('catalogues')
-    .select('id,title,model_slug,status').eq('id', catalogueId).maybeSingle();
+    .select('id,title,model_slug,status,product_type').eq('id', catalogueId).maybeSingle();
   if (catalogueError || !catalogue) return { error: 'Catalogue not found.' };
 
   const rows = paths.map((path, index) => ({
@@ -55,7 +55,7 @@ export async function saveCatalogueMedia(catalogueId: string, paths: string[]) {
     alt_text: `${catalogue.title}, photograph ${index + 1}`,
     bucket: 'member-media' as const,
     storage_path: path,
-    min_tier: 'impura' as const,
+    min_tier: catalogue.product_type === 'magazine_edition' ? 'standard' as const : 'impura' as const,
     model_slug: catalogue.model_slug,
     catalogue_id: catalogue.id,
   }));
@@ -95,4 +95,18 @@ export async function updateCatalogue(input: { catalogueId: string; description:
   revalidatePath('/library');
   if (catalogue.model_slug) revalidatePath(`/models/${catalogue.model_slug}`);
   return { success: input.publish ? 'Catalogue published.' : 'Catalogue saved as a draft.' };
+}
+
+export async function createMagazineIssue(titleInput: string) {
+  await requireContentAdmin();
+  if (typeof titleInput !== 'string') return { error: 'Enter an issue title.' };
+  const title = titleInput.trim().slice(0, 160);
+  if (!title) return { error: 'Enter an issue title.' };
+  const { data, error } = await createAdminClient().from('catalogues')
+    .insert({ title, description: '', product_type: 'magazine_edition', model_slug: null, stripe_price_id: null, status: 'draft' })
+    .select('id').maybeSingle();
+  if (error || !data) return { error: 'Could not create the subscriber issue. Apply the latest Supabase migration first.' };
+  revalidatePath('/studio');
+  revalidatePath('/library');
+  return { success: 'Subscriber issue created as a draft. Upload its private pages and publish it when ready.' };
 }
