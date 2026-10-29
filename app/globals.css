@@ -485,9 +485,9 @@ button.under-link {
 
 .membership-card .buy-button:hover:not(:disabled) {
   border-color: #ff646b;
-  background: rgba(255, 100, 107, 0.14);
-  box-shadow: 0 0 22px rgba(255, 100, 107, 0.18);
-  color: #fff4ee;
+  background: linear-gradient(135deg, #ff646b, #e65e5e);
+  box-shadow: 0 0 28px rgba(255, 100, 107, 0.28);
+  color: #fff5ef;
   transform: translateY(-1px);
 }
 
