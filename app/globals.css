@@ -483,9 +483,12 @@ button.under-link {
   color: #fff5ef;
 }
 
-.membership-card.is-featured .buy-button.featured:hover:not(:disabled) {
+.membership-card .buy-button:hover:not(:disabled) {
+  border-color: #ff646b;
   background: rgba(255, 100, 107, 0.14);
   box-shadow: 0 0 22px rgba(255, 100, 107, 0.18);
+  color: #fff4ee;
+  transform: translateY(-1px);
 }
 
 .featured-editorial-gallery-label {
