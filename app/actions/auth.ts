@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseConfig } from '@/lib/supabase/config';
-import { createStripePortal, startMembershipCheckout, startPortfolioCheckout } from '@/lib/billing/stripe';
+import { createStripePortal, startCatalogueCheckout, startMembershipCheckout, startPortfolioCheckout } from '@/lib/billing/stripe';
 
 export type AuthFormState = { type?: 'error' | 'success'; message?: string };
 
@@ -82,6 +82,11 @@ export async function beginMembershipCheckout(formData: FormData) {
 export async function beginPortfolioCheckout(formData: FormData) {
   const mediaId = String(formData.get('mediaId') || '');
   await startPortfolioCheckout(mediaId);
+}
+
+export async function beginCatalogueCheckout(formData: FormData) {
+  const catalogueId = String(formData.get('catalogueId') || '');
+  await startCatalogueCheckout(catalogueId);
 }
 
 export async function manageStripeSubscription() {

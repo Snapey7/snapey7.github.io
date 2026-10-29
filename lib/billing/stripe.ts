@@ -29,6 +29,35 @@ export function isStripeCheckoutReady() {
   );
 }
 
+export function isStripeOneTimeCheckoutReady() {
+  return Boolean(
+    /^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY || '') &&
+    /^whsec_\S+$/.test(process.env.STRIPE_WEBHOOK_SECRET || '') &&
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY &&
+    process.env.SUPABASE_SERVICE_ROLE_KEY &&
+    !process.env.SUPABASE_SERVICE_ROLE_KEY.startsWith('your-'),
+  );
+}
+
+export async function getStripePriceLabel(priceId: string) {
+  const secret = process.env.STRIPE_SECRET_KEY;
+  if (!/^price_[A-Za-z0-9]+$/.test(priceId) || !secret || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(secret)) return null;
+  try {
+    const response = await fetch(`https://api.stripe.com/v1/prices/${encodeURIComponent(priceId)}`, {
+      headers: { Authorization: `Bearer ${secret}` },
+      cache: 'no-store',
+    });
+    if (!response.ok) return null;
+    const price = await response.json() as { unit_amount?: number | null; currency?: string };
+    if (typeof price.unit_amount !== 'number' || !price.currency) return null;
+    return new Intl.NumberFormat('en-GB', { style: 'currency', currency: price.currency.toUpperCase() })
+      .format(price.unit_amount / 100);
+  } catch {
+    return null;
+  }
+}
+
 export async function createStripeCheckout(fields: Record<string, string>, successPath: string, cancelPath: string) {
   const secret = process.env.STRIPE_SECRET_KEY;
   if (!secret || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(secret)) throw new Error('Stripe is not configured.');
@@ -102,7 +131,7 @@ export async function startMembershipCheckout(tierInput: string, intervalInput: 
 }
 
 export async function startPortfolioCheckout(mediaId: string) {
-  if (!/^[0-9a-f-]{36}$/i.test(mediaId) || !isStripeCheckoutReady()) redirect('/models?checkout=unavailable');
+  if (!/^[0-9a-f-]{36}$/i.test(mediaId) || !isStripeOneTimeCheckoutReady()) redirect('/models?checkout=unavailable');
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/api/billing/stripe/portfolio/${mediaId}`)}`);
@@ -111,8 +140,8 @@ export async function startPortfolioCheckout(mediaId: string) {
   const { data: priorPurchase } = await admin.from('portfolio_purchases').select('id')
     .eq('user_id', user.id).eq('media_id', mediaId).eq('status', 'paid').maybeSingle();
   if (priorPurchase) redirect('/library');
-  const { data: item } = await admin.from('member_media').select('id,stripe_price_id').eq('id', mediaId).maybeSingle();
-  if (!item?.stripe_price_id || !/^price_[A-Za-z0-9]+$/.test(item.stripe_price_id)) redirect('/models?checkout=unavailable');
+  const { data: item } = await admin.from('member_media').select('id,stripe_price_id,catalogue_id').eq('id', mediaId).maybeSingle();
+  if (!item?.stripe_price_id || item.catalogue_id || !/^price_[A-Za-z0-9]+$/.test(item.stripe_price_id)) redirect('/models?checkout=unavailable');
   try {
     const sessionUrl = await createStripeCheckout({
       mode: 'payment',
@@ -128,6 +157,45 @@ export async function startPortfolioCheckout(mediaId: string) {
     if (error && typeof error === 'object' && 'digest' in error) throw error;
     console.error('Stripe portfolio checkout failed:', error);
     redirect('/models?checkout=unavailable');
+  }
+}
+
+export async function startCatalogueCheckout(catalogueId: string) {
+  if (!/^[0-9a-f-]{36}$/i.test(catalogueId) || !isStripeOneTimeCheckoutReady()) {
+    redirect('/models?checkout=unavailable');
+  }
+  const admin = (await import('@/lib/supabase/admin')).createAdminClient();
+  const { data: catalogue } = await admin.from('catalogues')
+    .select('id,stripe_price_id,status,model_slug').eq('id', catalogueId).maybeSingle();
+  if (!catalogue || catalogue.status !== 'published' || !/^price_[A-Za-z0-9]+$/.test(catalogue.stripe_price_id)) {
+    redirect('/models?checkout=unavailable');
+  }
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const returnPath = catalogue.model_slug ? `/models/${catalogue.model_slug}` : '/shop';
+  if (!user) redirect(`/login?next=${encodeURIComponent(returnPath)}`);
+
+  const { data: priorPurchase } = await admin.from('portfolio_purchases').select('id')
+    .eq('user_id', user.id).eq('catalogue_id', catalogueId).eq('status', 'paid').maybeSingle();
+  if (priorPurchase) redirect('/library');
+
+  try {
+    const sessionUrl = await createStripeCheckout({
+      mode: 'payment',
+      'line_items[0][price]': catalogue.stripe_price_id,
+      'line_items[0][quantity]': '1',
+      client_reference_id: user.id,
+      ...(user.email ? { customer_email: user.email } : {}),
+      'metadata[user_id]': user.id,
+      'metadata[catalogue_id]': catalogue.id,
+      'payment_intent_data[metadata][user_id]': user.id,
+      'payment_intent_data[metadata][catalogue_id]': catalogue.id,
+    }, '/library?purchase=returned', `${returnPath}?checkout=cancelled`);
+    redirect(sessionUrl);
+  } catch (error) {
+    if (error && typeof error === 'object' && 'digest' in error) throw error;
+    console.error('Stripe catalogue checkout failed:', error);
+    redirect('/models?checkout=setup');
   }
 }
 

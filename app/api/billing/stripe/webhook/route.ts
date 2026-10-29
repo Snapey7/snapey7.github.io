@@ -7,6 +7,9 @@ export const dynamic = 'force-dynamic';
 const handledEvents = new Set([
   'checkout.session.completed',
   'checkout.session.async_payment_succeeded',
+  'charge.refunded',
+  'charge.dispute.created',
+  'charge.dispute.closed',
   'customer.subscription.created',
   'customer.subscription.updated',
   'customer.subscription.deleted',
