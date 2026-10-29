@@ -7,6 +7,7 @@ import { beginCatalogueCheckout } from '@/app/actions/auth';
 import { isStripeOneTimeCheckoutReady } from '@/lib/billing/stripe';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentMembership, membershipAllows } from '@/lib/membership';
+import { PrivateCatalogueExperience } from './PrivateCatalogueExperience';
 
 type ModelPageProps = {
   params: Promise<{ slug: string }>;
@@ -37,15 +38,23 @@ export default async function ModelDetailPage({ params, searchParams }: ModelPag
 
   return (
     <PageShell>
-      <main className="model-entry-page">
-        <section className="model-entry-layout" aria-label={`${model.name} gallery` }>
-          <div className="model-entry-copy">
-            <h1>{model.name} | {model.location}</h1>
-            <p className="model-entry-meta">GALLERY <span>·</span> IMPURA | EXCLUSIVE PHOTOS</p>
-            {query.checkout === 'setup' && <p className="auth-notice is-error" role="status">Checkout could not start. Please try again or contact us if this keeps happening.</p>}
-            {query.checkout === 'cancelled' && <p className="auth-notice" role="status">Checkout was cancelled. You can try again whenever you’re ready.</p>}
-            {catalogue?.status === 'published' && catalogue.description && <p>{catalogue.description}</p>}
-            {!canView && <>
+      {canView ? (
+        <PrivateCatalogueExperience
+          coverImage={model.image}
+          description={catalogue?.description || ''}
+          location={model.location}
+          modelName={model.name}
+          photos={media || []}
+        />
+      ) : (
+        <main className="model-entry-page">
+          <section className="model-entry-layout" aria-label={`${model.name} gallery`}>
+            <div className="model-entry-copy">
+              <h1>{model.name} | {model.location}</h1>
+              <p className="model-entry-meta">GALLERY <span>·</span> IMPURA | EXCLUSIVE PHOTOS</p>
+              {query.checkout === 'setup' && <p className="auth-notice is-error" role="status">Checkout could not start. Please try again or contact us if this keeps happening.</p>}
+              {query.checkout === 'cancelled' && <p className="auth-notice" role="status">Checkout was cancelled. You can try again whenever you’re ready.</p>}
+              {catalogue?.status === 'published' && catalogue.description && <p>{catalogue.description}</p>}
               {catalogue?.status === 'published' && <form action={beginCatalogueCheckout}>
                 <input type="hidden" name="catalogueId" value={catalogue.id} />
                 <button className="model-entry-cta" disabled={!isStripeOneTimeCheckoutReady()} type="submit">
@@ -53,19 +62,13 @@ export default async function ModelDetailPage({ params, searchParams }: ModelPag
                 </button>
               </form>}
               {catalogue && catalogue.status !== 'published' && <p className="model-entry-availability">This catalogue is being prepared and isn’t available to buy yet.</p>}
-            </>}
-          </div>
-          <div className="model-entry-image">
-            <Image alt={`${model.name} — ${model.location}`} src={model.image} fill priority sizes="(max-width: 700px) 90vw, 420px" />
-          </div>
-        </section>
-        {canView && <section aria-label={`${model.name} private catalogue`} className="member-library-grid model-catalogue-grid">
-          {(media || []).map((item) => <article className="member-library-card" key={item.id}>
-            <div className="member-library-image"><img alt={item.alt_text} loading="lazy" src={`/api/member-media/${item.id}`} /></div>
-            <h2>{item.title}</h2>
-          </article>)}
-        </section>}
-      </main>
+            </div>
+            <div className="model-entry-image">
+              <Image alt={`${model.name} — ${model.location}`} src={model.image} fill priority sizes="(max-width: 700px) 90vw, 420px" />
+            </div>
+          </section>
+        </main>
+      )}
     </PageShell>
   );
 }
