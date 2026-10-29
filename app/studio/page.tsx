@@ -38,7 +38,7 @@ export default async function StudioPage() {
     id: string;
     title: string;
     description: string;
-    status: 'draft' | 'published';
+    status: 'draft' | 'published' | 'coming_soon';
     shop_product_images: { id: string; storage_path: string; alt_text: string; position: number }[];
   }[] = [];
   let shopOrders: {
@@ -54,7 +54,9 @@ export default async function StudioPage() {
       .select('id,title,description,product_type,model_slug,status,member_media(id)')
       .order('product_type').order('title');
     if (error) loadError = 'Apply the catalogue publishing migration in Supabase to finish connecting the content studio.';
-    else catalogues = (data || []).map((item) => ({ ...item, member_media: item.member_media || [] }));
+    else catalogues = (data || [])
+      .filter((item) => item.product_type !== 'physical_shop')
+      .map((item) => ({ ...item, member_media: item.member_media || [] }));
     if (!error) {
       const { data: products, error: productsError } = await createAdminClient().from('shop_products')
         .select('id,title,description,status,shop_product_images(id,storage_path,alt_text,position)')

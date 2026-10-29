@@ -9,7 +9,7 @@ type ShopProduct = {
   id: string;
   title: string;
   description: string;
-  status: 'draft' | 'published';
+  status: 'draft' | 'published' | 'coming_soon';
   shop_product_images: { id: string; storage_path: string; alt_text: string; position: number }[];
 };
 
@@ -75,12 +75,12 @@ export function ShopProductManager({ products }: { products: ShopProduct[] }) {
     if (!('error' in result)) router.refresh();
   }
 
-  async function save(product: ShopProduct, publish: boolean) {
+  async function save(product: ShopProduct, status: ShopProduct['status']) {
     setBusyId(product.id);
     const result = await updateShopProduct({
       productId: product.id,
       description: descriptions[product.id] || '',
-      publish,
+      status,
     });
     setMessages((current) => ({ ...current, [product.id]: ('error' in result ? result.error : result.success) || '' }));
     setBusyId(null);
@@ -119,7 +119,7 @@ export function ShopProductManager({ products }: { products: ShopProduct[] }) {
           <p className="eyebrow">PHYSICAL SHOP PRODUCT</p>
           <h3>{product.title}</h3>
         </div>
-        <span className={`studio-status ${product.status}`}>{product.status}</span>
+        <span className={`studio-status ${product.status}`}>{product.status === 'coming_soon' ? 'Coming soon' : product.status}</span>
       </div>
       <p className="studio-count">{product.shop_product_images.length} public display photo{product.shop_product_images.length === 1 ? '' : 's'}</p>
       {product.shop_product_images.length > 0 && <div className="studio-shop-image-list">
@@ -139,11 +139,12 @@ export function ShopProductManager({ products }: { products: ShopProduct[] }) {
           onChange={(event) => { void upload(product, event.currentTarget.files); event.currentTarget.value = ''; }} type="file" />
       </label>
       <div className="studio-actions">
-        <button disabled={busyId === product.id} onClick={() => void save(product, false)} type="button">Save draft</button>
-        {product.status === 'published' ? (
-          <button disabled={busyId === product.id} onClick={() => void save(product, false)} type="button">Unpublish</button>
-        ) : (
-          <button className="studio-publish" disabled={busyId === product.id} onClick={() => void save(product, true)} type="button">Publish</button>
+        <button disabled={busyId === product.id} onClick={() => void save(product, 'draft')} type="button">Save draft</button>
+        {product.status !== 'coming_soon' && (
+          <button disabled={busyId === product.id} onClick={() => void save(product, 'coming_soon')} type="button">Mark coming soon</button>
+        )}
+        {product.status !== 'published' && (
+          <button className="studio-publish" disabled={busyId === product.id} onClick={() => void save(product, 'published')} type="button">Publish for sale</button>
         )}
       </div>
       {messages[product.id] && <p className="studio-feedback" role="status">{messages[product.id]}</p>}
