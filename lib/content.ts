@@ -258,7 +258,8 @@ export const membershipTiers = [
       'Extended photo releases',
       'Exclusive Videos',
     ],
-    price: '29.99 / MONTH',
+    price: '29.99',
+    yearlyPrice: '298.70',
     featured: true,
   },
   {
@@ -266,7 +267,8 @@ export const membershipTiers = [
     badge: null,
     image: '/assets/editorial-coastal-escape.png',
     benefits: ['Access to Impura Vida Magazine issues'],
-    price: '14.99 / MONTH',
+    price: '14.99',
+    yearlyPrice: '149.30',
     featured: false,
   },
 ] as const;

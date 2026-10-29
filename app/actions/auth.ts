@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseConfig } from '@/lib/supabase/config';
-import { startMembershipCheckout } from '@/lib/billing/verotel';
+import { createStripePortal, startMembershipCheckout, startPortfolioCheckout } from '@/lib/billing/stripe';
 
 export type AuthFormState = { type?: 'error' | 'success'; message?: string };
 
@@ -75,5 +75,29 @@ export async function signOut() {
 
 export async function beginMembershipCheckout(formData: FormData) {
   const tier = String(formData.get('tier') || '');
-  await startMembershipCheckout(tier);
+  const interval = String(formData.get('interval') || 'monthly');
+  await startMembershipCheckout(tier, interval);
+}
+
+export async function beginPortfolioCheckout(formData: FormData) {
+  const mediaId = String(formData.get('mediaId') || '');
+  await startPortfolioCheckout(mediaId);
+}
+
+export async function manageStripeSubscription() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+  const { data: membership } = await supabase.from('memberships')
+    .select('stripe_customer_id').eq('user_id', user.id).eq('provider', 'stripe')
+    .in('status', ['active', 'canceled']).not('stripe_customer_id', 'is', null)
+    .order('current_period_end', { ascending: false }).limit(1).maybeSingle();
+  if (!membership?.stripe_customer_id) redirect('/account?billing=unavailable');
+  try {
+    redirect(await createStripePortal(membership.stripe_customer_id));
+  } catch (error) {
+    if (error && typeof error === 'object' && 'digest' in error) throw error;
+    console.error('Could not open Stripe customer portal:', error);
+    redirect('/account?billing=unavailable');
+  }
 }

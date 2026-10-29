@@ -2,13 +2,13 @@ import Image from 'next/image';
 import { BadgeCheck, Eye, Film, Images, MessageCircle, Shell } from 'lucide-react';
 import { membershipTiers } from '@/lib/content';
 import { beginMembershipCheckout } from '@/app/actions/auth';
-import { isMembershipCheckoutReady } from '@/lib/billing/verotel';
+import { isStripeCheckoutReady } from '@/lib/billing/stripe';
 import { SectionHeading } from './SectionHeading';
 
 const icons = [Shell, Eye, MessageCircle, Images, Film];
 
 export function MembershipSection({ showHeading = true }: { showHeading?: boolean }) {
-  const checkoutReady = isMembershipCheckoutReady();
+  const checkoutReady = isStripeCheckoutReady();
   return (
     <section className="membership-section" id="membership">
       {showHeading ? (
@@ -52,8 +52,11 @@ export function MembershipSection({ showHeading = true }: { showHeading?: boolea
               <div className="mt-auto space-y-3">
                 <form action={beginMembershipCheckout}>
                   <input type="hidden" name="tier" value={tier.name.toLowerCase()} />
-                  <button className={`buy-button ${tier.featured ? 'featured' : ''}`} disabled={!checkoutReady} type="submit">
-                    {checkoutReady ? `JOIN ${tier.name} · $${tier.price}` : 'CHECKOUT OPENING SOON'}
+                  <button className={`buy-button ${tier.featured ? 'featured' : ''}`} disabled={!checkoutReady} name="interval" value="monthly" type="submit">
+                    {checkoutReady ? `MONTHLY · £${tier.price}/MO` : 'CHECKOUT OPENING SOON'}
+                  </button>
+                  <button className={`buy-button ${tier.featured ? 'featured' : ''}`} disabled={!checkoutReady} name="interval" value="yearly" type="submit">
+                    {checkoutReady ? `YEARLY · £${tier.yearlyPrice}/YR · SAVE 17%` : 'YEARLY CHECKOUT OPENING SOON'}
                   </button>
                 </form>
               </div>

@@ -7,16 +7,24 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const membership = await getCurrentMembership().catch(() => null);
   const { id } = await context.params;
-  if (!membership) return NextResponse.redirect(new URL('/login', request.url));
+  const supabase = await import('@/lib/supabase/server').then((module) => module.createClient());
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.redirect(new URL('/login', request.url));
 
   const admin = createAdminClient();
   const { data: media, error } = await admin
     .from('member_media')
-    .select('storage_path,bucket,min_tier')
+    .select('id,storage_path,bucket,min_tier')
     .eq('id', id)
     .maybeSingle();
   if (error || !media) return new Response('Not found.', { status: 404 });
-  if (!membershipAllows(membership, media.min_tier)) return new Response('Membership required.', { status: 403 });
+  let entitled = membershipAllows(membership, media.min_tier);
+  if (!entitled) {
+    const { data: purchase } = await admin.from('portfolio_purchases').select('id')
+      .eq('user_id', user.id).eq('media_id', media.id).eq('status', 'paid').maybeSingle();
+    entitled = Boolean(purchase);
+  }
+  if (!entitled) return new Response('Purchase or membership required.', { status: 403 });
 
   const { data: signed, error: signError } = await admin.storage
     .from(media.bucket)

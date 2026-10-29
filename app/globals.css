@@ -294,6 +294,14 @@ a {
   letter-spacing: 0.22em;
 }
 
+button.under-link {
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
 .editorial-grid {
   position: relative;
   z-index: 2;
