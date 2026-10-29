@@ -35,7 +35,7 @@ export default function ShopPage() {
                   role="img"
                 />
                 <h2>{edition.title}</h2>
-                <p className="shop-price">$500</p>
+                <p className="shop-price">£500</p>
                 <Link className="shop-edition-link" href={edition.href}>
                   VIEW EDITION <span aria-hidden="true">→</span>
                 </Link>
