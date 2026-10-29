@@ -201,7 +201,7 @@ export async function startCatalogueCheckout(catalogueId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const returnPath = catalogue.model_slug ? `/models/${catalogue.model_slug}` : '/shop';
-  if (!user) redirect(`/login?next=${encodeURIComponent(returnPath)}`);
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/checkout/catalogue/${catalogue.id}`)}`);
 
   const { data: priorPurchase } = await admin.from('portfolio_purchases').select('id')
     .eq('user_id', user.id).eq('catalogue_id', catalogueId).eq('status', 'paid').maybeSingle();
@@ -223,7 +223,7 @@ export async function startCatalogueCheckout(catalogueId: string) {
   } catch (error) {
     if (error && typeof error === 'object' && 'digest' in error) throw error;
     console.error('Stripe catalogue checkout failed:', error);
-    redirect('/models?checkout=setup');
+    redirect(`${returnPath}?checkout=setup`);
   }
 }
 

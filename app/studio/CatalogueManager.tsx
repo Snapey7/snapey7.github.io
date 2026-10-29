@@ -112,6 +112,9 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
             <span className={`studio-status ${catalogue.status}`}>{catalogue.status}</span>
           </div>
           <p className="studio-count">{catalogue.member_media.length} private image{catalogue.member_media.length === 1 ? '' : 's'}</p>
+          {catalogue.product_type === 'model_catalogue' && catalogue.status !== 'published' && (
+            <p className="studio-feedback">To show the individual Buy Catalogue option on this muse page, upload at least one private photo and publish this catalogue.</p>
+          )}
           <label className="studio-field">
             <span>Customer description</span>
             <textarea

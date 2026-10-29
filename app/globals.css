@@ -1683,6 +1683,12 @@ button.under-link {
   background: #3f5422;
 }
 
+.model-entry-availability {
+  margin: 0.85rem 0 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
 .model-entry-image {
   position: relative;
   width: 100%;

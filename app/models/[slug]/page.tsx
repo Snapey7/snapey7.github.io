@@ -10,10 +10,11 @@ import { getCurrentMembership, membershipAllows } from '@/lib/membership';
 
 type ModelPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ checkout?: string }>;
 };
 
-export default async function ModelDetailPage({ params }: ModelPageProps) {
-  const { slug } = await params;
+export default async function ModelDetailPage({ params, searchParams }: ModelPageProps) {
+  const [{ slug }, query] = await Promise.all([params, searchParams]);
   const model = models.find((item) => item.slug === slug);
   if (!model) notFound();
   const admin = createAdminClient();
@@ -44,15 +45,18 @@ export default async function ModelDetailPage({ params }: ModelPageProps) {
           <div className="model-entry-copy">
             <h1>{model.name} | {model.location}</h1>
             <p className="model-entry-meta">GALLERY <span>·</span> IMPURA | EXCLUSIVE PHOTOS</p>
+            {query.checkout === 'setup' && <p className="auth-notice is-error" role="status">Checkout could not start. Please try again or contact us if this keeps happening.</p>}
+            {query.checkout === 'cancelled' && <p className="auth-notice" role="status">Checkout was cancelled. You can try again whenever you’re ready.</p>}
             {catalogue?.status === 'published' && catalogue.description && <p>{catalogue.description}</p>}
             {!canView && <>
-              <a className="model-entry-cta" href="/members">Get Full Access</a>
+              <a className="model-entry-cta" href="/members">Get Full Access with Impura</a>
               {catalogue?.status === 'published' && <form action={beginCatalogueCheckout}>
                 <input type="hidden" name="catalogueId" value={catalogue.id} />
                 <button className="model-entry-cta" disabled={!isStripeOneTimeCheckoutReady()} type="submit">
                   {priceLabel ? `Buy Catalogue · ${priceLabel}` : 'Buy Catalogue'}
                 </button>
               </form>}
+              {catalogue && catalogue.status !== 'published' && <p className="model-entry-availability">This catalogue is being prepared and isn’t available to buy yet.</p>}
             </>}
           </div>
           <div className="model-entry-image">
