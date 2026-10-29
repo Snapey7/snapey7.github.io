@@ -53,7 +53,7 @@ Copy the endpoint's signing secret (`whsec_...`) into `STRIPE_WEBHOOK_SECRET`. T
 
 Add these in **Project Settings → Environment Variables** for Production. Use the matching test keys and test price IDs only in Preview/Development.
 
-- `STRIPE_SECRET_KEY` — live secret key (`sk_live_...`)
+- `STRIPE_SECRET_KEY` — live secret or restricted key (`sk_live_...` or `rk_live_...`)
 - `STRIPE_WEBHOOK_SECRET` — endpoint signing secret (`whsec_...`)
 - `STRIPE_PRICE_STANDARD_MONTHLY` — STANDARD monthly recurring price ID
 - `STRIPE_PRICE_STANDARD_YEARLY` — STANDARD annual recurring price ID

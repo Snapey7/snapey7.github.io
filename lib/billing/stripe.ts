@@ -16,7 +16,7 @@ const configuredPrice = (key: string) => /^price_[A-Za-z0-9]+$/.test(process.env
 
 export function isStripeCheckoutReady() {
   return Boolean(
-    /^sk_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY || '') &&
+    /^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY || '') &&
     configuredPrice('STRIPE_PRICE_STANDARD_MONTHLY') &&
     configuredPrice('STRIPE_PRICE_STANDARD_YEARLY') &&
     configuredPrice('STRIPE_PRICE_IMPURA_MONTHLY') &&
@@ -31,7 +31,7 @@ export function isStripeCheckoutReady() {
 
 export async function createStripeCheckout(fields: Record<string, string>, successPath: string, cancelPath: string) {
   const secret = process.env.STRIPE_SECRET_KEY;
-  if (!secret || !/^sk_(test|live)_[A-Za-z0-9]+$/.test(secret)) throw new Error('Stripe is not configured.');
+  if (!secret || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(secret)) throw new Error('Stripe is not configured.');
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.impuravidamagazine.com').replace(/\/$/, '');
   const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
@@ -51,7 +51,7 @@ export async function createStripeCheckout(fields: Record<string, string>, succe
 
 export async function createStripePortal(customerId: string) {
   const secret = process.env.STRIPE_SECRET_KEY;
-  if (!secret || !/^sk_(test|live)_[A-Za-z0-9]+$/.test(secret)) throw new Error('Stripe is not configured.');
+  if (!secret || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(secret)) throw new Error('Stripe is not configured.');
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.impuravidamagazine.com').replace(/\/$/, '');
   const response = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
     method: 'POST',
@@ -69,7 +69,7 @@ export async function startMembershipCheckout(tierInput: string, intervalInput: 
   const tier = tierInput as MembershipTier;
   const interval = intervalInput as BillingInterval;
   const price = process.env[priceEnv[tier][interval]];
-  if (!price || !configuredPrice(priceEnv[tier][interval]) || !/^sk_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY || '')) redirect('/members?checkout=setup');
+  if (!price || !configuredPrice(priceEnv[tier][interval]) || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY || '')) redirect('/members?checkout=setup');
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
