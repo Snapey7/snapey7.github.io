@@ -7,6 +7,8 @@ export type Membership = {
   status: 'active' | 'canceled' | 'expired' | 'refunded' | 'chargeback';
   current_period_end: string | null;
   provider_subscription_id: string;
+  provider: 'stripe' | 'verotel';
+  stripe_customer_id: string | null;
 };
 
 export async function getCurrentMembership(): Promise<Membership | null> {
@@ -16,7 +18,7 @@ export async function getCurrentMembership(): Promise<Membership | null> {
 
   const { data } = await supabase
     .from('memberships')
-    .select('tier,status,current_period_end,provider_subscription_id')
+    .select('tier,status,current_period_end,provider_subscription_id,provider,stripe_customer_id')
     .eq('user_id', user.id)
     .in('status', ['active', 'canceled'])
     .gt('current_period_end', new Date().toISOString())

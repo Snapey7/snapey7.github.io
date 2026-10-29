@@ -12,19 +12,23 @@ export default async function MemberLibraryPage() {
   if (!user) redirect('/login?next=%2Flibrary');
 
   const membership = await getCurrentMembership();
-  if (!membership) redirect('/members');
-
-  const { data: media } = await createAdminClient()
+  const admin = createAdminClient();
+  const [{ data: media }, { data: purchases }] = await Promise.all([
+    admin
     .from('member_media')
     .select('id,title,alt_text,min_tier')
-    .order('created_at', { ascending: false });
-  const accessibleMedia = (media ?? []).filter((item) => membershipAllows(membership, item.min_tier));
+    .order('created_at', { ascending: false }),
+    admin.from('portfolio_purchases').select('media_id').eq('user_id', user.id).eq('status', 'paid'),
+  ]);
+  const ownedIds = new Set((purchases ?? []).map((purchase) => purchase.media_id));
+  const accessibleMedia = (media ?? []).filter((item) => ownedIds.has(item.id) || membershipAllows(membership, item.min_tier));
+  if (!membership && !accessibleMedia.length) redirect('/members');
 
   return (
     <PageShell>
       <main className="auth-page">
         <section className="auth-panel member-library">
-          <p className="eyebrow">{membership.tier.toUpperCase()} MEMBERSHIP</p>
+          <p className="eyebrow">{membership ? `${membership.tier.toUpperCase()} MEMBERSHIP` : 'YOUR PURCHASES'}</p>
           <h1>YOUR PRIVATE LIBRARY</h1>
           {accessibleMedia.length ? (
             <div className="member-library-grid">

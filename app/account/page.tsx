@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
-import { signOut } from '@/app/actions/auth';
+import { manageStripeSubscription, signOut } from '@/app/actions/auth';
 import { getSupabaseConfig } from '@/lib/supabase/config';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentMembership } from '@/lib/membership';
@@ -30,6 +30,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
   const displayName = typeof user.user_metadata?.display_name === 'string' ? user.user_metadata.display_name : '';
   const membership = await getCurrentMembership();
   const cancelUrl = membership?.status === 'active'
+    && membership.provider === 'verotel'
     ? createCancelSubscriptionUrl(membership.provider_subscription_id)
     : null;
 
@@ -47,6 +48,11 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               <p>Status: {membership.status === 'canceled' ? 'Canceled; access remains until the paid period ends.' : 'Active'}</p>
               {membership.current_period_end && <p>Access through {new Date(membership.current_period_end).toLocaleDateString('en-GB', { dateStyle: 'long', timeZone: 'UTC' })}.</p>}
               <a className="under-link" href="/library">OPEN YOUR PRIVATE LIBRARY</a>
+              {membership.provider === 'stripe' && membership.stripe_customer_id && (
+                <form action={manageStripeSubscription}>
+                  <button className="under-link" type="submit">MANAGE OR CANCEL MEMBERSHIP</button>
+                </form>
+              )}
               {cancelUrl && <a className="under-link" href={cancelUrl}>MANAGE OR CANCEL MEMBERSHIP</a>}
             </div>
           ) : (
