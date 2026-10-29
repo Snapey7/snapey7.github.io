@@ -14,14 +14,21 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   const admin = createAdminClient();
   const { data: media, error } = await admin
     .from('member_media')
-    .select('id,storage_path,bucket,min_tier')
+    .select('id,storage_path,bucket,min_tier,catalogue_id')
     .eq('id', id)
     .maybeSingle();
   if (error || !media) return new Response('Not found.', { status: 404 });
   let entitled = membershipAllows(membership, media.min_tier);
+  if (media.catalogue_id) {
+    const { data: catalogue } = await admin.from('catalogues').select('status').eq('id', media.catalogue_id).maybeSingle();
+    if (catalogue?.status !== 'published') entitled = false;
+  }
   if (!entitled) {
-    const { data: purchase } = await admin.from('portfolio_purchases').select('id')
-      .eq('user_id', user.id).eq('media_id', media.id).eq('status', 'paid').maybeSingle();
+    let purchaseQuery = admin.from('portfolio_purchases').select('id').eq('user_id', user.id).eq('status', 'paid');
+    purchaseQuery = media.catalogue_id
+      ? purchaseQuery.eq('catalogue_id', media.catalogue_id)
+      : purchaseQuery.eq('media_id', media.id);
+    const { data: purchase } = await purchaseQuery.maybeSingle();
     entitled = Boolean(purchase);
   }
   if (!entitled) return new Response('Purchase or membership required.', { status: 403 });

@@ -1,12 +1,18 @@
 # Backend and Stripe setup
 
-The site is prepared for Supabase accounts and private media, plus Stripe-hosted checkout for monthly and annual memberships and individual portfolio purchases. Stripe only grants access after a signed webhook is received. Stripe Checkout keeps card details off the website and can present supported payment methods such as Apple Pay and Link.
+The site supports Supabase accounts and private media, Stripe-hosted membership checkout, and one-time purchases for complete model catalogues and magazine editions. Stripe only grants purchase access after a signed webhook is received. Stripe Checkout keeps card details off the website and can present supported payment methods such as Apple Pay and Link.
 
 Photographic art is not automatically the same as sexually explicit material. Stripe reviews each merchant and its actual content; approval is up to Stripe. Describe the business and the content accurately in your Stripe application and ask Stripe to confirm eligibility before relying on live payments.
 
 ## 1. Apply the database update
 
-In Supabase, open **SQL Editor**, paste and run `supabase/migrations/202610280001_stripe_checkout.sql`. This adds Stripe membership fields, portfolio purchase entitlements, webhook idempotency, and the server-only event function. The original Verotel migration must already have been applied.
+In Supabase, open **SQL Editor** and run these files in order:
+
+1. `supabase/migrations/202610270001_memberships_and_private_media.sql`
+2. `supabase/migrations/202610280001_stripe_checkout.sql`
+3. `supabase/migrations/202610290001_catalogue_publishing.sql`
+
+The last migration creates the catalogue records from the seven Stripe Price IDs already supplied, attaches image records to catalogues, and adds catalogue-level purchase entitlements. All seven releases start as drafts.
 
 ## 2. Create Stripe products and prices
 
@@ -19,15 +25,7 @@ In Stripe Dashboard, create two products: **STANDARD Membership** and **IMPURA M
 
 The annual amounts are 17% below twelve monthly payments. Copy each Stripe `price_...` ID into the matching Vercel Production environment variable below. These are GBP prices for your UK audience.
 
-For each one-time portfolio, create a **one-time** Stripe price. Put that price ID in `member_media.stripe_price_id`, and set `model_slug` to the matching site's model slug. The existing private file path is the item delivered after payment. For example:
-
-```sql
-update public.member_media
-set model_slug = 'rachel', stripe_price_id = 'price_REPLACE_WITH_REAL_PRICE_ID'
-where id = 'REPLACE_WITH_MEDIA_UUID';
-```
-
-Only add real Stripe price IDs and real private media records. The model page will show a purchase button for configured items. Buyers get signed access to that item; membership access continues to work as before.
+The seven catalogue products are Ana, Cynthia, Lucy, Alexis, Angie, Daya, and Impura Vida Magazine Edition 1. Their Stripe Price IDs are seeded by the publishing migration. Add or change prices in Stripe, then update the matching `catalogues.stripe_price_id` if needed. Checkout reads the price from the server-side catalogue record; it never trusts a price ID from the browser. The Stripe amount and currency are fetched from Stripe and shown on the site.
 
 ## 3. Set up payment methods and domain
 
@@ -46,6 +44,9 @@ Subscribe to these events:
 - `customer.subscription.created`
 - `customer.subscription.updated`
 - `customer.subscription.deleted`
+- `charge.refunded`
+- `charge.dispute.created`
+- `charge.dispute.closed`
 
 Copy the endpoint's signing secret (`whsec_...`) into `STRIPE_WEBHOOK_SECRET`. The handler checks Stripe's signature and timestamp and ignores duplicate event IDs. Do not use the webhook's browser return URL as proof of payment.
 
@@ -59,12 +60,19 @@ Add these in **Project Settings → Environment Variables** for Production. Use 
 - `STRIPE_PRICE_STANDARD_YEARLY` — STANDARD annual recurring price ID
 - `STRIPE_PRICE_IMPURA_MONTHLY` — IMPURA monthly recurring price ID
 - `STRIPE_PRICE_IMPURA_YEARLY` — IMPURA annual recurring price ID
+- `CONTENT_ADMIN_EMAILS` — comma-separated email(s) of Supabase accounts allowed to upload and publish releases
 - Existing Supabase variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_SITE_URL=https://www.impuravidamagazine.com`
 
 Redeploy after setting variables. Checkout buttons stay disabled until all required Stripe and Supabase settings exist. Configure the Stripe Billing Portal in Dashboard so subscribers can manage or cancel; the account page opens the portal for Stripe subscriptions.
 
-## 6. Private content
+## 6. Upload and publish releases
+
+After the migrations and environment variables are deployed, sign in with the Supabase account whose email is in `CONTENT_ADMIN_EMAILS` and open `/studio`. Select a catalogue, add a customer description, upload its full-resolution images, then choose **Publish**. Uploads go directly to the private `member-media` Storage bucket using short-lived upload tokens. The site displays only published catalogues; unpublished files are not delivered even to members. Model catalogues appear on their Muse model page and Edition 1 appears in Shop.
+
+Create one sample release first: upload one approved test image to a catalogue, publish it, check its page as a visitor, buy it using Stripe test mode, and confirm the paid image appears in the buyer's library. Use Stripe test mode keys and test price IDs in Vercel Preview; use live keys only after the live webhook and account eligibility are confirmed.
+
+## 7. Private content
 
 Keep full paid files in the private `member-media` Supabase Storage bucket. Do not put paid originals in `public/`. The app issues short-lived signed URLs only after checking membership or a recorded one-time purchase. For monthly and annual membership checkout, use the matching configured Stripe Price ID. Account entitlements update through webhooks, not a client-side success redirect.
 

@@ -13,15 +13,23 @@ export default async function MemberLibraryPage() {
 
   const membership = await getCurrentMembership();
   const admin = createAdminClient();
-  const [{ data: media }, { data: purchases }] = await Promise.all([
+  const [{ data: media }, { data: purchases }, { data: liveCatalogues }] = await Promise.all([
     admin
     .from('member_media')
-    .select('id,title,alt_text,min_tier')
+    .select('id,title,alt_text,min_tier,catalogue_id')
     .order('created_at', { ascending: false }),
-    admin.from('portfolio_purchases').select('media_id').eq('user_id', user.id).eq('status', 'paid'),
+    admin.from('portfolio_purchases').select('media_id,catalogue_id').eq('user_id', user.id).eq('status', 'paid'),
+    admin.from('catalogues').select('id').eq('status', 'published'),
   ]);
   const ownedIds = new Set((purchases ?? []).map((purchase) => purchase.media_id));
-  const accessibleMedia = (media ?? []).filter((item) => ownedIds.has(item.id) || membershipAllows(membership, item.min_tier));
+  const ownedCatalogues = new Set((purchases ?? []).map((purchase) => purchase.catalogue_id).filter(Boolean));
+  const publishedCatalogues = new Set((liveCatalogues ?? []).map((catalogue) => catalogue.id));
+  const accessibleMedia = (media ?? []).filter((item) =>
+    (!item.catalogue_id || publishedCatalogues.has(item.catalogue_id)) && (
+      (item.catalogue_id && ownedCatalogues.has(item.catalogue_id)) ||
+      ownedIds.has(item.id) || membershipAllows(membership, item.min_tier)
+    ),
+  );
   if (!membership && !accessibleMedia.length) redirect('/members');
 
   return (
