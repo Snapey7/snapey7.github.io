@@ -9,12 +9,12 @@ export const dynamic = 'force-dynamic';
 export default async function ShopPage() {
   const { data: products } = await createAdminClient().from('shop_products')
     .select('id,title,description,stripe_price_id,status,shop_product_images(id,storage_path,alt_text,position)')
-    .eq('status', 'published').order('created_at');
+    .in('status', ['published', 'coming_soon']).order('created_at');
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
   const items = await Promise.all((products || []).map(async (product, index) => ({
     product,
     images: [...(product.shop_product_images || [])].sort((a, b) => a.position - b.position),
-    priceLabel: await getStripePriceLabel(product.stripe_price_id),
+    priceLabel: product.status === 'published' ? await getStripePriceLabel(product.stripe_price_id) : null,
     coverPosition: index === 0 ? 'shop-cover-costa-rica' : 'shop-cover-after-dark',
     href: index === 0 ? '/destinations/costa-rica' : '/editorials',
   })));
@@ -45,12 +45,16 @@ export default async function ShopPage() {
                   {images.slice(1).map((image) => <img alt={image.alt_text} key={image.id}
                     src={`${supabaseUrl}/storage/v1/object/public/shop-product-images/${image.storage_path.split('/').map(encodeURIComponent).join('/')}`} />)}
                 </div>}
-                <p className="shop-price">{priceLabel || 'Price at checkout'}</p>
-                <form action={beginShopProductCheckout}>
-                  <input name="productId" type="hidden" value={product.id} />
-                  <button className="shop-edition-link" disabled={!checkoutReady} type="submit">BUY NOW <span aria-hidden="true">→</span></button>
-                </form>
-                {!checkoutReady && <p className="shop-shipping-note">Checkout opens once shipping regions and rates are set up.</p>}
+                {product.status === 'coming_soon' ? (
+                  <p className="shop-price">COMING SOON</p>
+                ) : <>
+                  <p className="shop-price">{priceLabel || 'Price at checkout'}</p>
+                  <form action={beginShopProductCheckout}>
+                    <input name="productId" type="hidden" value={product.id} />
+                    <button className="shop-edition-link" disabled={!checkoutReady} type="submit">BUY NOW <span aria-hidden="true">→</span></button>
+                  </form>
+                  {!checkoutReady && <p className="shop-shipping-note">Checkout opens once shipping regions and rates are set up.</p>}
+                </>}
                 <Link className="shop-edition-link" href={href}>VIEW DETAILS <span aria-hidden="true">→</span></Link>
               </article>;
             })}

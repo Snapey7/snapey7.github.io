@@ -99,20 +99,25 @@ export async function removeShopImage(productId: string, imageId: string) {
   return { success: 'Shop photo removed.' };
 }
 
-export async function updateShopProduct(input: { productId: string; description: string; publish: boolean }) {
+export async function updateShopProduct(input: { productId: string; description: string; status: 'draft' | 'published' | 'coming_soon' }) {
   await requireContentAdmin();
-  if (!input || typeof input !== 'object' || typeof input.productId !== 'string' || typeof input.description !== 'string' || typeof input.publish !== 'boolean') {
+  if (!input || typeof input !== 'object' || typeof input.productId !== 'string' || typeof input.description !== 'string' || !['draft', 'published', 'coming_soon'].includes(input.status)) {
     return { error: 'Invalid shop product details.' };
   }
   if (!validProductId(input.productId)) return { error: 'Choose a valid shop product.' };
   const description = input.description.trim().slice(0, 2000);
   const { data, error } = await createAdminClient().from('shop_products')
-    .update({ description, status: input.publish ? 'published' : 'draft', updated_at: new Date().toISOString() })
+    .update({ description, status: input.status, updated_at: new Date().toISOString() })
     .eq('id', input.productId).select('id').maybeSingle();
   if (error || !data) return { error: 'Could not save this shop product.' };
   revalidatePath('/studio');
   revalidatePath('/shop');
-  return { success: input.publish ? 'Shop product published.' : 'Shop product saved as a draft.' };
+  const messages = {
+    draft: 'Shop product saved as a draft.',
+    coming_soon: 'Shop product marked as coming soon. Customers can see it but cannot purchase it.',
+    published: 'Shop product published for sale.',
+  };
+  return { success: messages[input.status] };
 }
 
 export async function createShopProduct(input: { title: string; stripePriceId: string }) {

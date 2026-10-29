@@ -1358,6 +1358,11 @@ button.under-link {
   color: #ff9b9d;
 }
 
+.studio-status.coming_soon {
+  border-color: rgba(255, 119, 121, 0.62);
+  color: #ff9b9d;
+}
+
 .studio-count {
   margin: 0.8rem 0 1rem;
   color: rgba(248, 239, 232, 0.65);
