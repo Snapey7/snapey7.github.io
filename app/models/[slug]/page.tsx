@@ -4,7 +4,7 @@ import { PageShell } from '@/components/site/PageShell';
 import { models } from '@/lib/content';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { beginCatalogueCheckout } from '@/app/actions/auth';
-import { getStripePriceLabel, isStripeOneTimeCheckoutReady } from '@/lib/billing/stripe';
+import { isStripeOneTimeCheckoutReady } from '@/lib/billing/stripe';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentMembership, membershipAllows } from '@/lib/membership';
 
@@ -24,9 +24,6 @@ export default async function ModelDetailPage({ params, searchParams }: ModelPag
     createClient().then((client) => client.auth.getUser()),
     getCurrentMembership(),
   ]);
-  const priceLabel = catalogue?.status === 'published'
-    ? await getStripePriceLabel(catalogue.stripe_price_id)
-    : null;
   const { data: media } = catalogue?.status === 'published'
     ? await admin.from('member_media').select('id,title,alt_text').eq('catalogue_id', catalogue.id).order('created_at')
     : { data: [] };
@@ -49,11 +46,10 @@ export default async function ModelDetailPage({ params, searchParams }: ModelPag
             {query.checkout === 'cancelled' && <p className="auth-notice" role="status">Checkout was cancelled. You can try again whenever you’re ready.</p>}
             {catalogue?.status === 'published' && catalogue.description && <p>{catalogue.description}</p>}
             {!canView && <>
-              <a className="model-entry-cta" href="/members">Get Full Access with Impura</a>
               {catalogue?.status === 'published' && <form action={beginCatalogueCheckout}>
                 <input type="hidden" name="catalogueId" value={catalogue.id} />
                 <button className="model-entry-cta" disabled={!isStripeOneTimeCheckoutReady()} type="submit">
-                  {priceLabel ? `Buy Catalogue · ${priceLabel}` : 'Buy Catalogue'}
+                  Get Access
                 </button>
               </form>}
               {catalogue && catalogue.status !== 'published' && <p className="model-entry-availability">This catalogue is being prepared and isn’t available to buy yet.</p>}
