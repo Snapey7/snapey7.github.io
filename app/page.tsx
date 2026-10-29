@@ -41,6 +41,7 @@ export default function Home() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/5 to-black/75" />
                 <div className="absolute inset-0 border border-white/10 transition duration-500 group-hover:border-coral/45 group-hover:shadow-[0_0_28px_rgba(255,99,105,0.16)]" />
+                <span className="featured-editorial-gallery-label">GALLERY</span>
                 <div className="absolute inset-x-0 bottom-0 px-5 pb-5 text-center transition duration-500 group-hover:-translate-y-1">
                   <h3 className="font-serif text-[1.03rem] uppercase tracking-[0.03em] text-ivory">
                     {model.name}
