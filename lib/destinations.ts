@@ -1,3 +1,12 @@
+export const destinationNavItems = [
+  { name: 'Costa Rica', href: '/destinations/costa-rica' },
+  { name: 'UK', href: '/destinations/london' },
+  { name: 'USA', href: '/destinations/usa' },
+  { name: 'Spain', href: '/destinations/spain' },
+  { name: 'Italy', href: '/destinations/italy' },
+  { name: 'France', href: '/destinations/france' },
+] as const;
+
 export const destinations = [
   {
     name: 'Santa Teresa',

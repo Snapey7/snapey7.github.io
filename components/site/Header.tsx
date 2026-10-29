@@ -2,12 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { navItems } from '@/lib/content';
+import { destinationNavItems } from '@/lib/destinations';
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [destinationsOpen, setDestinationsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -33,8 +35,11 @@ export function Header() {
                 {item.label}
               </Link>
               <div className="nav-dropdown-menu">
-                <Link href="/destinations/costa-rica">Costa Rica</Link>
-                <Link href="/destinations/london">London</Link>
+                {destinationNavItems.map((destination) => (
+                  <Link href={destination.href} key={destination.name}>
+                    {destination.name}
+                  </Link>
+                ))}
               </div>
             </div>
           ) : (
@@ -47,7 +52,10 @@ export function Header() {
         <button
           aria-label={open ? 'Close menu' : 'Open menu'}
           className="inline-flex h-10 w-10 items-center justify-center border border-coral/30 text-coral lg:hidden"
-          onClick={() => setOpen((value) => !value)}
+          onClick={() => {
+            setOpen((value) => !value);
+            setDestinationsOpen(false);
+          }}
           type="button"
         >
           {open ? <X size={18} /> : <Menu size={18} />}
@@ -86,36 +94,53 @@ export function Header() {
       </div>
 
       <div
-        className={`overflow-hidden border-t border-coral/15 transition-[max-height,opacity] duration-500 lg:hidden ${
-          open ? 'max-h-[520px] opacity-100' : 'max-h-0 opacity-0'
+        className={`border-t border-coral/15 transition-[max-height,opacity] duration-500 lg:hidden ${
+          open
+            ? 'max-h-[calc(100dvh-5rem)] overflow-y-auto opacity-100'
+            : 'max-h-0 overflow-hidden opacity-0'
         }`}
       >
         <nav className="grid gap-1 bg-black/96 px-5 py-5">
           {navItems.map((item) => (
             <div className="mobile-nav-item" key={item.label}>
-              <Link
-                className="border-b border-white/8 py-3 text-xs font-semibold tracking-[0.22em] text-ivory/85"
-                href={item.href}
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-              </Link>
-              {item.label === 'DESTINATIONS' && (
+              {item.label === 'DESTINATIONS' ? (
+                <button
+                  aria-expanded={destinationsOpen}
+                  className="mobile-destinations-toggle"
+                  onClick={() => setDestinationsOpen((value) => !value)}
+                  type="button"
+                >
+                  <span>{item.label}</span>
+                  <ChevronDown
+                    aria-hidden="true"
+                    className={`transition-transform duration-200 ${destinationsOpen ? 'rotate-180' : ''}`}
+                    size={16}
+                  />
+                </button>
+              ) : (
+                <Link
+                  className="border-b border-white/8 py-3 text-xs font-semibold tracking-[0.22em] text-ivory/85"
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              )}
+              {item.label === 'DESTINATIONS' && destinationsOpen && (
                 <>
-                  <Link
-                    className="mobile-nav-subitem"
-                    href="/destinations/costa-rica"
-                    onClick={() => setOpen(false)}
-                  >
-                    Costa Rica
+                  <Link className="mobile-nav-subitem" href={item.href} onClick={() => setOpen(false)}>
+                    All destinations
                   </Link>
-                  <Link
-                    className="mobile-nav-subitem"
-                    href="/destinations/london"
-                    onClick={() => setOpen(false)}
-                  >
-                    London
-                  </Link>
+                  {destinationNavItems.map((destination) => (
+                    <Link
+                      className="mobile-nav-subitem"
+                      href={destination.href}
+                      key={destination.name}
+                      onClick={() => setOpen(false)}
+                    >
+                      {destination.name}
+                    </Link>
+                  ))}
                 </>
               )}
             </div>
