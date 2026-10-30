@@ -11,10 +11,11 @@ export async function getContentAdminState() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const email = user?.email?.trim().toLowerCase();
+  const verifiedEmail = Boolean(user?.email_confirmed_at || user?.confirmed_at);
   return {
     user,
     configured: configuredEmails.length > 0,
-    authorized: Boolean(email && configuredEmails.includes(email)),
+    authorized: Boolean(email && verifiedEmail && configuredEmails.includes(email)),
   };
 }
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
-import { createCatalogueUploadTarget, createMagazineIssue, removeCataloguePhoto, removeCatalogueUploads, saveCatalogueMedia, updateCatalogue } from './actions';
+import { createCatalogueUploadTarget, createMagazineIssue, moveCataloguePhoto, removeCataloguePhoto, removeCatalogueUploads, saveCatalogueMedia, updateCatalogue } from './actions';
 
 type Catalogue = {
   id: string;
@@ -12,7 +12,7 @@ type Catalogue = {
   product_type: 'model_catalogue' | 'magazine_edition';
   model_slug: string | null;
   status: 'draft' | 'published';
-  member_media: { id: string; title: string; alt_text: string; preview_url: string }[];
+  member_media: { id: string; title: string; alt_text: string; preview_url: string; position: number }[];
 };
 
 export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
@@ -103,6 +103,26 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
     }
   }
 
+  async function movePhoto(catalogue: Catalogue, photoId: string, direction: 'up' | 'down') {
+    setBusyId(catalogue.id);
+    setMessages((current) => ({ ...current, [catalogue.id]: 'Updating photo order…' }));
+    try {
+      const result = await moveCataloguePhoto(catalogue.id, photoId, direction);
+      if ('error' in result) {
+        setMessages((current) => ({ ...current, [catalogue.id]: result.error || 'Could not update photo order.' }));
+      } else if (!result.moved) {
+        setMessages((current) => ({ ...current, [catalogue.id]: 'That photo is already at the edge of the collection.' }));
+      } else {
+        setMessages((current) => ({ ...current, [catalogue.id]: 'Photo order updated.' }));
+        router.refresh();
+      }
+    } catch {
+      setMessages((current) => ({ ...current, [catalogue.id]: 'Could not change the photo order. Refresh and try again.' }));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
     <>
     <form className="studio-new-product" action={async (formData) => {
@@ -136,13 +156,17 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
           </div>
           <p className="studio-count">{catalogue.member_media.length} private image{catalogue.member_media.length === 1 ? '' : 's'}</p>
           {catalogue.member_media.length > 0 && <div className="studio-private-image-list" aria-label={`Private photos in ${catalogue.title}`}>
-            {catalogue.member_media.map((photo) => <figure className="studio-private-image" key={photo.id}>
+            {catalogue.member_media.map((photo, index) => <figure className="studio-private-image" key={photo.id}>
               {photo.preview_url ? <img src={photo.preview_url} alt={photo.alt_text || photo.title} loading="lazy" /> : <div className="studio-private-image-placeholder">Preview unavailable</div>}
               <figcaption>
                 <span>{photo.title || photo.alt_text}</span>
-                <button disabled={busyId === catalogue.id} onClick={() => void removePhoto(catalogue, photo)} type="button">
-                  {busyId === catalogue.id ? 'Working…' : 'Remove photo'}
-                </button>
+                <div className="studio-private-image-actions">
+                  <button aria-label={`Move ${photo.title || `photo ${index + 1}`} earlier`} disabled={busyId === catalogue.id || index === 0} onClick={() => void movePhoto(catalogue, photo.id, 'up')} type="button">↑</button>
+                  <button aria-label={`Move ${photo.title || `photo ${index + 1}`} later`} disabled={busyId === catalogue.id || index === catalogue.member_media.length - 1} onClick={() => void movePhoto(catalogue, photo.id, 'down')} type="button">↓</button>
+                  <button className="studio-private-image-remove" disabled={busyId === catalogue.id} onClick={() => void removePhoto(catalogue, photo)} type="button">
+                    {busyId === catalogue.id ? 'Working…' : 'Remove photo'}
+                  </button>
+                </div>
               </figcaption>
             </figure>)}
           </div>}
