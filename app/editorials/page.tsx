@@ -1,7 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
-import Link from 'next/link';
-import { BookOpen } from 'lucide-react';
 import { EditorialCard } from '@/components/site/EditorialCard';
 import { PageShell } from '@/components/site/PageShell';
 import { editorials } from '@/lib/content';
@@ -35,100 +32,11 @@ export default function EditorialsPage() {
         <section className="archive-hero editorials-archive-hero">
           <h1>Editorials</h1>
           <p className="section-copy">
-            Creativity's whisper, captured after dark. Here is a peak into what
-            members are experiencing right now, subscribe to go all the way.
+            Stories from the shoots, and the creative voices, places, and ideas
+            behind each frame.
           </p>
         </section>
         <section className="archive-grid editorials-archive-grid">
-          <Link href="/models/ana" className="editorial-card group editorial-card-captioned editorial-featured-gallery">
-            <div className="editorial-card-media editorial-featured-gallery-media">
-              <Image
-                alt="Ana on a city balcony for A Private Kind of Summer"
-                className="object-cover"
-                fill
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                src="/assets/editorial-ana-cover.jpg"
-              />
-              <div className="editorial-featured-gallery-shade" />
-              <div className="editorial-placeholder-badge">
-                <BookOpen aria-hidden="true" size={11} />
-                GALLERY
-              </div>
-            </div>
-            <div className="editorial-card-caption">
-              <h2>A Private Kind of Summer</h2>
-              <p>Ana’s Little Vice, where temptation turns an ordinary afternoon into something far more sinful.</p>
-              <span>Impura Vida</span>
-              <span className="editorial-hover-cta">VIEW STORY <b aria-hidden="true">→</b></span>
-            </div>
-          </Link>
-          <Link href="/models/lucy" className="editorial-card group editorial-card-captioned editorial-featured-gallery">
-            <div className="editorial-card-media editorial-featured-gallery-media">
-              <Image
-                alt="Lucy at a secluded cove in Manzanillo, Costa Rica"
-                className="object-cover"
-                fill
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                src="/assets/editorial-manzanillo-cover.jpg"
-              />
-              <div className="editorial-featured-gallery-shade" />
-              <div className="editorial-placeholder-badge">
-                <BookOpen aria-hidden="true" size={11} />
-                GALLERY
-              </div>
-            </div>
-            <div className="editorial-card-caption">
-              <h2>Manzanillo Part I — Nothing Beyond the Horizon</h2>
-              <p>Lucy’s secret cove at the edge of the jungle.</p>
-              <span>Impura Vida</span>
-              <span className="editorial-hover-cta">VIEW STORY <b aria-hidden="true">→</b></span>
-            </div>
-          </Link>
-          <Link href="/models/angie" className="editorial-card group editorial-card-captioned editorial-featured-gallery">
-            <div className="editorial-card-media editorial-featured-gallery-media">
-              <Image
-                alt="Angie and Daya sharing an afternoon beside a green window"
-                className="object-cover"
-                fill
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                src="/assets/editorial-angie-daya-cover.png"
-              />
-              <div className="editorial-featured-gallery-shade" />
-              <div className="editorial-placeholder-badge">
-                <BookOpen aria-hidden="true" size={11} />
-                GALLERY
-              </div>
-            </div>
-            <div className="editorial-card-caption">
-              <h2>Where the Green Comes In</h2>
-              <p>A shared afternoon with Angie and Daya.</p>
-              <span>Impura Vida</span>
-              <span className="editorial-hover-cta">VIEW STORY <b aria-hidden="true">→</b></span>
-            </div>
-          </Link>
-          <Link href="/models/cynthia" className="editorial-card group editorial-card-captioned editorial-featured-gallery">
-            <div className="editorial-card-media editorial-featured-gallery-media">
-              <Image
-                alt="Cynthia in warm, low light for The House Keeps the Shadows"
-                className="object-cover"
-                fill
-                priority
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                src="/assets/editorial-cynthia-cover.jpg"
-              />
-              <div className="editorial-featured-gallery-shade" />
-              <div className="editorial-placeholder-badge">
-                <BookOpen aria-hidden="true" size={11} />
-                GALLERY
-              </div>
-            </div>
-            <div className="editorial-card-caption">
-              <h2>The House Keeps the Shadows</h2>
-              <p>An intimate portrait in warm light and deep shadow.</p>
-              <span>Impura Vida</span>
-              <span className="editorial-hover-cta">VIEW STORY <b aria-hidden="true">→</b></span>
-            </div>
-          </Link>
           {editorials.map((editorial) => (
             <EditorialCard captioned editorial={editorial} key={editorial.slug} />
           ))}

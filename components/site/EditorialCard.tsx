@@ -43,7 +43,7 @@ export function EditorialCard({
         <div className="absolute inset-0 border border-white/10 transition duration-500 group-hover:border-coral/45 group-hover:shadow-[0_0_28px_rgba(255,99,105,0.16)]" />
         <div className="absolute left-4 top-4 flex items-center gap-1.5 text-[9px] font-bold tracking-[0.16em] text-coral">
           <BookOpen aria-hidden="true" size={11} />
-          GALLERY
+          EDITORIAL
         </div>
       </div>
       {captioned && (

@@ -54,6 +54,55 @@ export const navItems = [
 
 export const editorials = [
   {
+    slug: 'a-private-kind-of-summer',
+    title: 'A PRIVATE KIND OF SUMMER',
+    image: '/assets/editorial-ana-cover.jpg',
+    location: 'Miami',
+    model: 'Ana',
+    cardDescription:
+      'Ana’s Little Vice, where temptation turns an ordinary afternoon into something far more sinful.',
+    photographer: 'Impura Vida',
+    date: '',
+    intro:
+      'An ordinary Miami afternoon becomes a study in confidence, warmth, and the small moments that turn into a story.',
+  },
+  {
+    slug: 'manzanillo-part-i-nothing-beyond-the-horizon',
+    title: 'MANZANILLO PART I — NOTHING BEYOND THE HORIZON',
+    image: '/assets/editorial-manzanillo-cover.jpg',
+    location: 'Manzanillo',
+    model: 'Lucy',
+    cardDescription: 'Lucy’s secret cove at the edge of the jungle.',
+    photographer: 'Impura Vida',
+    date: '',
+    intro:
+      'A public story about the meeting of jungle and sea, and the quiet of a cove at the edge of Manzanillo.',
+  },
+  {
+    slug: 'where-the-green-comes-in',
+    title: 'WHERE THE GREEN COMES IN',
+    image: '/assets/editorial-angie-daya-cover.png',
+    location: 'Playa Carmen',
+    model: 'Angie and Daya',
+    cardDescription: 'A shared afternoon with Angie and Daya.',
+    photographer: 'Impura Vida',
+    date: '',
+    intro:
+      'A shared afternoon framed by the deep greens and open light of Playa Carmen.',
+  },
+  {
+    slug: 'the-house-keeps-the-shadows',
+    title: 'THE HOUSE KEEPS THE SHADOWS',
+    image: '/assets/editorial-cynthia-cover.jpg',
+    location: 'Santa Teresa',
+    model: 'Cynthia',
+    cardDescription: 'An intimate portrait in warm light and deep shadow.',
+    photographer: 'Impura Vida',
+    date: '',
+    intro:
+      'Warm light and deep shadows shape this public portrait from Santa Teresa.',
+  },
+  {
     slug: 'the-haven',
     title: 'THE HAVEN',
     image: '/assets/editorial-the-haven.png',
@@ -64,7 +113,6 @@ export const editorials = [
     date: 'September 2026',
     intro:
       'A private jungle hideaway where candlelight, salt air, and late-night water shape the first chapter of the season.',
-    locked: true,
   },
   {
     slug: 'monica-riviera',
@@ -77,7 +125,6 @@ export const editorials = [
     date: 'August 2026',
     intro:
       'Warm interiors, rain-heavy windows, and a muse caught between ceremony and escape.',
-    locked: true,
   },
   {
     slug: 'coastal-escape-pt-2',
@@ -90,7 +137,6 @@ export const editorials = [
     date: 'August 2026',
     intro:
       'The second movement of a coastal story told through linen sheets, night breeze, and slow tropical light.',
-    locked: true,
   },
   {
     slug: 'golden-horizons-pt-1',
@@ -103,7 +149,6 @@ export const editorials = [
     date: 'July 2026',
     intro:
       'A sunset field note from Costa Rica’s dry coast, edited like a private postcard.',
-    locked: true,
   },
   {
     slug: 'alexis-noir',
@@ -116,7 +161,6 @@ export const editorials = [
     date: 'July 2026',
     intro:
       'Deep foliage, wet skin, and the intimate quiet that arrives before the storm.',
-    locked: true,
   },
   {
     slug: 'willow',
@@ -129,7 +173,6 @@ export const editorials = [
     date: 'June 2026',
     intro:
       'An earth-toned portrait study in shadow, texture, and restrained tropical heat.',
-    locked: true,
   },
   {
     slug: 'the-sanctuary',
@@ -142,7 +185,6 @@ export const editorials = [
     date: 'June 2026',
     intro:
       'Volcanic stone, still water, and the ritual atmosphere of a hidden refuge.',
-    locked: true,
   },
   {
     slug: 'isabella',
@@ -155,7 +197,6 @@ export const editorials = [
     date: 'May 2026',
     intro:
       'A high-sun silhouette translated into leather, palms, and after-dark confidence.',
-    locked: true,
   },
 ] as const;
 
