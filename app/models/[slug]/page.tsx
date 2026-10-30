@@ -26,7 +26,7 @@ export default async function ModelDetailPage({ params, searchParams }: ModelPag
     getCurrentMembership(),
   ]);
   const { data: media } = catalogue?.status === 'published'
-    ? await admin.from('member_media').select('id,title,alt_text').eq('catalogue_id', catalogue.id).order('created_at')
+    ? await admin.from('member_media').select('id,title,alt_text').eq('catalogue_id', catalogue.id).order('position').order('created_at')
     : { data: [] };
   let purchased = false;
   if (user && catalogue) {

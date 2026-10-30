@@ -50,6 +50,10 @@ export async function saveCatalogueMedia(catalogueId: string, paths: string[]) {
     .select('id,title,model_slug,status,product_type').eq('id', catalogueId).maybeSingle();
   if (catalogueError || !catalogue) return { error: 'Catalogue not found.' };
 
+  const { data: lastPhoto, error: orderError } = await admin.from('member_media')
+    .select('position').eq('catalogue_id', catalogueId).order('position', { ascending: false }).limit(1).maybeSingle();
+  if (orderError) return { error: 'Could not determine the next photo position.' };
+
   const rows = paths.map((path, index) => ({
     title: catalogue.title,
     alt_text: `${catalogue.title}, photograph ${index + 1}`,
@@ -58,6 +62,7 @@ export async function saveCatalogueMedia(catalogueId: string, paths: string[]) {
     min_tier: catalogue.product_type === 'magazine_edition' ? 'standard' as const : 'impura' as const,
     model_slug: catalogue.model_slug,
     catalogue_id: catalogue.id,
+    position: (lastPhoto?.position ?? -1) + index + 1,
   }));
   const { error } = await admin.from('member_media').insert(rows);
   if (error) return { error: 'Images uploaded, but the catalogue could not be updated. Please retry or contact support.' };
@@ -120,6 +125,29 @@ export async function removeCataloguePhoto(catalogueId: string, photoId: string)
   return { success: !count
     ? 'Photo removed and empty catalogue unpublished.'
     : `Photo removed from ${catalogue.title}.` };
+}
+
+export async function moveCataloguePhoto(catalogueId: string, photoId: string, direction: 'up' | 'down') {
+  await requireContentAdmin();
+  if (!/^[0-9a-f-]{36}$/i.test(catalogueId) || !/^[0-9a-f-]{36}$/i.test(photoId) || !['up', 'down'].includes(direction)) {
+    return { error: 'Choose a valid catalogue photo and direction.' };
+  }
+
+  const admin = createAdminClient();
+  const { data, error } = await admin.rpc('move_catalogue_photo', {
+    p_catalogue_id: catalogueId,
+    p_photo_id: photoId,
+    p_direction: direction,
+  });
+  if (error) return { error: 'Could not update photo order. Apply the photo ordering migration in Supabase, then try again.' };
+  if (data) {
+    const { data: catalogue } = await admin.from('catalogues').select('model_slug').eq('id', catalogueId).maybeSingle();
+    revalidatePath('/studio');
+    revalidatePath('/models');
+    revalidatePath('/library');
+    if (catalogue?.model_slug) revalidatePath(`/models/${catalogue.model_slug}`);
+  }
+  return { moved: Boolean(data) };
 }
 
 export async function updateCatalogue(input: { catalogueId: string; description: string; publish: boolean }) {

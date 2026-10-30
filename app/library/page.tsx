@@ -16,8 +16,8 @@ export default async function MemberLibraryPage() {
   const [{ data: media }, { data: purchases }, { data: liveCatalogues }] = await Promise.all([
     admin
     .from('member_media')
-    .select('id,title,alt_text,min_tier,catalogue_id')
-    .order('created_at', { ascending: false }),
+    .select('id,title,alt_text,min_tier,catalogue_id,position')
+    .order('position').order('created_at', { ascending: false }),
     admin.from('portfolio_purchases').select('media_id,catalogue_id').eq('user_id', user.id).eq('status', 'paid'),
     admin.from('catalogues').select('id').eq('status', 'published'),
   ]);

@@ -1414,6 +1414,20 @@ button.under-link {
   white-space: nowrap;
 }
 
+.studio-private-image-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+}
+
+.studio-private-image-actions button {
+  min-width: 0;
+}
+
+.studio-private-image-actions .studio-private-image-remove {
+  grid-column: 1 / -1;
+}
+
 .studio-private-image button {
   min-height: 34px;
   border: 1px solid rgba(255, 119, 121, 0.8);
