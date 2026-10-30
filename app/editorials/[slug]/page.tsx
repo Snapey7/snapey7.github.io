@@ -35,8 +35,22 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
   const previous = allEditorials[(index - 1 + allEditorials.length) % allEditorials.length];
   const next = allEditorials[(index + 1) % allEditorials.length];
   const paragraphs = editorialBody(editorial);
-  const isLucy = editorial.slug === 'manzanillo-part-i-nothing-beyond-the-horizon';
-  const storySections = [paragraphs.slice(0, 2), paragraphs.slice(2, 4), paragraphs.slice(4, 5), paragraphs.slice(5)];
+  const isLucy =
+    editorial.slug === 'manzanillo-part-i-nothing-beyond-the-horizon' ||
+    editorial.model?.trim().toLowerCase() === 'lucy';
+  const gallery = editorial.gallery || [];
+  const openingCount = gallery.length ? Math.min(2, paragraphs.length) : paragraphs.length;
+  const storyOpening = paragraphs.slice(0, openingCount).map((text, index) => ({ text, index }));
+  let paragraphCursor = openingCount;
+  const storyBeats = gallery.map((photo, photoIndex) => {
+    const beatsRemaining = gallery.length - photoIndex;
+    const paragraphsInBeat = Math.ceil((paragraphs.length - paragraphCursor) / beatsRemaining);
+    const text = paragraphs
+      .slice(paragraphCursor, paragraphCursor + paragraphsInBeat)
+      .map((paragraph, offset) => ({ text: paragraph, index: paragraphCursor + offset }));
+    paragraphCursor += text.length;
+    return { photo, photoIndex, text };
+  });
 
   return (
     <PageShell>
@@ -54,18 +68,15 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             </header>
             <section className="editorial-flow-story" aria-label="The story">
               <div className="editorial-flow-copy editorial-story-paragraphs">
-                {storySections[0].map((paragraph, paragraphIndex) => <p key={`opening-${paragraphIndex}`}>{paragraph}</p>)}
+                {storyOpening.map(({ text, index }) => <p className={index === paragraphs.length - 1 ? 'editorial-story-ending' : undefined} key={`opening-${index}`}>{text}</p>)}
               </div>
-              {editorial.gallery?.map((photo, photoIndex) => (
+              {storyBeats.map(({ photo, photoIndex, text }) => (
                 <div className={`editorial-flow-beat editorial-flow-beat-${photoIndex}`} key={photo.id || photo.src}>
                   <figure className={`editorial-flow-photo editorial-flow-photo-${photoIndex}`}>
                     <img src={photo.src} alt={photo.alt} />
                   </figure>
                   <div className="editorial-flow-copy editorial-story-paragraphs">
-                    {storySections[photoIndex + 1]?.map((paragraph, paragraphIndex) => {
-                      const absoluteIndex = photoIndex === 0 ? paragraphIndex + 2 : photoIndex === 1 ? paragraphIndex + 4 : paragraphIndex + 5;
-                      return <p className={absoluteIndex === paragraphs.length - 1 ? 'editorial-story-ending' : undefined} key={`beat-${photoIndex}-${paragraphIndex}`}>{paragraph}</p>;
-                    })}
+                    {text.map(({ text: paragraph, index }) => <p className={index === paragraphs.length - 1 ? 'editorial-story-ending' : undefined} key={`beat-${photoIndex}-${index}`}>{paragraph}</p>)}
                   </div>
                 </div>
               ))}
