@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
 import { editorials } from '@/lib/content';
@@ -36,29 +37,36 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
 
   return (
     <PageShell>
-      <main>
-        <section
-          className="detail-hero"
-          style={{
-            backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.12), #030303), url(${editorial.image})`,
-          }}
-        >
-          <div className="detail-hero-inner">
-            <p className="eyebrow">{editorial.location}</p>
-            <h1>{editorial.title}</h1>
-            <div className="detail-meta">
-              {editorial.model && <span>{editorial.model}</span>}
-              {editorial.photographer && <span>{editorial.photographer}</span>}
-              {editorial.date && <span>{editorial.date}</span>}
-            </div>
-          </div>
-        </section>
-        <section className="detail-body">
-          <p className="detail-intro">{editorial.intro}</p>
-          <p>{editorial.cardDescription}</p>
-          <figure className="editorial-story-image">
-            <img alt={`${editorial.title} — public editorial story`} src={editorial.image} />
+      <main className={`editorial-story-page editorial-story-layout-${index % 4}`}>
+        <section className="editorial-story-hero">
+          <figure className="editorial-story-art">
+            <Image
+              alt={`${editorial.title} — public editorial story`}
+              className="editorial-story-photo"
+              fill
+              priority
+              sizes="(max-width: 760px) 100vw, (max-width: 1200px) 55vw, 760px"
+              src={editorial.image}
+            />
+            <figcaption>IMPURA VIDA <span>·</span> EDITORIAL {String(index + 1).padStart(2, '0')}</figcaption>
           </figure>
+          <header className="editorial-story-heading">
+            <p className="eyebrow">{editorial.location} <span>·</span> EDITORIAL</p>
+            <h1>{editorial.title}</h1>
+            <p className="editorial-story-deck">{editorial.cardDescription}</p>
+          </header>
+        </section>
+        <section className="editorial-story-body">
+          <div className="editorial-story-copy">
+            <p className="editorial-story-label">THE STORY</p>
+            <p className="detail-intro">{editorial.intro}</p>
+          </div>
+          <div className="editorial-story-byline" aria-label="Editorial credits">
+            {editorial.model && <p><span>FEATURING</span>{editorial.model}</p>}
+            {editorial.photographer && <p><span>PHOTOGRAPHY</span>{editorial.photographer}</p>}
+            {editorial.date && <p><span>RELEASE</span>{editorial.date}</p>}
+            <p><span>LOCATION</span>{editorial.location}</p>
+          </div>
           <div className="pager">
             <Link className="under-link" href={`/editorials/${previous.slug}`}>
               PREVIOUS · {previous.title}
