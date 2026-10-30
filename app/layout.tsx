@@ -22,6 +22,24 @@ export const metadata: Metadata = {
   },
   description:
     'A digital magazine celebrating freedom, beauty, and temptation in Costa Rica and beyond. Discover cinematic editorials, muses, and destinations.',
+  icons: {
+    icon: [
+      { url: '/assets/impura-icon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/assets/impura-icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [
+      {
+        url: '/assets/impura-apple-touch-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
+  },
+  appleWebApp: {
+    capable: true,
+    title: 'IMPURA VIDA',
+    statusBarStyle: 'black-translucent',
+  },
   alternates: {
     canonical: '/',
   },
