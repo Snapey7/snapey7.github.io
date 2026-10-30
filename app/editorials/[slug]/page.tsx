@@ -47,21 +47,18 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             <p className="eyebrow">{editorial.location}</p>
             <h1>{editorial.title}</h1>
             <div className="detail-meta">
-              <span>{editorial.model}</span>
-              <span>{editorial.photographer}</span>
-              <span>{editorial.date}</span>
+              {editorial.model && <span>{editorial.model}</span>}
+              {editorial.photographer && <span>{editorial.photographer}</span>}
+              {editorial.date && <span>{editorial.date}</span>}
             </div>
           </div>
         </section>
         <section className="detail-body">
           <p className="detail-intro">{editorial.intro}</p>
-          <div className="gallery-grid">
-            <img alt={editorial.title} src={editorial.image} />
-            <img alt="IMPURA VIDA atmosphere" src="/assets/hero.png" />
-          </div>
-          <div className="locked-panel">
-            <p>MEMBERS ONLY GALLERY</p>
-          </div>
+          <p>{editorial.cardDescription}</p>
+          <figure className="editorial-story-image">
+            <img alt={`${editorial.title} — public editorial story`} src={editorial.image} />
+          </figure>
           <div className="pager">
             <Link className="under-link" href={`/editorials/${previous.slug}`}>
               PREVIOUS · {previous.title}
