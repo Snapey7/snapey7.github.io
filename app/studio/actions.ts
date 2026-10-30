@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireContentAdmin } from '@/lib/content-admin';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { editorials } from '@/lib/content';
 
 const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
 const maxImageBytes = 20 * 1024 * 1024;
@@ -35,6 +36,132 @@ export async function createCatalogueUploadTarget(input: {
   const { data, error } = await admin.storage.from('member-media').createSignedUploadUrl(path, { upsert: false });
   if (error || !data?.token) return { error: 'Could not prepare a secure upload. Check the private Supabase storage bucket.' };
   return { path, token: data.token };
+}
+
+export async function createEditorialUploadTarget(input: {
+  slug: string;
+  fileName: string;
+  contentType: string;
+  size: number;
+}) {
+  await requireContentAdmin();
+  const base = editorials.find((item) => item.slug === input.slug);
+  if (!base) return { error: 'Choose an existing editorial.' };
+  if (!Number.isFinite(input.size) || input.size <= 0 || input.size > maxImageBytes) {
+    return { error: 'Each image must be no larger than 20 MB.' };
+  }
+  const extension = safeExtension(input.fileName, input.contentType);
+  if (!extension) return { error: 'Upload JPEG, PNG, WebP, or AVIF images.' };
+
+  const admin = createAdminClient();
+  const { data: existing, error: lookupError } = await admin.from('editorial_stories')
+    .select('slug').eq('slug', input.slug).maybeSingle();
+  if (lookupError) return { error: 'Editorial storage is not ready. Apply the editorial studio migration in Supabase.' };
+  if (!existing) {
+    const { error: seedError } = await admin.from('editorial_stories').insert({
+      slug: base.slug,
+      title: base.title,
+      location: base.location,
+      model: base.model,
+      deck: base.cardDescription,
+      body: base.body || [base.intro],
+      photographer: base.photographer,
+      release_date: base.date,
+      status: 'published',
+    });
+    if (seedError) return { error: 'Could not prepare this editorial for editing.' };
+  }
+
+  const path = `${input.slug}/${crypto.randomUUID()}.${extension}`;
+  const { data, error } = await admin.storage.from('editorial-media').createSignedUploadUrl(path, { upsert: false });
+  if (error || !data?.token) return { error: 'Could not prepare a private upload. Check the editorial-media bucket in Supabase.' };
+  return { path, token: data.token };
+}
+
+export async function saveEditorialPhoto(slug: string, path: string, altText: string) {
+  await requireContentAdmin();
+  if (!editorials.some((item) => item.slug === slug) || typeof path !== 'string' || !path.startsWith(`${slug}/`) || path.includes('..')) {
+    return { error: 'Choose a valid editorial image.' };
+  }
+  const admin = createAdminClient();
+  const { data: lastImage, error: orderError } = await admin.from('editorial_images')
+    .select('position').eq('editorial_slug', slug).order('position', { ascending: false }).limit(1).maybeSingle();
+  if (orderError) return { error: 'Could not determine the next image position.' };
+  const { error } = await admin.from('editorial_images').insert({
+    editorial_slug: slug,
+    storage_path: path,
+    public_url: null,
+    alt_text: altText.trim().slice(0, 300) || `${slug.replaceAll('-', ' ')} editorial photograph`,
+    position: (lastImage?.position ?? -1) + 1,
+    published: false,
+  });
+  if (error) return { error: 'The image uploaded, but the editorial could not be updated.' };
+  revalidatePath('/studio');
+  revalidatePath('/editorials');
+  revalidatePath(`/editorials/${slug}`);
+  revalidatePath('/');
+  return { success: 'Editorial image uploaded.' };
+}
+
+export async function removeEditorialUpload(slug: string, path: string) {
+  await requireContentAdmin();
+  if (!editorials.some((item) => item.slug === slug) || typeof path !== 'string' || !path.startsWith(`${slug}/`) || path.includes('..')) {
+    return { error: 'Choose a valid uploaded editorial photo.' };
+  }
+  const admin = createAdminClient();
+  const { data: image } = await admin.from('editorial_images').select('id,storage_path')
+    .eq('editorial_slug', slug).eq('storage_path', path).maybeSingle();
+  if (!image) return { error: 'This uploaded image was not found. Refresh the page and try again.' };
+  const { error: storageError } = await admin.storage.from('editorial-media').remove([path]);
+  if (storageError) return { error: 'The image could not be removed from storage.' };
+  const { error: deleteError } = await admin.from('editorial_images').delete().eq('id', image.id);
+  if (deleteError) return { error: 'The storage file was deleted, but its editorial record could not be cleared.' };
+  revalidatePath('/studio');
+  revalidatePath('/editorials');
+  revalidatePath(`/editorials/${slug}`);
+  revalidatePath('/');
+  return { success: 'Uploaded image removed.' };
+}
+
+export async function updateEditorial(input: {
+  slug: string;
+  title: string;
+  location: string;
+  model: string;
+  deck: string;
+  body: string;
+  photographer: string;
+  releaseDate: string;
+}) {
+  await requireContentAdmin();
+  const base = editorials.find((item) => item.slug === input.slug);
+  if (!base) return { error: 'Choose an existing editorial.' };
+  const title = input.title.trim().slice(0, 180);
+  const deck = input.deck.trim().slice(0, 400);
+  const body = input.body.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean).slice(0, 30);
+  if (!title || !deck || !body.length || body.join('\n').length > 16000) return { error: 'Add a title, a short introduction, and story text (separate paragraphs with a blank line).' };
+  const admin = createAdminClient();
+  const { error } = await admin.from('editorial_stories').upsert({
+    slug: base.slug,
+    title,
+    location: input.location.trim().slice(0, 120),
+    model: input.model.trim().slice(0, 120),
+    deck,
+    body,
+    photographer: input.photographer.trim().slice(0, 120),
+    release_date: input.releaseDate.trim().slice(0, 80),
+    status: 'published',
+    updated_at: new Date().toISOString(),
+  });
+  if (error) return { error: 'Could not save this editorial. Apply the editorial studio migration in Supabase first.' };
+  const { error: imagePublishError } = await admin.from('editorial_images')
+    .update({ published: true }).eq('editorial_slug', base.slug);
+  if (imagePublishError) return { error: 'Story saved, but new images are not public yet. Refresh and try publishing again.' };
+  revalidatePath('/studio');
+  revalidatePath('/editorials');
+  revalidatePath(`/editorials/${base.slug}`);
+  revalidatePath('/');
+  return { success: 'Editorial published.' };
 }
 
 export async function saveCatalogueMedia(catalogueId: string, paths: string[]) {

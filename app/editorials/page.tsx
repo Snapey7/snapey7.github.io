@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { EditorialCard } from '@/components/site/EditorialCard';
 import { PageShell } from '@/components/site/PageShell';
-import { editorials } from '@/lib/content';
+import { getPublicEditorials } from '@/lib/editorials';
 
 export const metadata: Metadata = {
   title: 'Editorials',
@@ -25,7 +25,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function EditorialsPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function EditorialsPage() {
+  const editorials = await getPublicEditorials();
   return (
     <PageShell>
       <main>

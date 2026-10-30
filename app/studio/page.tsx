@@ -1,8 +1,10 @@
 import { redirect } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
 import { getContentAdminState } from '@/lib/content-admin';
+import { editorials, type Editorial } from '@/lib/content';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { CatalogueManager } from './CatalogueManager';
+import { EditorialManager } from './EditorialManager';
 import { ShopProductManager } from './ShopProductManager';
 
 export const dynamic = 'force-dynamic';
@@ -34,6 +36,15 @@ export default async function StudioPage() {
     member_media: { id: string; title: string; alt_text: string; preview_url: string; position: number }[];
   }[] = [];
   let loadError = '';
+  let editorialLoadError = '';
+  let editorialItems: (Editorial & { status: 'draft' | 'published'; images: { id: string; storage_path: string | null; preview_url: string; alt_text: string }[] })[] = editorials.map((item) => ({
+    ...item,
+    status: 'published',
+    images: [
+      { id: `static-${item.slug}`, storage_path: null, preview_url: item.image, alt_text: item.title },
+      ...(item.gallery || []).map((photo, index) => ({ id: `static-${item.slug}-${index}`, storage_path: null, preview_url: photo.src, alt_text: photo.alt })),
+    ],
+  }));
   let shopProducts: {
     id: string;
     title: string;
@@ -51,6 +62,46 @@ export default async function StudioPage() {
   }[] = [];
   try {
     const admin = createAdminClient();
+    const { data: storyRows, error: editorialError } = await admin.from('editorial_stories')
+      .select('slug,title,location,model,deck,body,photographer,release_date,status,editorial_images(id,storage_path,public_url,alt_text,position)')
+      .order('title');
+    if (editorialError) {
+      editorialLoadError = 'Apply the editorial studio migration in Supabase to manage public stories and photos.';
+    } else {
+      const bySlug = new Map((storyRows || []).map((row) => [row.slug, row]));
+      const allPaths = (storyRows || []).flatMap((row) => (row.editorial_images || [])
+        .filter((photo) => photo.storage_path)
+        .map((photo) => photo.storage_path as string));
+      const { data: signedPhotos } = allPaths.length
+        ? await admin.storage.from('editorial-media').createSignedUrls(allPaths, 600)
+        : { data: [] };
+      const signedUrls = new Map((signedPhotos || []).map((photo) => [photo.path, photo.signedUrl || '']));
+      editorialItems = editorials.map((base) => {
+        const row = bySlug.get(base.slug);
+        if (!row) return { ...base, status: 'published' as const, images: [
+          { id: `static-${base.slug}`, storage_path: null, preview_url: base.image, alt_text: base.title },
+          ...(base.gallery || []).map((photo, index) => ({ id: `static-${base.slug}-${index}`, storage_path: null, preview_url: photo.src, alt_text: photo.alt })),
+        ] };
+        return {
+          ...base,
+          title: row.title,
+          location: row.location,
+          model: row.model,
+          cardDescription: row.deck,
+          photographer: row.photographer,
+          date: row.release_date,
+          body: row.body,
+          intro: row.body?.[0] || base.intro,
+          status: row.status as 'draft' | 'published',
+          images: [...(row.editorial_images || [])].sort((a, b) => a.position - b.position || a.id.localeCompare(b.id)).map((photo) => ({
+            id: photo.id,
+            storage_path: photo.storage_path,
+            preview_url: photo.public_url || (photo.storage_path ? signedUrls.get(photo.storage_path) || '' : ''),
+            alt_text: photo.alt_text,
+          })),
+        };
+      });
+    }
     const { data, error } = await admin.from('catalogues')
       .select('id,title,description,product_type,model_slug,status,member_media(id,title,alt_text,bucket,storage_path,position)')
       .order('product_type').order('title');
@@ -103,6 +154,12 @@ export default async function StudioPage() {
         <h1>Content studio</h1>
         <p className="studio-intro">Private releases are stored in the subscriber vault. Public shop photos are managed separately and visible to everyone.</p>
         {loadError && <p className="studio-feedback" role="status">{loadError}</p>}
+        <section aria-labelledby="studio-editorials-heading" className="studio-section">
+          <h2 id="studio-editorials-heading">Public editorials</h2>
+          <p>Write and publish public shoot stories here. These photographs are separate from the paid Muse catalogue. Draft uploads stay in private storage until you publish.</p>
+          {editorialLoadError && <p className="studio-feedback" role="status">{editorialLoadError}</p>}
+          <EditorialManager editorials={editorialItems} />
+        </section>
         {!loadError && <>
           <section aria-labelledby="studio-shop-heading" className="studio-section">
             <h2 id="studio-shop-heading">Shop products · public display photos</h2>

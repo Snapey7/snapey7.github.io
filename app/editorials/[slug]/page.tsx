@@ -2,19 +2,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
-import { editorials } from '@/lib/content';
+import { getPublicEditorials, editorialBody } from '@/lib/editorials';
 
 type EditorialPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return editorials.map((editorial) => ({ slug: editorial.slug }));
-}
-
 export async function generateMetadata({ params }: EditorialPageProps) {
   const { slug } = await params;
-  const editorial = editorials.find((item) => item.slug === slug);
+  const allEditorials = await getPublicEditorials();
+  const editorial = allEditorials.find((item) => item.slug === slug);
   if (!editorial) return {};
   return {
     title: `${editorial.title} | IMPURA VIDA`,
@@ -27,17 +24,21 @@ export async function generateMetadata({ params }: EditorialPageProps) {
   };
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditorialDetailPage({ params }: EditorialPageProps) {
   const { slug } = await params;
-  const editorial = editorials.find((item) => item.slug === slug);
+  const allEditorials = await getPublicEditorials();
+  const editorial = allEditorials.find((item) => item.slug === slug);
   if (!editorial) notFound();
-  const index = editorials.findIndex((item) => item.slug === editorial.slug);
-  const previous = editorials[(index - 1 + editorials.length) % editorials.length];
-  const next = editorials[(index + 1) % editorials.length];
+  const index = allEditorials.findIndex((item) => item.slug === editorial.slug);
+  const previous = allEditorials[(index - 1 + allEditorials.length) % allEditorials.length];
+  const next = allEditorials[(index + 1) % allEditorials.length];
+  const paragraphs = editorialBody(editorial);
 
   return (
     <PageShell>
-      <main className={`editorial-story-page editorial-story-layout-${index % 4}`}>
+      <main className={`editorial-story-page editorial-story-layout-${index % 4}${editorial.slug === 'manzanillo-part-i-nothing-beyond-the-horizon' ? ' editorial-story-lucy' : ''}`}>
         <section className="editorial-story-hero">
           <figure className="editorial-story-art">
             <Image
@@ -59,7 +60,13 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
         <section className="editorial-story-body">
           <div className="editorial-story-copy">
             <p className="editorial-story-label">THE STORY</p>
-            <p className="detail-intro">{editorial.intro}</p>
+            <div className="editorial-story-paragraphs">
+              {paragraphs.map((paragraph, paragraphIndex) => (
+                <p className={paragraphIndex === paragraphs.length - 1 ? 'editorial-story-ending' : undefined} key={`${paragraphIndex}-${paragraph.slice(0, 24)}`}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
           </div>
           <div className="editorial-story-byline" aria-label="Editorial credits">
             {editorial.model && <p><span>FEATURING</span>{editorial.model}</p>}
@@ -76,6 +83,16 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             </Link>
           </div>
         </section>
+        {editorial.gallery?.length ? (
+          <section className="editorial-story-gallery" aria-label={`${editorial.model} editorial photographs`}>
+            {editorial.gallery.map((photo, photoIndex) => (
+              <figure className={`editorial-story-gallery-item editorial-story-gallery-item-${photoIndex % 3}`} key={photo.id || photo.src}>
+                <Image alt={photo.alt} fill sizes="(max-width: 760px) 100vw, 50vw" src={photo.src} />
+                <figcaption>{String(photoIndex + 2).padStart(2, '0')} <span>·</span> {photo.alt}</figcaption>
+              </figure>
+            ))}
+          </section>
+        ) : null}
       </main>
     </PageShell>
   );

@@ -52,7 +52,23 @@ export const navItems = [
   { label: 'SHOP', href: '/shop' },
 ] as const;
 
-export const editorials = [
+export type EditorialImage = { id?: string; src: string; alt: string };
+
+export type Editorial = {
+  slug: string;
+  title: string;
+  image: string;
+  location: string;
+  model: string;
+  cardDescription: string;
+  photographer: string;
+  date: string;
+  intro: string;
+  body?: string[];
+  gallery?: EditorialImage[];
+};
+
+export const editorials: Editorial[] = [
   {
     slug: 'a-private-kind-of-summer',
     title: 'A PRIVATE KIND OF SUMMER',
@@ -68,15 +84,28 @@ export const editorials = [
   },
   {
     slug: 'manzanillo-part-i-nothing-beyond-the-horizon',
-    title: 'MANZANILLO PART I — NOTHING BEYOND THE HORIZON',
-    image: '/assets/editorial-manzanillo-cover.jpg',
+    title: 'LUCY — MANZANILLO PART I: NOTHING BEYOND THE HORIZON',
+    image: '/assets/lucy-manzanillo-01.jpg',
     location: 'Manzanillo',
     model: 'Lucy',
-    cardDescription: 'Lucy’s secret cove at the edge of the jungle.',
+    cardDescription: 'A portrait of Lucy where the jungle meets the Caribbean, and the day opens out.',
     photographer: 'Impura Vida',
     date: '',
-    intro:
-      'A public story about the meeting of jungle and sea, and the quiet of a cove at the edge of Manzanillo.',
+    body: [
+      'At the edge of Manzanillo, the landscape seems to exhale. Green gives way to shoreline. The sea carries the eye out until there is almost nothing left to follow.',
+      'Lucy brings a human scale to that vastness. A glance, a gesture, the small distance between a person and the water. The photographs move between her presence and the place around her, allowing each to draw us towards the other.',
+      'Some of the best frames arrived without a fixed plan. We drove along the Costa Rican coast, stopping when the light or the landscape asked us to stay a little longer.',
+      'At Playa Hermosa, ocean mist drifted through the sunrays above the jungle and softened the view into something almost magical. Nearby, the waves met the rocks with such force and timing that the shoreline itself became part of the action.',
+      'The surfboard shop offered a different kind of composition: boards leaning together in a row, their colour and worn surfaces making a simple, beautiful frame. It was the kind of small discovery that feels especially at home on film, where texture and grain become part of the memory.',
+      'There is room here for a picture that does nothing except hold the afternoon: a stretch of coast, leaves meeting the light, the horizon again.',
+      'Stay a little longer. There is no next place to be.',
+    ],
+    intro: 'At the edge of Manzanillo, the landscape seems to exhale. Green gives way to shoreline. The sea carries the eye out until there is almost nothing left to follow.',
+    gallery: [
+      { src: '/assets/lucy-manzanillo-02.jpg', alt: 'Lucy among the rocks as a wave breaks across the Playa Hermosa shoreline.' },
+      { src: '/assets/lucy-manzanillo-03.jpg', alt: 'Lucy beside a row of surfboards at a Costa Rican surf shop.' },
+      { src: '/assets/lucy-manzanillo-04.jpg', alt: 'Lucy in a sunlit portrait surrounded by the Costa Rican jungle.' },
+    ],
   },
   {
     slug: 'where-the-green-comes-in',
@@ -198,7 +227,7 @@ export const editorials = [
     intro:
       'A high-sun silhouette translated into leather, palms, and after-dark confidence.',
   },
-] as const;
+];
 
 export const models = [
   {

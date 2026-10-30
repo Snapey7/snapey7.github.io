@@ -5,7 +5,7 @@ import { ImpactSection } from '@/components/site/ImpactSection';
 import { MembershipSection } from '@/components/site/MembershipSection';
 import { PageShell } from '@/components/site/PageShell';
 import { SectionHeading } from '@/components/site/SectionHeading';
-import { editorials } from '@/lib/content';
+import { getPublicEditorials } from '@/lib/editorials';
 
 const featuredEditorialSlugs = [
   'a-private-kind-of-summer',
@@ -13,11 +13,14 @@ const featuredEditorialSlugs = [
   'where-the-green-comes-in',
   'the-house-keeps-the-shadows',
 ];
-const featuredEditorials = featuredEditorialSlugs
-  .map((slug) => editorials.find((editorial) => editorial.slug === slug))
-  .filter((editorial): editorial is (typeof editorials)[number] => Boolean(editorial));
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const editorials = await getPublicEditorials();
+  const featuredEditorials = featuredEditorialSlugs
+    .map((slug) => editorials.find((editorial) => editorial.slug === slug))
+    .filter((editorial): editorial is (typeof editorials)[number] => Boolean(editorial));
   return (
     <PageShell>
       <main>
