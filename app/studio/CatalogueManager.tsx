@@ -91,7 +91,10 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
     setMessages((current) => ({ ...current, [catalogue.id]: 'Removing private photo…' }));
     try {
       const result = await removeCataloguePhoto(catalogue.id, photo.id);
-      setMessages((current) => ({ ...current, [catalogue.id]: ('error' in result ? result.error : result.success) }));
+      const message = 'error' in result
+        ? result.error || 'Could not remove this photo.'
+        : result.success || 'Photo removed.';
+      setMessages((current) => ({ ...current, [catalogue.id]: message }));
       if (!('error' in result)) router.refresh();
     } catch {
       setMessages((current) => ({ ...current, [catalogue.id]: 'Could not remove this photo. Refresh the page and try again.' }));
