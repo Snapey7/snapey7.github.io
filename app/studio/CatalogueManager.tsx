@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
-import { createCatalogueUploadTarget, createMagazineIssue, removeCatalogueUploads, saveCatalogueMedia, updateCatalogue } from './actions';
+import { createCatalogueUploadTarget, createMagazineIssue, removeCataloguePhoto, removeCatalogueUploads, saveCatalogueMedia, updateCatalogue } from './actions';
 
 type Catalogue = {
   id: string;
@@ -12,7 +12,7 @@ type Catalogue = {
   product_type: 'model_catalogue' | 'magazine_edition';
   model_slug: string | null;
   status: 'draft' | 'published';
-  member_media: { id: string }[];
+  member_media: { id: string; title: string; alt_text: string; preview_url: string }[];
 };
 
 export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
@@ -80,6 +80,29 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
     if (!('error' in result)) router.refresh();
   }
 
+  async function removePhoto(catalogue: Catalogue, photo: Catalogue['member_media'][number]) {
+    const isLastPhoto = catalogue.member_media.length === 1;
+    const warning = isLastPhoto
+      ? `Remove this last photo from “${catalogue.title}”? The catalogue will be unpublished, so customers can no longer buy it until you add photos and publish it again.`
+      : `Permanently remove this photo from “${catalogue.title}”? It will disappear from the catalogue for everyone, including existing purchasers.`;
+    if (!window.confirm(warning)) return;
+
+    setBusyId(catalogue.id);
+    setMessages((current) => ({ ...current, [catalogue.id]: 'Removing private photo…' }));
+    try {
+      const result = await removeCataloguePhoto(catalogue.id, photo.id);
+      const message = 'error' in result
+        ? result.error || 'Could not remove this photo.'
+        : result.success || 'Photo removed.';
+      setMessages((current) => ({ ...current, [catalogue.id]: message }));
+      if (!('error' in result)) router.refresh();
+    } catch {
+      setMessages((current) => ({ ...current, [catalogue.id]: 'Could not remove this photo. Refresh the page and try again.' }));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
     <>
     <form className="studio-new-product" action={async (formData) => {
@@ -112,6 +135,17 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
             <span className={`studio-status ${catalogue.status}`}>{catalogue.status}</span>
           </div>
           <p className="studio-count">{catalogue.member_media.length} private image{catalogue.member_media.length === 1 ? '' : 's'}</p>
+          {catalogue.member_media.length > 0 && <div className="studio-private-image-list" aria-label={`Private photos in ${catalogue.title}`}>
+            {catalogue.member_media.map((photo) => <figure className="studio-private-image" key={photo.id}>
+              {photo.preview_url ? <img src={photo.preview_url} alt={photo.alt_text || photo.title} loading="lazy" /> : <div className="studio-private-image-placeholder">Preview unavailable</div>}
+              <figcaption>
+                <span>{photo.title || photo.alt_text}</span>
+                <button disabled={busyId === catalogue.id} onClick={() => void removePhoto(catalogue, photo)} type="button">
+                  {busyId === catalogue.id ? 'Working…' : 'Remove photo'}
+                </button>
+              </figcaption>
+            </figure>)}
+          </div>}
           {catalogue.product_type === 'model_catalogue' && catalogue.status !== 'published' && (
             <p className="studio-feedback">To show the individual Buy Catalogue option on this muse page, upload at least one private photo and publish this catalogue.</p>
           )}

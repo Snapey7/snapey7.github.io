@@ -75,6 +75,53 @@ export async function removeCatalogueUploads(catalogueId: string, paths: string[
   if (paths.length) await createAdminClient().storage.from('member-media').remove(paths);
 }
 
+export async function removeCataloguePhoto(catalogueId: string, photoId: string) {
+  await requireContentAdmin();
+  if (!/^[0-9a-f-]{36}$/i.test(catalogueId) || !/^[0-9a-f-]{36}$/i.test(photoId)) {
+    return { error: 'Choose a valid catalogue photo.' };
+  }
+
+  const admin = createAdminClient();
+  const { data: photo, error: photoError } = await admin.from('member_media')
+    .select('id,catalogue_id,bucket,storage_path').eq('id', photoId).eq('catalogue_id', catalogueId).maybeSingle();
+  if (photoError || !photo) return { error: 'This photo is no longer in that catalogue. Refresh the page.' };
+  if (photo.bucket !== 'member-media' || !photo.storage_path.startsWith(`${catalogueId}/`) || photo.storage_path.includes('..')) {
+    return { error: 'This photo does not belong to the private catalogue storage area.' };
+  }
+
+  const { data: catalogue, error: catalogueError } = await admin.from('catalogues')
+    .select('id,model_slug,title').eq('id', catalogueId).maybeSingle();
+  if (catalogueError || !catalogue) return { error: 'Catalogue not found.' };
+
+  const { error: storageError } = await admin.storage.from('member-media').remove([photo.storage_path]);
+  if (storageError) return { error: 'The private photo could not be deleted. The catalogue has not been changed.' };
+
+  const { error: deleteError } = await admin.from('member_media').delete().eq('id', photoId).eq('catalogue_id', catalogueId);
+  if (deleteError) {
+    return { error: 'The private file was deleted, but its catalogue record could not be cleared. Refresh the page and try again.' };
+  }
+
+  revalidatePath('/studio');
+  revalidatePath('/models');
+  revalidatePath('/shop');
+  revalidatePath('/library');
+  if (catalogue.model_slug) revalidatePath(`/models/${catalogue.model_slug}`);
+
+  const { count, error: countError } = await admin.from('member_media')
+    .select('id', { count: 'exact', head: true }).eq('catalogue_id', catalogueId);
+  if (countError) return { error: 'Photo removed, but the remaining photo count could not be checked. Refresh the page before publishing.' };
+
+  if (!count) {
+    const { error: unpublishError } = await admin.from('catalogues')
+      .update({ status: 'draft', updated_at: new Date().toISOString() }).eq('id', catalogueId);
+    if (unpublishError) return { error: 'Last photo removed, but the empty catalogue could not be unpublished. Please unpublish it in Studio.' };
+  }
+
+  return { success: !count
+    ? 'Photo removed and empty catalogue unpublished.'
+    : `Photo removed from ${catalogue.title}.` };
+}
+
 export async function updateCatalogue(input: { catalogueId: string; description: string; publish: boolean }) {
   await requireContentAdmin();
   if (!/^[0-9a-f-]{36}$/i.test(input.catalogueId)) return { error: 'Choose a valid catalogue.' };

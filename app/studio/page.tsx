@@ -31,7 +31,7 @@ export default async function StudioPage() {
     product_type: 'model_catalogue' | 'magazine_edition';
     model_slug: string | null;
     status: 'draft' | 'published';
-    member_media: { id: string }[];
+    member_media: { id: string; title: string; alt_text: string; preview_url: string }[];
   }[] = [];
   let loadError = '';
   let shopProducts: {
@@ -50,15 +50,32 @@ export default async function StudioPage() {
     shop_products: { title: string } | null;
   }[] = [];
   try {
-    const { data, error } = await createAdminClient().from('catalogues')
-      .select('id,title,description,product_type,model_slug,status,member_media(id)')
+    const admin = createAdminClient();
+    const { data, error } = await admin.from('catalogues')
+      .select('id,title,description,product_type,model_slug,status,member_media(id,title,alt_text,bucket,storage_path)')
       .order('product_type').order('title');
     if (error) loadError = 'Apply the catalogue publishing migration in Supabase to finish connecting the content studio.';
-    else catalogues = (data || [])
-      .filter((item) => item.product_type !== 'physical_shop')
-      .map((item) => ({ ...item, member_media: item.member_media || [] }));
+    else {
+      const privateCatalogues = (data || []).filter((item) => item.product_type !== 'physical_shop');
+      const photoPaths = privateCatalogues.flatMap((item) => (item.member_media || [])
+        .filter((photo) => photo.bucket === 'member-media')
+        .map((photo) => photo.storage_path));
+      const { data: signedPhotos } = photoPaths.length
+        ? await admin.storage.from('member-media').createSignedUrls(photoPaths, 600)
+        : { data: [] };
+      const signedUrls = new Map((signedPhotos || []).map((photo) => [photo.path, photo.signedUrl || '']));
+      catalogues = privateCatalogues.map((item) => ({
+        ...item,
+        member_media: (item.member_media || []).filter((photo) => photo.bucket === 'member-media').map((photo) => ({
+          id: photo.id,
+          title: photo.title,
+          alt_text: photo.alt_text,
+          preview_url: signedUrls.get(photo.storage_path) || '',
+        })),
+      }));
+    }
     if (!error) {
-      const { data: products, error: productsError } = await createAdminClient().from('shop_products')
+      const { data: products, error: productsError } = await admin.from('shop_products')
         .select('id,title,description,status,shop_product_images(id,storage_path,alt_text,position)')
         .order('created_at');
       if (productsError) loadError = 'Apply the shop product migration in Supabase to manage public shop photos.';
@@ -67,7 +84,7 @@ export default async function StudioPage() {
         shop_product_images: [...(item.shop_product_images || [])].sort((a, b) => a.position - b.position),
       }));
       if (!productsError) {
-        const { data: orders, error: ordersError } = await createAdminClient().from('shop_orders')
+        const { data: orders, error: ordersError } = await admin.from('shop_orders')
           .select('id,status,created_at,customer_email,shipping_details,shop_products(title)')
           .order('created_at', { ascending: false }).limit(100);
         if (ordersError) loadError = 'Shop photos are connected, but the orders table is unavailable.';
