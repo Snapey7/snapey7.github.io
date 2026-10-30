@@ -33,7 +33,6 @@ export default async function EditorialsPage() {
     <PageShell>
       <main>
         <section className="archive-hero editorials-archive-hero">
-          <p className="eyebrow editorial-archive-kicker">THE STORY BEHIND THE IMAGE</p>
           <h1>Editorials</h1>
           <p className="section-copy">
             Stories from the shoots, and the creative voices, places, and ideas
