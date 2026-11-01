@@ -320,6 +320,39 @@ button.under-link {
   background: #090909;
 }
 
+.editorial-card-title-below {
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: auto;
+  overflow: visible;
+  background: transparent;
+}
+
+.editorial-card-title-below .editorial-card-media {
+  position: relative;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 0.86;
+  flex: none;
+  overflow: hidden;
+}
+
+.editorial-card-title-caption {
+  padding: 0.7rem 0.25rem 0;
+  text-align: center;
+}
+
+.editorial-card-title-below .editorial-card-title-caption h3 {
+  margin: 0;
+  color: rgba(248, 239, 232, 0.96);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(0.82rem, 1.05vw, 1rem);
+  font-weight: 500;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .transition-cta {
   position: relative;
   z-index: 2;
@@ -3188,6 +3221,10 @@ button.under-link {
   }
 
   .editorial-card {
+    aspect-ratio: 0.78;
+  }
+
+  .editorial-card-title-below .editorial-card-media {
     aspect-ratio: 0.78;
   }
 
