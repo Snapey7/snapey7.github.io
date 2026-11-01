@@ -84,7 +84,7 @@ export const editorials: Editorial[] = [
   },
   {
     slug: 'manzanillo-part-i-nothing-beyond-the-horizon',
-    title: 'LUCY — MANZANILLO PART I: NOTHING BEYOND THE HORIZON',
+    title: 'NOTHING BEYOND THE HORIZON',
     image: '/assets/lucy-manzanillo-01.jpg',
     location: 'Manzanillo',
     model: 'Lucy',
