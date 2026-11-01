@@ -8,9 +8,11 @@ type Editorial = (typeof editorials)[number];
 export function EditorialCard({
   editorial,
   captioned = false,
+  titleBelow = false,
 }: {
   editorial: Editorial;
   captioned?: boolean;
+  titleBelow?: boolean;
 }) {
   const displayTitle = editorial.title
     .toLowerCase()
@@ -18,7 +20,7 @@ export function EditorialCard({
 
   return (
     <Link
-      className={`editorial-card group${captioned ? ' editorial-card-captioned' : ''}`}
+      className={`editorial-card group${captioned ? ' editorial-card-captioned' : ''}${titleBelow ? ' editorial-card-title-below' : ''}`}
       href={`/editorials/${editorial.slug}`}
     >
       <div className="editorial-card-media relative h-full overflow-hidden">
@@ -54,7 +56,12 @@ export function EditorialCard({
           <span className="editorial-hover-cta">VIEW STORY <b aria-hidden="true">→</b></span>
         </div>
       )}
-      {!captioned && (
+      {!captioned && titleBelow && (
+        <div className="editorial-card-title-caption">
+          <h3>{editorial.title}</h3>
+        </div>
+      )}
+      {!captioned && !titleBelow && (
         <div className="absolute inset-x-0 bottom-0 translate-y-0 px-5 pb-5 text-center transition duration-500 group-hover:-translate-y-1">
           <h3 className="font-serif text-[1.03rem] uppercase tracking-[0.03em] text-ivory">
             {editorial.title}

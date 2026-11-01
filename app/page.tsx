@@ -36,7 +36,7 @@ export default async function Home() {
           />
           <div className="editorial-grid">
             {featuredEditorials.map((editorial) => (
-              <EditorialCard editorial={editorial} key={editorial.slug} />
+              <EditorialCard editorial={editorial} key={editorial.slug} titleBelow />
             ))}
           </div>
           <div className="transition-cta">
