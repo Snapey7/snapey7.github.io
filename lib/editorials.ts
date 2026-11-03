@@ -43,7 +43,9 @@ export async function getPublicEditorials(): Promise<Editorial[]> {
       const body = Array.isArray(row.body) && row.body.length ? row.body : base.body || [base.intro];
       return {
         ...base,
-        title: row.title,
+        title: row.slug === 'manzanillo-part-i-nothing-beyond-the-horizon'
+          ? 'NOTHING BEYOND THE HORIZON'
+          : row.title,
         location: row.location,
         model: row.model,
         cardDescription: row.deck,
