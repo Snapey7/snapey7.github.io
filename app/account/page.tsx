@@ -41,6 +41,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <h1>YOUR ACCOUNT</h1>
           <p>{displayName ? `Welcome, ${displayName}.` : 'You are signed in.'}</p>
           <p className="account-email">{user.email}</p>
+          <p className="account-trees"><strong>TREES PLANTED</strong><br />Coming soon...</p>
           {params.passwordUpdated === '1' && <p className="auth-notice is-success" role="status">Your password has been updated.</p>}
           {membership ? (
             <div className="account-membership-note">
