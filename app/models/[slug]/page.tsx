@@ -54,11 +54,11 @@ export default async function ModelDetailPage({ params, searchParams }: ModelPag
               <p className="model-entry-meta">GALLERY <span>·</span> IMPURA | EXCLUSIVE PHOTOS</p>
               {query.checkout === 'setup' && <p className="auth-notice is-error" role="status">Checkout could not start. Please try again or contact us if this keeps happening.</p>}
               {query.checkout === 'cancelled' && <p className="auth-notice" role="status">Checkout was cancelled. You can try again whenever you’re ready.</p>}
-              {catalogue?.status === 'published' && catalogue.description && <p>{catalogue.description}</p>}
-              {catalogue?.status === 'published' && <form action={beginCatalogueCheckout}>
+              {catalogue?.status === 'published' && catalogue.description && <p className="model-entry-description">{catalogue.description}</p>}
+              {catalogue?.status === 'published' && <form className="model-entry-checkout" action={beginCatalogueCheckout}>
                 <input type="hidden" name="catalogueId" value={catalogue.id} />
                 <button className="model-entry-cta" disabled={!isStripeOneTimeCheckoutReady()} type="submit">
-                  Get Access
+                  Get Full Access
                 </button>
               </form>}
               {catalogue && catalogue.status !== 'published' && <p className="model-entry-availability">This catalogue is being prepared and isn’t available to buy yet.</p>}

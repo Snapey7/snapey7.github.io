@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { navItems } from '@/lib/content';
 import { destinationNavItems } from '@/lib/destinations';
 
-export function Header() {
+export function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
   const [open, setOpen] = useState(false);
   const [destinationsOpen, setDestinationsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -80,16 +80,16 @@ export function Header() {
           <Link className="nav-link nav-link-accent" href="/members">
             SUBSCRIBE
           </Link>
-          <Link className="nav-link" href="/login">
-            LOGIN
+          <Link className="nav-link" href={isAuthenticated ? '/account' : '/login'}>
+            {isAuthenticated ? 'MY ACCOUNT' : 'LOGIN'}
           </Link>
         </nav>
 
         <Link
           className="justify-self-end text-[10px] font-semibold tracking-[0.2em] text-coral lg:hidden"
-          href="/members"
+          href={isAuthenticated ? '/account' : '/members'}
         >
-          JOIN
+          {isAuthenticated ? 'MY ACCOUNT' : 'JOIN'}
         </Link>
       </div>
 
@@ -147,10 +147,10 @@ export function Header() {
           ))}
           <Link
             className="mt-3 border border-coral/50 px-4 py-4 text-center text-xs font-semibold tracking-[0.22em] text-coral"
-            href="/login"
+            href={isAuthenticated ? '/account' : '/login'}
             onClick={() => setOpen(false)}
           >
-            MEMBER LOGIN
+            {isAuthenticated ? 'MY ACCOUNT' : 'MEMBER LOGIN'}
           </Link>
         </nav>
       </div>

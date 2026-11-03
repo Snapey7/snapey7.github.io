@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
-import { getPublicEditorials, editorialBody } from '@/lib/editorials';
+import { editorialBody, getPublicEditorials } from '@/lib/editorials';
 
 type EditorialPageProps = {
   params: Promise<{ slug: string }>;
@@ -142,6 +142,14 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             ))}
           </section>
         ) : null}
+        <section className="editorial-impura-invitation" aria-label="Continue exploring Impura Vida">
+          <Link className="editorial-impura-link editorial-impura-link-outline" href="/models">
+            View More Content
+          </Link>
+          <Link className="editorial-impura-link editorial-impura-link-filled" href="/members">
+            Subscribe for More
+          </Link>
+        </section>
       </main>
     </PageShell>
   );

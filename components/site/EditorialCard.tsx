@@ -17,16 +17,25 @@ export function EditorialCard({
   const displayTitle = editorial.title
     .toLowerCase()
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const homepageImageAspectRatios: Record<string, number> = {
+    'a-private-kind-of-summer': 1800 / 1549,
+    'manzanillo-part-i-nothing-beyond-the-horizon': 2400 / 1600,
+    'where-the-green-comes-in': 4968 / 3312,
+    'the-house-keeps-the-shadows': 5088 / 3392,
+  };
 
   return (
     <Link
       className={`editorial-card group${captioned ? ' editorial-card-captioned' : ''}${titleBelow ? ' editorial-card-title-below' : ''}`}
       href={`/editorials/${editorial.slug}`}
     >
-      <div className="editorial-card-media relative h-full overflow-hidden">
+      <div
+        className="editorial-card-media relative h-full overflow-hidden"
+        style={titleBelow ? { aspectRatio: homepageImageAspectRatios[editorial.slug] ?? 1.5 } : undefined}
+      >
         <Image
           alt={editorial.title}
-          className="object-cover transition duration-700 group-hover:scale-[1.045]"
+          className={`${titleBelow ? 'object-contain' : 'object-cover'} transition duration-700${titleBelow ? '' : ' group-hover:scale-[1.045]'}`}
           fill
           src={editorial.image}
           style={
@@ -41,7 +50,7 @@ export function EditorialCard({
           }
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/82" />
+        {!titleBelow && <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-black/82" />}
         <div className="absolute inset-0 border border-white/10 transition duration-500 group-hover:border-coral/45 group-hover:shadow-[0_0_28px_rgba(255,99,105,0.16)]" />
         <div className="absolute left-4 top-4 flex items-center gap-1.5 text-[9px] font-bold tracking-[0.16em] text-coral">
           <BookOpen aria-hidden="true" size={11} />
