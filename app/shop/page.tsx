@@ -14,7 +14,9 @@ export default async function ShopPage() {
   const items = await Promise.all((products || []).map(async (product, index) => ({
     product,
     images: [...(product.shop_product_images || [])].sort((a, b) => a.position - b.position),
-    priceLabel: product.status === 'published' ? await getStripePriceLabel(product.stripe_price_id) : null,
+    priceLabel: product.status === 'published'
+      ? await getStripePriceLabel(product.stripe_price_id)
+      : /edition\s*0?1/i.test(product.title) ? '£500.00' : null,
     coverPosition: index === 0 ? 'shop-cover-costa-rica' : 'shop-cover-after-dark',
     href: index === 0 ? '/destinations/costa-rica' : '/editorials',
   })));
@@ -45,7 +47,7 @@ export default async function ShopPage() {
                   {images.slice(1).map((image) => <img alt={image.alt_text} key={image.id}
                     src={`${supabaseUrl}/storage/v1/object/public/shop-product-images/${image.storage_path.split('/').map(encodeURIComponent).join('/')}`} />)}
                 </div>}
-                {product.status === 'coming_soon' ? (
+                {product.status === 'coming_soon' && !/edition\s*0?1/i.test(product.title) ? (
                   <p className="shop-price">COMING SOON</p>
                 ) : <>
                   <p className="shop-price">{priceLabel || 'Price at checkout'}</p>
@@ -55,7 +57,7 @@ export default async function ShopPage() {
                   </form>
                   {!checkoutReady && <p className="shop-shipping-note">Checkout opens once shipping regions and rates are set up.</p>}
                 </>}
-                <Link className="shop-edition-link" href={href}>VIEW DETAILS <span aria-hidden="true">→</span></Link>
+                {!/edition\s*0?1/i.test(product.title) && <Link className="shop-edition-link" href={href}>VIEW DETAILS <span aria-hidden="true">→</span></Link>}
               </article>;
             })}
             {showComingSoonEdition && <article className="shop-edition">
