@@ -12,7 +12,8 @@ export function PolicyPage({ title, intro, children }: { title: string; intro: s
           <p className="policy-updated">Last updated: 3 November 2026</p>
           <div className="policy-sections">{children}</div>
           <p className="policy-contact">
-            Questions about this policy? Contact <a href="mailto:impuravidamag@gmail.com">impuravidamag@gmail.com</a>.
+            Business location: Santa Teresa, Costa Rica. Questions about this policy? Contact{' '}
+            <a href="mailto:impuravidamag@gmail.com">impuravidamag@gmail.com</a>.
           </p>
         </article>
       </main>

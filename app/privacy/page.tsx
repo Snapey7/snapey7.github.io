@@ -10,7 +10,7 @@ export default function PrivacyPage() {
       intro="This policy describes how Impura Vida Magazine handles personal information when you browse the site, create an account, use a membership, contact us, or make a purchase."
     >
       <PolicySection title="1. Who is responsible">
-        <p>Impura Vida Magazine is responsible for personal information collected through impuravidamagazine.com. For privacy questions or requests, email <a href="mailto:impuravidamag@gmail.com">impuravidamag@gmail.com</a>.</p>
+        <p>Impura Vida operates impuravidamagazine.com and is responsible for personal information collected through the site. The business location is Santa Teresa, Costa Rica. For privacy questions or requests, email <a href="mailto:impuravidamag@gmail.com">impuravidamag@gmail.com</a>.</p>
       </PolicySection>
       <PolicySection title="2. Information we collect">
         <p>Depending on how you use the site, we may handle:</p>

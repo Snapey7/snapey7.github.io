@@ -10,7 +10,7 @@ export default function TermsPage() {
       intro="These terms explain how you may use the Impura Vida Magazine website, memberships, digital catalogues and shop. By using the site or placing an order, you agree to these terms."
     >
       <PolicySection title="1. About these terms">
-        <p>“Impura Vida Magazine”, “we”, “us” and “our” refer to the people operating the Impura Vida Magazine website at impuravidamagazine.com. For questions, contact <a href="mailto:impuravidamag@gmail.com">impuravidamag@gmail.com</a>.</p>
+        <p>“Impura Vida”, “we”, “us” and “our” refer to the business operating the Impura Vida Magazine website at impuravidamagazine.com. Our business location is Santa Teresa, Costa Rica. For questions, contact <a href="mailto:impuravidamag@gmail.com">impuravidamag@gmail.com</a>.</p>
         <p>These terms apply alongside the <a href="/privacy">Privacy Policy</a>, <a href="/refund-cancellation">Refund &amp; Cancellation Policy</a> and <a href="/acceptable-use">Acceptable Use Policy</a>. They do not remove or limit any rights that cannot legally be excluded.</p>
       </PolicySection>
       <PolicySection title="2. Age and accounts">
