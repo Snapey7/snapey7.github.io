@@ -340,6 +340,16 @@ button.under-link {
   background: #090909;
 }
 
+.editorial-card-title-below .editorial-card-backdrop {
+  z-index: 0;
+  filter: blur(14px) brightness(0.55);
+  transform: scale(1.08);
+}
+
+.editorial-card-title-below .editorial-card-media > img:not(.editorial-card-backdrop) {
+  z-index: 1;
+}
+
 .editorial-card-title-caption {
   padding: 0.7rem 0.25rem 0;
   text-align: center;

@@ -24,6 +24,16 @@ export function EditorialCard({
       href={`/editorials/${editorial.slug}`}
     >
       <div className="editorial-card-media relative h-full overflow-hidden">
+        {titleBelow && (
+          <Image
+            alt=""
+            aria-hidden="true"
+            className="editorial-card-backdrop object-cover"
+            fill
+            src={editorial.image}
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          />
+        )}
         <Image
           alt={editorial.title}
           className={`${titleBelow ? 'object-contain' : 'object-cover'} transition duration-700${titleBelow ? '' : ' group-hover:scale-[1.045]'}`}
