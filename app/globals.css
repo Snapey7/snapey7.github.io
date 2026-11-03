@@ -3374,66 +3374,41 @@ button.under-link {
 }
 
 .editorial-impura-invitation {
-  width: min(calc(100% - 2.5rem), 760px);
-  margin: clamp(4rem, 9vw, 7rem) auto 1rem;
-  border: 1px solid rgba(255, 119, 121, 0.38);
-  padding: clamp(1.75rem, 4vw, 3.25rem);
-  text-align: center;
-  background: linear-gradient(145deg, rgba(255, 119, 121, 0.08), rgba(12, 10, 10, 0.72));
-}
-
-.editorial-impura-kicker {
-  margin: 0;
-  color: #ff7779;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-}
-
-.editorial-impura-invitation h2 {
-  margin: 0.7rem 0 0;
-  color: #f8efe8;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(1.6rem, 3vw, 2.35rem);
-  font-weight: 400;
-}
-
-.editorial-impura-invitation > p:not(.editorial-impura-kicker) {
-  margin: 0.65rem auto 0;
-  color: rgba(248, 239, 232, 0.68);
-  font-size: 0.9rem;
-  line-height: 1.65;
-}
-
-.editorial-impura-links {
   display: flex;
+  width: min(calc(100% - 2.5rem), 760px);
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.75rem;
-  margin-top: 1.4rem;
+  gap: 1rem;
+  margin: clamp(4rem, 9vw, 7rem) auto 1rem;
 }
 
 .editorial-impura-link {
-  display: inline-flex;
-  min-height: 48px;
+  display: flex;
+  width: min(100%, 320px);
+  min-height: 58px;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
-  border: 1px solid rgba(255, 119, 121, 0.72);
-  padding: 0.75rem 1.1rem;
-  color: #fff3ed;
-  background: #a8313d;
-  font-size: 0.76rem;
+  border: 1px solid #f8efe8;
+  padding: 0.8rem 1.25rem;
+  color: #f8efe8;
+  background: transparent;
+  font-size: 0.95rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.035em;
   text-decoration: none;
-  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.editorial-impura-link-filled {
+  color: #080707;
+  background: #f8efe8;
 }
 
 .editorial-impura-link:hover,
 .editorial-impura-link:focus-visible {
-  border-color: #ff8587;
-  background: #c53d4a;
+  color: #080707;
+  background: #ff7779;
+  border-color: #ff7779;
   transform: translateY(-2px);
 }
 

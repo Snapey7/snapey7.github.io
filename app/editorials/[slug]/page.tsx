@@ -2,9 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
-import { models } from '@/lib/content';
 import { editorialBody, getPublicEditorials } from '@/lib/editorials';
-import { createAdminClient } from '@/lib/supabase/admin';
 
 type EditorialPageProps = {
   params: Promise<{ slug: string }>;
@@ -37,33 +35,6 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
   const previous = allEditorials[(index - 1 + allEditorials.length) % allEditorials.length];
   const next = allEditorials[(index + 1) % allEditorials.length];
   const paragraphs = editorialBody(editorial);
-  const modelNames = editorial.model
-    .split(/\s+(?:and|&)\s+/i)
-    .map((name) => name.trim().toLowerCase());
-  const editorialModels = models.filter((model) => {
-    const names = [model.name.toLowerCase(), model.slug.replace(/-/g, ' ')];
-    return modelNames.some((name) => names.includes(name));
-  });
-  let impuraCollections: { id: string; modelName: string }[] = [];
-  if (editorialModels.length) {
-    try {
-      const { data, error } = await createAdminClient()
-        .from('catalogues')
-        .select('id,model_slug')
-        .in('model_slug', editorialModels.map((model) => model.slug))
-        .eq('product_type', 'model_catalogue')
-        .eq('status', 'published');
-      if (!error && data) {
-        const catalogueByModel = new Map(data.map((catalogue) => [catalogue.model_slug, catalogue.id]));
-        impuraCollections = editorialModels.flatMap((model) => {
-          const id = catalogueByModel.get(model.slug);
-          return id ? [{ id, modelName: model.name }] : [];
-        });
-      }
-    } catch {
-      // Keep the public editorial available if catalogue checkout is not configured.
-    }
-  }
   const isLucy =
     editorial.slug === 'manzanillo-part-i-nothing-beyond-the-horizon' ||
     editorial.model?.trim().toLowerCase() === 'lucy';
@@ -171,20 +142,14 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             ))}
           </section>
         ) : null}
-        {impuraCollections.length > 0 && (
-          <section className="editorial-impura-invitation" aria-labelledby="editorial-impura-title">
-            <p className="editorial-impura-kicker">THE PRIVATE COLLECTION</p>
-            <h2 id="editorial-impura-title">Want to see more?</h2>
-            <p>Step beyond the editorial and explore exclusive photographs in the Impura collection.</p>
-            <div className="editorial-impura-links">
-              {impuraCollections.map((collection) => (
-                <Link className="editorial-impura-link" href={`/checkout/catalogue/${collection.id}`} key={collection.id} prefetch={false}>
-                  Explore {collection.modelName}&apos;s Impura collection <span aria-hidden="true">→</span>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
+        <section className="editorial-impura-invitation" aria-label="Continue exploring Impura Vida">
+          <Link className="editorial-impura-link editorial-impura-link-outline" href="/models">
+            View More Content
+          </Link>
+          <Link className="editorial-impura-link editorial-impura-link-filled" href="/members">
+            Subscribe for More
+          </Link>
+        </section>
       </main>
     </PageShell>
   );
