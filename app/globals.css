@@ -332,9 +332,12 @@ button.under-link {
   position: relative;
   width: 100%;
   height: auto;
-  aspect-ratio: 0.86;
+  aspect-ratio: 1.6;
   flex: none;
   overflow: hidden;
+  border: 1px solid rgba(248, 239, 232, 0.14);
+  border-radius: 12px;
+  background: #090909;
 }
 
 .editorial-card-title-caption {
@@ -3225,7 +3228,7 @@ button.under-link {
   }
 
   .editorial-card-title-below .editorial-card-media {
-    aspect-ratio: 0.78;
+    aspect-ratio: 1.6;
   }
 
   .editorial-card h3 {
