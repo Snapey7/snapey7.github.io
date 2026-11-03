@@ -18,7 +18,7 @@ export function EditorialCard({
     .toLowerCase()
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
   const homepageImageAspectRatios: Record<string, number> = {
-    'a-private-kind-of-summer': 1800 / 1549,
+    'a-private-kind-of-summer': 1.6,
     'manzanillo-part-i-nothing-beyond-the-horizon': 2400 / 1600,
     'where-the-green-comes-in': 4968 / 3312,
     'the-house-keeps-the-shadows': 5088 / 3392,
