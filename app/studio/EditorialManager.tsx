@@ -49,10 +49,16 @@ export function EditorialManager({ editorials }: { editorials: ManagedEditorial[
   async function save(item: ManagedEditorial) {
     const value = fields[item.slug] || initialFields(item);
     setBusy(item.slug);
-    const result = await updateEditorial({ slug: item.slug, ...value });
-    setMessages((current) => ({ ...current, [item.slug]: ('error' in result ? result.error : result.success) || 'Could not save this editorial.' }));
-    setBusy(null);
-    if (!('error' in result)) router.refresh();
+    setMessages((current) => ({ ...current, [item.slug]: 'Publishing editorial…' }));
+    try {
+      const result = await updateEditorial({ slug: item.slug, ...value });
+      setMessages((current) => ({ ...current, [item.slug]: ('error' in result ? result.error : result.success) || 'Could not save this editorial.' }));
+      if (!('error' in result)) router.refresh();
+    } catch {
+      setMessages((current) => ({ ...current, [item.slug]: 'Publishing failed. Please refresh and try again. If it continues, send support the time of the attempt.' }));
+    } finally {
+      setBusy(null);
+    }
   }
 
   async function upload(item: ManagedEditorial, file: File | undefined) {

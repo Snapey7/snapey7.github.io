@@ -134,34 +134,45 @@ export async function updateEditorial(input: {
   releaseDate: string;
 }) {
   await requireContentAdmin();
-  const base = editorials.find((item) => item.slug === input.slug);
-  if (!base) return { error: 'Choose an existing editorial.' };
-  const title = input.title.trim().slice(0, 180);
-  const deck = input.deck.trim().slice(0, 400);
-  const body = input.body.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean).slice(0, 30);
-  if (!title || !deck || !body.length || body.join('\n').length > 16000) return { error: 'Add a title, a short introduction, and story text (separate paragraphs with a blank line).' };
-  const admin = createAdminClient();
-  const { error } = await admin.from('editorial_stories').upsert({
-    slug: base.slug,
-    title,
-    location: input.location.trim().slice(0, 120),
-    model: input.model.trim().slice(0, 120),
-    deck,
-    body,
-    photographer: input.photographer.trim().slice(0, 120),
-    release_date: input.releaseDate.trim().slice(0, 80),
-    status: 'published',
-    updated_at: new Date().toISOString(),
-  });
-  if (error) return { error: 'Could not save this editorial. Apply the editorial studio migration in Supabase first.' };
-  const { error: imagePublishError } = await admin.from('editorial_images')
-    .update({ published: true }).eq('editorial_slug', base.slug);
-  if (imagePublishError) return { error: 'Story saved, but new images are not public yet. Refresh and try publishing again.' };
-  revalidatePath('/studio');
-  revalidatePath('/editorials');
-  revalidatePath(`/editorials/${base.slug}`);
-  revalidatePath('/');
-  return { success: 'Editorial published.' };
+  try {
+    const base = editorials.find((item) => item.slug === input.slug);
+    if (!base) return { error: 'Choose an existing editorial.' };
+    const title = input.title.trim().slice(0, 180);
+    const deck = input.deck.trim().slice(0, 400);
+    const body = input.body.split(/\n\s*\n/).map((paragraph) => paragraph.trim()).filter(Boolean).slice(0, 30);
+    if (!title || !deck || !body.length || body.join('\n').length > 16000) return { error: 'Add a title, a short introduction, and story text (separate paragraphs with a blank line).' };
+    const admin = createAdminClient();
+    const { error } = await admin.from('editorial_stories').upsert({
+      slug: base.slug,
+      title,
+      location: input.location.trim().slice(0, 120),
+      model: input.model.trim().slice(0, 120),
+      deck,
+      body,
+      photographer: input.photographer.trim().slice(0, 120),
+      release_date: input.releaseDate.trim().slice(0, 80),
+      status: 'published',
+      updated_at: new Date().toISOString(),
+    });
+    if (error) {
+      console.error('Editorial publish database write failed:', error.message);
+      return { error: 'Could not save this editorial. Check that the editorial studio migration is applied in Supabase.' };
+    }
+    const { error: imagePublishError } = await admin.from('editorial_images')
+      .update({ published: true }).eq('editorial_slug', base.slug);
+    if (imagePublishError) {
+      console.error('Editorial image publish failed:', imagePublishError.message);
+      return { error: 'Story saved, but its new images are not public yet. Refresh and try publishing again.' };
+    }
+    revalidatePath('/studio');
+    revalidatePath('/editorials');
+    revalidatePath(`/editorials/${base.slug}`);
+    revalidatePath('/');
+    return { success: 'Editorial published.' };
+  } catch (error) {
+    console.error('Editorial publish action failed:', error);
+    return { error: 'Publishing failed. Check the Vercel function log for the editorial publish error.' };
+  }
 }
 
 export async function saveCatalogueMedia(catalogueId: string, paths: string[]) {

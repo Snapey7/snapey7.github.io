@@ -3402,10 +3402,10 @@ button.under-link {
   min-height: 58px;
   align-items: center;
   justify-content: center;
-  border: 1px solid #f8efe8;
+  border: 1px solid #ff7779;
   padding: 0.8rem 1.25rem;
-  color: #f8efe8;
-  background: transparent;
+  color: #ff7779;
+  background: #080707;
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.035em;
@@ -3415,15 +3415,23 @@ button.under-link {
 
 .editorial-impura-link-filled {
   color: #080707;
-  background: #f8efe8;
+  border-color: #ff7779;
+  background: #ff7779;
 }
 
 .editorial-impura-link:hover,
 .editorial-impura-link:focus-visible {
-  color: #080707;
-  background: #ff7779;
-  border-color: #ff7779;
+  color: #ffb0aa;
+  background: #1b0b0d;
+  border-color: #ffb0aa;
   transform: translateY(-2px);
+}
+
+.editorial-impura-link-filled:hover,
+.editorial-impura-link-filled:focus-visible {
+  color: #080707;
+  background: #ff9293;
+  border-color: #ff9293;
 }
 
 .editorial-impura-link:focus-visible {
