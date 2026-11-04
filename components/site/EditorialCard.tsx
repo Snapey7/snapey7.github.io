@@ -35,11 +35,13 @@ export function EditorialCard({
       >
         <Image
           alt={editorial.title}
-          className={`${titleBelow ? 'object-contain' : 'object-cover'} transition duration-700${titleBelow ? '' : ' group-hover:scale-[1.045]'}`}
+          className={`object-cover transition duration-700${titleBelow ? '' : ' group-hover:scale-[1.045]'}`}
           fill
           src={editorial.image}
           style={
-            captioned && editorial.slug === 'alexis-noir'
+            titleBelow && editorial.slug === 'a-private-kind-of-summer'
+              ? { objectPosition: 'center 34%' }
+              : captioned && editorial.slug === 'alexis-noir'
               ? { objectPosition: 'center 50%' }
               : captioned &&
             ['monica-riviera', 'willow', 'isabella'].includes(
