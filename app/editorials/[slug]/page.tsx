@@ -38,6 +38,8 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
   const isLucy =
     editorial.slug === 'manzanillo-part-i-nothing-beyond-the-horizon' ||
     editorial.model?.trim().toLowerCase() === 'lucy';
+  const isCynthia = editorial.slug === 'the-house-keeps-the-shadows';
+  const isStoryFlow = isLucy || isCynthia;
   const gallery = editorial.gallery || [];
   const openingCount = gallery.length ? Math.min(2, paragraphs.length) : paragraphs.length;
   const storyOpening = paragraphs.slice(0, openingCount).map((text, index) => ({ text, index }));
@@ -51,14 +53,32 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
     paragraphCursor += text.length;
     return { photo, photoIndex, text };
   });
+  const cynthiaBeatCount = Math.min(gallery.length, Math.max(1, Math.ceil((paragraphs.length - openingCount) / 2)));
+  const cynthiaBeats = Array.from({ length: cynthiaBeatCount }, (_, beatIndex) => {
+    return { beatIndex, photos: [] as ((typeof gallery)[number] & { sequence: number })[], text: [] as { text: string; index: number }[] };
+  });
+  let cynthiaPhotoCursor = 0;
+  let cynthiaParagraphCursor = openingCount;
+  for (const beat of cynthiaBeats) {
+    const remainingPhotos = gallery.length - cynthiaPhotoCursor;
+    const photosInBeat = Math.ceil(remainingPhotos / (cynthiaBeatCount - beat.beatIndex));
+    beat.photos.push(...gallery.slice(cynthiaPhotoCursor, cynthiaPhotoCursor + photosInBeat)
+      .map((photo, offset) => ({ ...photo, sequence: cynthiaPhotoCursor + offset + 2 })));
+    cynthiaPhotoCursor += photosInBeat;
+    const remainingParagraphs = paragraphs.length - cynthiaParagraphCursor;
+    const paragraphsInBeat = Math.ceil(remainingParagraphs / (cynthiaBeatCount - beat.beatIndex));
+    beat.text.push(...paragraphs.slice(cynthiaParagraphCursor, cynthiaParagraphCursor + paragraphsInBeat)
+      .map((text, offset) => ({ text, index: cynthiaParagraphCursor + offset })));
+    cynthiaParagraphCursor += paragraphsInBeat;
+  }
 
   return (
     <PageShell>
-      <main className={`editorial-story-page editorial-story-layout-${index % 4}${isLucy ? ' editorial-story-lucy' : ''}`}>
-        {isLucy ? (
+      <main className={`editorial-story-page editorial-story-layout-${index % 4}${isLucy ? ' editorial-story-lucy' : ''}${isCynthia ? ' editorial-story-cynthia' : ''}`}>
+        {isStoryFlow ? (
           <>
-            <figure className="editorial-flow-hero">
-              <img src={editorial.image} alt={`${editorial.model} on the Manzanillo shoreline`} />
+              <figure className="editorial-flow-hero">
+              <img src={editorial.image} alt={isCynthia ? `${editorial.model} in a Costa Rican editorial portrait` : `${editorial.model} on the Manzanillo shoreline`} />
               <figcaption>IMPURA VIDA <span>·</span> EDITORIAL {String(index + 1).padStart(2, '0')}</figcaption>
             </figure>
             <header className="editorial-flow-heading">
@@ -70,7 +90,21 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
               <div className="editorial-flow-copy editorial-story-paragraphs">
                 {storyOpening.map(({ text, index }) => <p className={index === paragraphs.length - 1 ? 'editorial-story-ending' : undefined} key={`opening-${index}`}>{text}</p>)}
               </div>
-              {storyBeats.map(({ photo, photoIndex, text }) => (
+              {isCynthia ? cynthiaBeats.map(({ beatIndex, photos, text }) => (
+                <div className={`editorial-flow-beat editorial-cynthia-beat editorial-flow-beat-${beatIndex}${beatIndex % 2 ? ' editorial-cynthia-beat-reversed' : ''}`} key={`cynthia-beat-${beatIndex}`}>
+                  <div className="editorial-cynthia-photos">
+                    {photos.map((photo) => (
+                      <figure className="editorial-flow-photo" key={photo.id || photo.src}>
+                        <img src={photo.src} alt={photo.alt} />
+                        <figcaption>{String(photo.sequence).padStart(2, '0')} <span>·</span> {photo.alt}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                  <div className="editorial-flow-copy editorial-story-paragraphs">
+                    {text.map(({ text: paragraph, index }) => <p className={index === paragraphs.length - 1 ? 'editorial-story-ending' : undefined} key={`cynthia-${beatIndex}-${index}`}>{paragraph}</p>)}
+                  </div>
+                </div>
+              )) : storyBeats.map(({ photo, photoIndex, text }) => (
                 <div className={`editorial-flow-beat editorial-flow-beat-${photoIndex}`} key={photo.id || photo.src}>
                   <figure className={`editorial-flow-photo editorial-flow-photo-${photoIndex}`}>
                     <img src={photo.src} alt={photo.alt} />
@@ -116,7 +150,7 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             </section>
           </>
         )}
-        <section className={`editorial-story-body${isLucy ? ' editorial-story-body-credits' : ''}`}>
+        <section className={`editorial-story-body${isStoryFlow ? ' editorial-story-body-credits' : ''}`}>
           <div className="editorial-story-byline" aria-label="Editorial credits">
             {editorial.model && <p><span>FEATURING</span>{editorial.model}</p>}
             {editorial.photographer && <p><span>PHOTOGRAPHY</span>{editorial.photographer}</p>}
@@ -132,7 +166,7 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             </Link>
           </div>
         </section>
-        {!isLucy && editorial.gallery?.length ? (
+        {!isStoryFlow && editorial.gallery?.length ? (
           <section className="editorial-story-gallery" aria-label={`${editorial.model} editorial photographs`}>
             {editorial.gallery.map((photo, photoIndex) => (
               <figure className={`editorial-story-gallery-item editorial-story-gallery-item-${photoIndex % 3}`} key={photo.id || photo.src}>

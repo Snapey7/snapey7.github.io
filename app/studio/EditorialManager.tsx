@@ -49,10 +49,16 @@ export function EditorialManager({ editorials }: { editorials: ManagedEditorial[
   async function save(item: ManagedEditorial) {
     const value = fields[item.slug] || initialFields(item);
     setBusy(item.slug);
-    const result = await updateEditorial({ slug: item.slug, ...value });
-    setMessages((current) => ({ ...current, [item.slug]: ('error' in result ? result.error : result.success) || 'Could not save this editorial.' }));
-    setBusy(null);
-    if (!('error' in result)) router.refresh();
+    setMessages((current) => ({ ...current, [item.slug]: 'Publishing editorial…' }));
+    try {
+      const result = await updateEditorial({ slug: item.slug, ...value });
+      setMessages((current) => ({ ...current, [item.slug]: ('error' in result ? result.error : result.success) || 'Could not save this editorial.' }));
+      if (!('error' in result)) router.refresh();
+    } catch {
+      setMessages((current) => ({ ...current, [item.slug]: 'Publishing failed. Please refresh and try again. If it continues, send support the time of the attempt.' }));
+    } finally {
+      setBusy(null);
+    }
   }
 
   async function upload(item: ManagedEditorial, file: File | undefined) {
@@ -122,7 +128,7 @@ export function EditorialManager({ editorials }: { editorials: ManagedEditorial[
           <label className="studio-field"><span>Photography by</span><input maxLength={120} onChange={(event) => update(item.slug, 'photographer', event.target.value)} value={value.photographer} /></label>
           <label className="studio-field"><span>Release date</span><input maxLength={80} onChange={(event) => update(item.slug, 'releaseDate', event.target.value)} placeholder="Optional" value={value.releaseDate} /></label>
           <label className="studio-field"><span>Image description for accessibility</span><input maxLength={300} onChange={(event) => setAltText((current) => ({ ...current, [item.slug]: event.target.value }))} placeholder="Describe the photograph" value={altText[item.slug] || ''} /></label>
-          <label className="studio-field"><span>Upload public editorial photographs (JPEG, PNG, WebP or AVIF; up to 20 MB each)</span><input accept="image/jpeg,image/png,image/webp,image/avif" disabled={busy === item.slug} onChange={(event) => { void upload(item, event.currentTarget.files?.[0]); event.currentTarget.value = ''; }} type="file" /></label>
+          <label className="studio-field"><span>Upload public editorial photographs (JPEG, PNG, WebP or AVIF; up to 200 MB each)</span><input accept="image/jpeg,image/png,image/webp,image/avif" disabled={busy === item.slug} onChange={(event) => { void upload(item, event.currentTarget.files?.[0]); event.currentTarget.value = ''; }} type="file" /></label>
         </div>
         <div className="studio-actions">
           <button className="studio-publish" disabled={busy === item.slug} onClick={() => void save(item)} type="button">{busy === item.slug ? 'Working…' : 'Save and publish'}</button>

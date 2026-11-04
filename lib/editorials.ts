@@ -40,15 +40,20 @@ export async function getPublicEditorials(): Promise<Editorial[]> {
           src: item.public_url || `/api/editorial-image/${item.id}`,
           alt: item.alt_text,
         }));
-      const body = Array.isArray(row.body) && row.body.length ? row.body : base.body || [base.intro];
+      const isCynthia = row.slug === 'the-house-keeps-the-shadows';
+  const body = Array.isArray(row.body) && row.body.length
+    ? row.body
+    : base.body || [base.intro];
       return {
         ...base,
         title: row.slug === 'manzanillo-part-i-nothing-beyond-the-horizon'
           ? 'NOTHING BEYOND THE HORIZON'
-          : row.title,
+          : isCynthia && row.title === 'THE HOUSE KEEPS THE SHADOWS'
+            ? base.title
+            : row.title,
         location: row.location,
         model: row.model,
-        cardDescription: row.deck,
+        cardDescription: isCynthia && row.title === 'THE HOUSE KEEPS THE SHADOWS' ? base.cardDescription : row.deck,
         photographer: row.photographer,
         date: row.release_date,
         body,

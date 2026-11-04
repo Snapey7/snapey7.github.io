@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { navItems } from '@/lib/content';
 import { destinationNavItems } from '@/lib/destinations';
 
-export function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
+export function Header({ isAuthenticated, isContentAdmin = false }: { isAuthenticated: boolean; isContentAdmin?: boolean }) {
   const [open, setOpen] = useState(false);
   const [destinationsOpen, setDestinationsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -77,6 +77,7 @@ export function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
         </Link>
 
         <nav className="hidden items-center justify-end gap-7 lg:flex">
+          {isContentAdmin && <Link className="nav-link" href="/studio">CREATOR STUDIO</Link>}
           <Link className="nav-link nav-link-accent" href="/members">
             SUBSCRIBE
           </Link>
@@ -85,12 +86,19 @@ export function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
           </Link>
         </nav>
 
-        <Link
-          className="justify-self-end text-[10px] font-semibold tracking-[0.2em] text-coral lg:hidden"
-          href={isAuthenticated ? '/account' : '/members'}
-        >
-          {isAuthenticated ? 'MY ACCOUNT' : 'JOIN'}
-        </Link>
+        <div className="flex items-center justify-self-end gap-4 lg:hidden">
+          {isContentAdmin && (
+            <Link className="text-[10px] font-semibold tracking-[0.16em] text-coral" href="/studio">
+              STUDIO
+            </Link>
+          )}
+          <Link
+            className="text-[10px] font-semibold tracking-[0.2em] text-coral"
+            href={isAuthenticated ? '/account' : '/members'}
+          >
+            {isAuthenticated ? 'MY ACCOUNT' : 'JOIN'}
+          </Link>
+        </div>
       </div>
 
       <div
@@ -145,6 +153,7 @@ export function Header({ isAuthenticated }: { isAuthenticated: boolean }) {
               )}
             </div>
           ))}
+          {isContentAdmin && <Link className="mobile-nav-subitem" href="/studio" onClick={() => setOpen(false)}>CREATOR STUDIO</Link>}
           <Link
             className="mt-3 border border-coral/50 px-4 py-4 text-center text-xs font-semibold tracking-[0.22em] text-coral"
             href={isAuthenticated ? '/account' : '/login'}

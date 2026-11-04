@@ -3387,6 +3387,88 @@ button.under-link {
   margin-top: clamp(4rem, 8vw, 7rem);
 }
 
+/* Cynthia's three-shoot story keeps the Studio photo sequence intact and
+   gives each image room to retain its original portrait or landscape shape. */
+.editorial-story-cynthia {
+  padding: 7.5rem 0 5rem;
+}
+
+.editorial-story-cynthia .editorial-flow-hero {
+  width: 100%;
+}
+
+.editorial-story-cynthia .editorial-flow-story {
+  gap: clamp(4rem, 8vw, 8rem);
+}
+
+.editorial-story-cynthia .editorial-flow-beat {
+  width: min(calc(100% - 3rem), 1480px);
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 6rem);
+  margin: 0 auto;
+}
+
+.editorial-story-cynthia .editorial-flow-copy {
+  width: 100%;
+  max-width: 620px;
+  margin: 0;
+}
+
+.editorial-cynthia-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  align-items: start;
+  gap: clamp(1rem, 2vw, 2rem);
+}
+
+.editorial-story-cynthia .editorial-flow-photo {
+  width: 100%;
+  margin: 0;
+}
+
+.editorial-story-cynthia .editorial-flow-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.editorial-story-cynthia .editorial-flow-photo figcaption {
+  width: 100%;
+  margin: 0.8rem 0 0;
+}
+
+.editorial-cynthia-beat-reversed .editorial-cynthia-photos {
+  order: 2;
+}
+
+.editorial-cynthia-beat-reversed .editorial-flow-copy {
+  order: 1;
+}
+
+@media (max-width: 760px) {
+  .editorial-story-cynthia {
+    padding-top: 6.75rem;
+  }
+
+  .editorial-story-cynthia .editorial-flow-beat {
+    width: calc(100% - 2rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .editorial-cynthia-photos {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .editorial-cynthia-beat-reversed .editorial-cynthia-photos,
+  .editorial-cynthia-beat-reversed .editorial-flow-copy {
+    order: initial;
+  }
+}
+
 .editorial-impura-invitation {
   display: flex;
   width: min(calc(100% - 2.5rem), 760px);
@@ -3402,10 +3484,10 @@ button.under-link {
   min-height: 58px;
   align-items: center;
   justify-content: center;
-  border: 1px solid #f8efe8;
+  border: 1px solid #ff7779;
   padding: 0.8rem 1.25rem;
-  color: #f8efe8;
-  background: transparent;
+  color: #ff7779;
+  background: #080707;
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.035em;
@@ -3415,15 +3497,23 @@ button.under-link {
 
 .editorial-impura-link-filled {
   color: #080707;
-  background: #f8efe8;
+  border-color: #ff7779;
+  background: #ff7779;
 }
 
 .editorial-impura-link:hover,
 .editorial-impura-link:focus-visible {
-  color: #080707;
-  background: #ff7779;
-  border-color: #ff7779;
+  color: #ffb0aa;
+  background: #1b0b0d;
+  border-color: #ffb0aa;
   transform: translateY(-2px);
+}
+
+.editorial-impura-link-filled:hover,
+.editorial-impura-link-filled:focus-visible {
+  color: #080707;
+  background: #ff9293;
+  border-color: #ff9293;
 }
 
 .editorial-impura-link:focus-visible {

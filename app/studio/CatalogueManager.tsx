@@ -184,7 +184,7 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
             />
           </label>
           <label className="studio-field">
-            <span>Add private photographs (JPEG, PNG, WebP or AVIF; up to 20 MB each)</span>
+            <span>Add private photographs (JPEG, PNG, WebP or AVIF; up to 200 MB each)</span>
             <input
               accept="image/jpeg,image/png,image/webp,image/avif"
               disabled={busyId === catalogue.id}

@@ -82,16 +82,20 @@ export default async function StudioPage() {
           { id: `static-${base.slug}`, storage_path: null, preview_url: base.image, alt_text: base.title },
           ...(base.gallery || []).map((photo, index) => ({ id: `static-${base.slug}-${index}`, storage_path: null, preview_url: photo.src, alt_text: photo.alt })),
         ] };
+        const isLegacyCynthia = row.slug === 'the-house-keeps-the-shadows' && row.title === 'THE HOUSE KEEPS THE SHADOWS';
+        const body = row.slug === 'the-house-keeps-the-shadows' && row.body?.[0] !== base.body?.[0]
+          ? base.body || row.body
+          : row.body;
         return {
           ...base,
-          title: row.title,
+          title: isLegacyCynthia ? base.title : row.title,
           location: row.location,
           model: row.model,
-          cardDescription: row.deck,
+          cardDescription: isLegacyCynthia ? base.cardDescription : row.deck,
           photographer: row.photographer,
           date: row.release_date,
-          body: row.body,
-          intro: row.body?.[0] || base.intro,
+          body,
+          intro: body?.[0] || base.intro,
           status: row.status as 'draft' | 'published',
           images: [...(row.editorial_images || [])].sort((a, b) => a.position - b.position || a.id.localeCompare(b.id)).map((photo) => ({
             id: photo.id,

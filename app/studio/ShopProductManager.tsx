@@ -134,7 +134,7 @@ export function ShopProductManager({ products }: { products: ShopProduct[] }) {
           placeholder="Describe the physical item shown in the Shop." rows={3} value={descriptions[product.id] || ''} />
       </label>
       <label className="studio-field">
-        <span>Upload public product photos (JPEG, PNG, WebP or AVIF; up to 20 MB each)</span>
+        <span>Upload public product photos (JPEG, PNG, WebP or AVIF; up to 200 MB each)</span>
         <input accept="image/jpeg,image/png,image/webp,image/avif" disabled={busyId === product.id} multiple
           onChange={(event) => { void upload(product, event.currentTarget.files); event.currentTarget.value = ''; }} type="file" />
       </label>

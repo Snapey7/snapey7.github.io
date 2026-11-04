@@ -6,7 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { isStripeOneTimePrice } from '@/lib/billing/stripe';
 
 const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
-const maxImageBytes = 20 * 1024 * 1024;
+const maxImageBytes = 200 * 1024 * 1024;
 
 function validExtension(fileName: string, contentType: string) {
   const extension = fileName.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || '';
@@ -30,7 +30,7 @@ export async function createShopImageUploadTarget(input: {
   }
   if (!validProductId(input.productId)) return { error: 'Choose a valid shop product.' };
   if (!Number.isFinite(input.size) || input.size <= 0 || input.size > maxImageBytes) {
-    return { error: 'Each shop photo must be no larger than 20 MB.' };
+    return { error: 'Each shop photo must be no larger than 200 MB.' };
   }
   const extension = validExtension(input.fileName, input.contentType);
   if (!extension) return { error: 'Upload JPEG, PNG, WebP, or AVIF photos.' };
