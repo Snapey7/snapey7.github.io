@@ -3665,6 +3665,28 @@ button.under-link {
   line-height: 1.7;
 }
 
+.ana-story-neon,
+.ana-story-window,
+.ana-story-balcony-intro,
+.ana-story-finale {
+  align-items: center;
+}
+
+.ana-story-neon > .cynthia-story-copy,
+.ana-story-balcony-intro > .cynthia-story-copy,
+.ana-story-finale > .cynthia-story-copy {
+  width: min(100%, 540px);
+}
+
+.ana-story-balcony-gallery {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+.ana-story-balcony-gallery .cynthia-story-photo {
+  width: 100%;
+}
+
 @media (max-width: 760px) {
   .editorial-story-cynthia {
     padding-top: 7.5rem;
@@ -3685,6 +3707,16 @@ button.under-link {
   }
 
   .cynthia-story-portrait > .cynthia-story-copy {
+    width: min(100%, 660px);
+  }
+
+  .ana-story-balcony-gallery {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ana-story-neon > .cynthia-story-copy,
+  .ana-story-balcony-intro > .cynthia-story-copy,
+  .ana-story-finale > .cynthia-story-copy {
     width: min(100%, 660px);
   }
 }
