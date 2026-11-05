@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
+import { CynthiaEditorialStory } from '@/components/site/CynthiaEditorialStory';
 import { editorialBody, getPublicEditorials } from '@/lib/editorials';
 
 type EditorialPageProps = {
@@ -35,6 +36,7 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
   const previous = allEditorials[(index - 1 + allEditorials.length) % allEditorials.length];
   const next = allEditorials[(index + 1) % allEditorials.length];
   const paragraphs = editorialBody(editorial);
+  const isCynthia = editorial.slug === 'the-house-keeps-the-shadows';
   const isLucy =
     editorial.slug === 'manzanillo-part-i-nothing-beyond-the-horizon' ||
     editorial.model?.trim().toLowerCase() === 'lucy';
@@ -54,8 +56,8 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
 
   return (
     <PageShell>
-      <main className={`editorial-story-page editorial-story-layout-${index % 4}${isLucy ? ' editorial-story-lucy' : ''}`}>
-        {isLucy ? (
+      <main className={`editorial-story-page editorial-story-layout-${index % 4}${isLucy ? ' editorial-story-lucy' : ''}${isCynthia ? ' editorial-story-cynthia' : ''}`}>
+        {isCynthia ? <CynthiaEditorialStory editorial={editorial} /> : isLucy ? (
           <>
             <figure className="editorial-flow-hero">
               <img src={editorial.image} alt={`${editorial.model} on the Manzanillo shoreline`} />
@@ -116,7 +118,7 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             </section>
           </>
         )}
-        <section className={`editorial-story-body${isLucy ? ' editorial-story-body-credits' : ''}`}>
+        <section className={`editorial-story-body${isLucy || isCynthia ? ' editorial-story-body-credits' : ''}`}>
           <div className="editorial-story-byline" aria-label="Editorial credits">
             {editorial.model && <p><span>FEATURING</span>{editorial.model}</p>}
             {editorial.photographer && <p><span>PHOTOGRAPHY</span>{editorial.photographer}</p>}
@@ -132,7 +134,7 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             </Link>
           </div>
         </section>
-        {!isLucy && editorial.gallery?.length ? (
+        {!isLucy && !isCynthia && editorial.gallery?.length ? (
           <section className="editorial-story-gallery" aria-label={`${editorial.model} editorial photographs`}>
             {editorial.gallery.map((photo, photoIndex) => (
               <figure className={`editorial-story-gallery-item editorial-story-gallery-item-${photoIndex % 3}`} key={photo.id || photo.src}>
