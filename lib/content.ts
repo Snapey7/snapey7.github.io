@@ -122,7 +122,7 @@ export const editorials: Editorial[] = [
   {
     slug: 'the-house-keeps-the-shadows',
     title: 'THE HOUSE KEEPS THE SHADOWS',
-    image: '/assets/editorial-cynthia-cover.jpg',
+    image: '/assets/editorial-cynthia-3v3a9014.jpg',
     location: 'Santa Teresa',
     model: 'Cynthia',
     cardDescription: 'An intimate portrait in warm light and deep shadow.',
