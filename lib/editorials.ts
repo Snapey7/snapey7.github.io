@@ -53,7 +53,8 @@ export async function getPublicEditorials(): Promise<Editorial[]> {
         date: row.release_date,
         body,
         intro: body[0] || row.deck,
-        image: images[0]?.src || base.image,
+        // Cynthia's public cover is curated in the repository, independently of Studio photo order.
+        image: base.slug === 'the-house-keeps-the-shadows' ? base.image : images[0]?.src || base.image,
         gallery: images.slice(1),
       };
     });
