@@ -3665,6 +3665,16 @@ button.under-link {
   line-height: 1.7;
 }
 
+.ana-story .cynthia-story-cover img {
+  max-height: min(82svh, 880px);
+  object-fit: contain;
+}
+
+.ana-story .cynthia-story-photo img {
+  max-height: min(72svh, 760px);
+  object-fit: contain;
+}
+
 @media (max-width: 760px) {
   .editorial-story-cynthia {
     padding-top: 7.5rem;
@@ -3686,5 +3696,9 @@ button.under-link {
 
   .cynthia-story-portrait > .cynthia-story-copy {
     width: min(100%, 660px);
+  }
+
+  .ana-story .cynthia-story-photo img {
+    max-height: 78svh;
   }
 }
