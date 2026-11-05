@@ -3551,3 +3551,140 @@ button.under-link {
   font-size: 0.9rem;
   line-height: 1.7;
 }
+
+/* Cynthia's repository-authored story preserves the supplied photo sequence. */
+.editorial-story-cynthia {
+  padding: 9rem 0 5rem;
+}
+
+.cynthia-story {
+  display: grid;
+  width: min(calc(100% - 5rem), 1280px);
+  margin: 0 auto;
+  gap: clamp(3rem, 6vw, 6rem);
+}
+
+.cynthia-story-heading {
+  width: min(100%, 920px);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cynthia-story-heading .eyebrow {
+  margin-bottom: 1.25rem;
+  color: #ff7779;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+}
+
+.cynthia-story-heading .eyebrow span {
+  padding: 0 0.5rem;
+}
+
+.cynthia-story-heading h1 {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.75rem, 6.5vw, 6.25rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.cynthia-story-deck {
+  max-width: 42rem;
+  margin: 1.5rem auto 0;
+  color: rgba(248, 239, 232, 0.72);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  line-height: 1.6;
+}
+
+.cynthia-story-cover,
+.cynthia-story-photo {
+  min-width: 0;
+  margin: 0;
+}
+
+.cynthia-story-cover img,
+.cynthia-story-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cynthia-story-copy {
+  display: grid;
+  width: min(100%, 660px);
+  margin: 0 auto;
+  gap: 1.35rem;
+}
+
+.cynthia-story-copy p {
+  margin: 0;
+  color: rgba(248, 239, 232, 0.8);
+  font-size: clamp(0.98rem, 1.15vw, 1.08rem);
+  line-height: 1.9;
+}
+
+.cynthia-story-opening .cynthia-story-copy p {
+  color: #f8efe8;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.35rem, 2.1vw, 1.8rem);
+  line-height: 1.65;
+}
+
+.cynthia-story-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(1.25rem, 4vw, 4rem);
+}
+
+.cynthia-story-column {
+  display: grid;
+  align-self: center;
+  min-width: 0;
+  gap: clamp(2rem, 4vw, 4rem);
+}
+
+.cynthia-story-portrait {
+  align-items: center;
+}
+
+.cynthia-story-portrait > .cynthia-story-copy {
+  width: min(100%, 510px);
+}
+
+.cynthia-story-copy p.cynthia-story-ending {
+  margin-top: 0.75rem;
+  color: #ff8587;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+  font-style: italic;
+  line-height: 1.7;
+}
+
+@media (max-width: 760px) {
+  .editorial-story-cynthia {
+    padding-top: 7.5rem;
+  }
+
+  .cynthia-story {
+    width: calc(100% - 2rem);
+    gap: 2.75rem;
+  }
+
+  .cynthia-story-pair {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.75rem;
+  }
+
+  .cynthia-story-column {
+    gap: 2.75rem;
+  }
+
+  .cynthia-story-portrait > .cynthia-story-copy {
+    width: min(100%, 660px);
+  }
+}

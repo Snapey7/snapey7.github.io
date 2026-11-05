@@ -31,6 +31,8 @@ export async function getPublicEditorials(): Promise<Editorial[]> {
 
     const published = new Map((data as EditorialRow[]).map((row) => [row.slug, row]));
     return editorials.map((base) => {
+      // Cynthia’s public story is authored in the repository; Studio remains independent.
+      if (base.slug === 'the-house-keeps-the-shadows') return base;
       const row = published.get(base.slug);
       if (!row) return base;
       const images = [...(row.editorial_images || [])]
@@ -53,8 +55,7 @@ export async function getPublicEditorials(): Promise<Editorial[]> {
         date: row.release_date,
         body,
         intro: body[0] || row.deck,
-        // Cynthia's public cover is curated in the repository, independently of Studio photo order.
-        image: base.slug === 'the-house-keeps-the-shadows' ? base.image : images[0]?.src || base.image,
+        image: images[0]?.src || base.image,
         gallery: images.slice(1),
       };
     });
