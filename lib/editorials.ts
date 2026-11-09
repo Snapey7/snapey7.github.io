@@ -31,8 +31,8 @@ export async function getPublicEditorials(): Promise<Editorial[]> {
 
     const published = new Map((data as EditorialRow[]).map((row) => [row.slug, row]));
     return editorials.map((base) => {
-      // Cynthia’s public story is authored in the repository; Studio remains independent.
-      if (base.slug === 'the-house-keeps-the-shadows' || base.slug === 'a-private-kind-of-summer') return base;
+      // Repository-authored stories stay independent from the Studio's editorial records.
+      if (base.slug === 'the-house-keeps-the-shadows' || base.slug === 'where-the-green-comes-in' || base.slug === 'a-private-kind-of-summer') return base;
       const row = published.get(base.slug);
       if (!row) return base;
       const images = [...(row.editorial_images || [])]
