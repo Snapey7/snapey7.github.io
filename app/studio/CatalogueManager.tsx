@@ -29,16 +29,10 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
   async function upload(catalogue: Catalogue, fileList: FileList | null) {
     const files = Array.from(fileList || []);
     if (!files.length) return;
-    const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const publicKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-    if (!publicUrl || !publicKey) {
-      setMessages((current) => ({ ...current, [catalogue.id]: 'Supabase is not configured for browser uploads.' }));
-      return;
-    }
     setBusyId(catalogue.id);
     setMessages((current) => ({ ...current, [catalogue.id]: 'Uploading private images…' }));
-    const supabase = createBrowserClient(publicUrl, publicKey);
     const uploadedPaths: string[] = [];
+    let uploadBucket: 'member-media' | 'member-media-r2' = 'member-media';
     try {
       for (const file of files) {
         const target = await createCatalogueUploadTarget({
@@ -48,17 +42,31 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
           size: file.size,
         });
         if ('error' in target) throw new Error(target.error);
-        const { error } = await supabase.storage.from('member-media')
-          .uploadToSignedUrl(target.path, target.token, file, { contentType: file.type, upsert: false });
-        if (error) throw new Error(error.message);
+        uploadBucket = target.bucket;
+        if (target.bucket === 'member-media-r2') {
+          const response = await fetch(target.uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': file.type },
+            body: file,
+          });
+          if (!response.ok) throw new Error(`Cloudflare upload failed (${response.status}). Check the R2 bucket CORS settings.`);
+        } else {
+          const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          const publicKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+          if (!publicUrl || !publicKey) throw new Error('Supabase is not configured for browser uploads.');
+          const supabase = createBrowserClient(publicUrl, publicKey);
+          const { error } = await supabase.storage.from('member-media')
+            .uploadToSignedUrl(target.path, target.token, file, { contentType: file.type, upsert: false });
+          if (error) throw new Error(error.message);
+        }
         uploadedPaths.push(target.path);
       }
-      const saved = await saveCatalogueMedia(catalogue.id, uploadedPaths);
+      const saved = await saveCatalogueMedia(catalogue.id, uploadedPaths, uploadBucket);
       if ('error' in saved) throw new Error(saved.error);
       setMessages((current) => ({ ...current, [catalogue.id]: saved.success }));
       router.refresh();
     } catch (error) {
-      if (uploadedPaths.length) await removeCatalogueUploads(catalogue.id, uploadedPaths).catch(() => undefined);
+      if (uploadedPaths.length) await removeCatalogueUploads(catalogue.id, uploadedPaths, uploadBucket).catch(() => undefined);
       setMessages((current) => ({
         ...current,
         [catalogue.id]: error instanceof Error ? error.message : 'Upload failed. Please try again.',

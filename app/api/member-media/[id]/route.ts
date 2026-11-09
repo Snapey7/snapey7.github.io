@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCurrentMembership, membershipAllows } from '@/lib/membership';
+import { createR2ReadUrl, R2_MEDIA_BUCKET_MARKER } from '@/lib/member-media-r2';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,9 +34,17 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   }
   if (!entitled) return new Response('Purchase or membership required.', { status: 403 });
 
-  const { data: signed, error: signError } = await admin.storage
-    .from(media.bucket)
-    .createSignedUrl(media.storage_path, 60);
-  if (signError || !signed?.signedUrl) return new Response('Media is unavailable.', { status: 404 });
-  return NextResponse.redirect(signed.signedUrl, { headers: { 'Cache-Control': 'private, no-store' } });
+  try {
+    if (media.bucket === R2_MEDIA_BUCKET_MARKER) {
+      const signedUrl = await createR2ReadUrl(media.storage_path, 60);
+      return NextResponse.redirect(signedUrl, { headers: { 'Cache-Control': 'private, no-store' } });
+    }
+    const { data: signed, error: signError } = await admin.storage
+      .from(media.bucket)
+      .createSignedUrl(media.storage_path, 60);
+    if (signError || !signed?.signedUrl) return new Response('Media is unavailable.', { status: 404 });
+    return NextResponse.redirect(signed.signedUrl, { headers: { 'Cache-Control': 'private, no-store' } });
+  } catch {
+    return new Response('Media is unavailable.', { status: 404 });
+  }
 }

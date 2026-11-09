@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { requireContentAdmin } from '@/lib/content-admin';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { editorials } from '@/lib/content';
+import { createR2UploadUrl, deleteR2Object, isR2MediaConfigured, R2_MEDIA_BUCKET_MARKER } from '@/lib/member-media-r2';
 
 const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
 const maxImageBytes = 20 * 1024 * 1024;
@@ -33,9 +34,17 @@ export async function createCatalogueUploadTarget(input: {
   const { data: catalogue } = await admin.from('catalogues').select('id').eq('id', input.catalogueId).maybeSingle();
   if (!catalogue) return { error: 'Catalogue not found.' };
   const path = `${input.catalogueId}/${crypto.randomUUID()}.${extension}`;
+  if (isR2MediaConfigured()) {
+    try {
+      return { path, bucket: 'member-media-r2' as const, uploadUrl: await createR2UploadUrl(path) };
+    } catch (error) {
+      console.error('R2 upload URL creation failed:', error);
+      return { error: 'Could not prepare a Cloudflare upload. Check the R2 credentials in the server environment.' };
+    }
+  }
   const { data, error } = await admin.storage.from('member-media').createSignedUploadUrl(path, { upsert: false });
   if (error || !data?.token) return { error: 'Could not prepare a secure upload. Check the private Supabase storage bucket.' };
-  return { path, token: data.token };
+  return { path, bucket: 'member-media' as const, token: data.token };
 }
 
 export async function createEditorialUploadTarget(input: {
@@ -175,9 +184,10 @@ export async function updateEditorial(input: {
   }
 }
 
-export async function saveCatalogueMedia(catalogueId: string, paths: string[]) {
+export async function saveCatalogueMedia(catalogueId: string, paths: string[], bucket: 'member-media' | 'member-media-r2') {
   await requireContentAdmin();
-  if (!/^[0-9a-f-]{36}$/i.test(catalogueId) || !Array.isArray(paths) || paths.length < 1 || paths.length > 100) {
+  if (!/^[0-9a-f-]{36}$/i.test(catalogueId) || !Array.isArray(paths) || paths.length < 1 || paths.length > 100
+    || !['member-media', R2_MEDIA_BUCKET_MARKER].includes(bucket)) {
     return { error: 'Choose a catalogue and at least one image.' };
   }
   if (paths.some((path) => typeof path !== 'string' || !path.startsWith(`${catalogueId}/`) || path.includes('..'))) {
@@ -195,7 +205,7 @@ export async function saveCatalogueMedia(catalogueId: string, paths: string[]) {
   const rows = paths.map((path, index) => ({
     title: catalogue.title,
     alt_text: `${catalogue.title}, photograph ${index + 1}`,
-    bucket: 'member-media' as const,
+    bucket,
     storage_path: path,
     min_tier: catalogue.product_type === 'magazine_edition' ? 'standard' as const : 'impura' as const,
     model_slug: catalogue.model_slug,
@@ -211,11 +221,16 @@ export async function saveCatalogueMedia(catalogueId: string, paths: string[]) {
   return { success: `${rows.length} image${rows.length === 1 ? '' : 's'} uploaded to ${catalogue.title}.` };
 }
 
-export async function removeCatalogueUploads(catalogueId: string, paths: string[]) {
+export async function removeCatalogueUploads(catalogueId: string, paths: string[], bucket: 'member-media' | 'member-media-r2') {
   await requireContentAdmin();
-  if (!/^[0-9a-f-]{36}$/i.test(catalogueId) || !Array.isArray(paths) || paths.length > 100) return;
+  if (!/^[0-9a-f-]{36}$/i.test(catalogueId) || !Array.isArray(paths) || paths.length > 100
+    || !['member-media', R2_MEDIA_BUCKET_MARKER].includes(bucket)) return;
   if (paths.some((path) => typeof path !== 'string' || !path.startsWith(`${catalogueId}/`) || path.includes('..'))) return;
-  if (paths.length) await createAdminClient().storage.from('member-media').remove(paths);
+  if (bucket === R2_MEDIA_BUCKET_MARKER) {
+    await Promise.all(paths.map((path) => deleteR2Object(path)));
+  } else if (paths.length) {
+    await createAdminClient().storage.from('member-media').remove(paths);
+  }
 }
 
 export async function removeCataloguePhoto(catalogueId: string, photoId: string) {
@@ -228,7 +243,8 @@ export async function removeCataloguePhoto(catalogueId: string, photoId: string)
   const { data: photo, error: photoError } = await admin.from('member_media')
     .select('id,catalogue_id,bucket,storage_path').eq('id', photoId).eq('catalogue_id', catalogueId).maybeSingle();
   if (photoError || !photo) return { error: 'This photo is no longer in that catalogue. Refresh the page.' };
-  if (photo.bucket !== 'member-media' || !photo.storage_path.startsWith(`${catalogueId}/`) || photo.storage_path.includes('..')) {
+  if (!['member-media', R2_MEDIA_BUCKET_MARKER].includes(photo.bucket)
+    || !photo.storage_path.startsWith(`${catalogueId}/`) || photo.storage_path.includes('..')) {
     return { error: 'This photo does not belong to the private catalogue storage area.' };
   }
 
@@ -236,8 +252,15 @@ export async function removeCataloguePhoto(catalogueId: string, photoId: string)
     .select('id,model_slug,title').eq('id', catalogueId).maybeSingle();
   if (catalogueError || !catalogue) return { error: 'Catalogue not found.' };
 
-  const { error: storageError } = await admin.storage.from('member-media').remove([photo.storage_path]);
-  if (storageError) return { error: 'The private photo could not be deleted. The catalogue has not been changed.' };
+  try {
+    if (photo.bucket === R2_MEDIA_BUCKET_MARKER) await deleteR2Object(photo.storage_path);
+    else {
+      const { error: storageError } = await admin.storage.from('member-media').remove([photo.storage_path]);
+      if (storageError) throw storageError;
+    }
+  } catch {
+    return { error: 'The private photo could not be deleted. The catalogue has not been changed.' };
+  }
 
   const { error: deleteError } = await admin.from('member_media').delete().eq('id', photoId).eq('catalogue_id', catalogueId);
   if (deleteError) {

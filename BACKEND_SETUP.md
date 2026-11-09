@@ -12,6 +12,7 @@ In Supabase, open **SQL Editor** and run these files in order:
 2. `supabase/migrations/202610280001_stripe_checkout.sql`
 3. `supabase/migrations/202610290001_catalogue_publishing.sql`
 4. `supabase/migrations/202610290002_separate_shop_products.sql`
+5. `supabase/migrations/202611090001_allow_r2_member_media.sql` (needed when enabling Cloudflare R2)
 
 The catalogue migration creates records from the seven Stripe Price IDs already supplied and adds catalogue-level entitlements. The next migration separates public physical Shop products from private digital releases: the existing Edition 1 product is carried into the Shop, its private magazine release remains in the subscriber vault, and shop checkouts are recorded as orders without granting digital access. Standard and Impura subscribers can access published magazine issues; Impura subscribers also get Muse catalogues; an individual Muse purchase unlocks only that model's catalogue.
 
@@ -71,7 +72,7 @@ Redeploy after setting variables. Checkout buttons stay disabled until all requi
 
 ## 6. Upload and publish releases
 
-After the migrations and environment variables are deployed, sign in with the Supabase account whose email is in `CONTENT_ADMIN_EMAILS` and open `/studio`. The **Shop products** section is for public preview/product photos only. Full-resolution subscriber content belongs in **Subscriber vault**. Uploads to the private `member-media` Storage bucket use short-lived upload tokens. Only published catalogues can be served to entitled members. Model catalogues appear on the matching Muse page and in the member library.
+After the migrations and environment variables are deployed, sign in with the Supabase account whose email is in `CONTENT_ADMIN_EMAILS` and open `/studio`. The **Shop products** section is for public preview/product photos only. Full-resolution subscriber content belongs in **Subscriber vault**. Without R2 configuration, uploads continue to the private Supabase `member-media` bucket. With R2 configured, new subscriber vault uploads go to the private R2 bucket using short-lived upload URLs. Existing Supabase media remains available. Only published catalogues can be served to entitled members. Model catalogues appear on the matching Muse page and in the member library.
 
 Create one sample release first: upload an approved test image to a Muse catalogue, publish it, check its page as a visitor, buy it using Stripe test mode, and confirm only that model's images appear in the buyer's library. Then publish a sample magazine issue and confirm it is available to both active membership tiers. Use Stripe test mode keys and test price IDs in Vercel Preview; use live keys only after the live webhook and account eligibility are confirmed.
 
@@ -79,7 +80,19 @@ For a physical Shop order, create matching shipping rates in Stripe and set the 
 
 ## 7. Private content
 
-Keep full paid files in the private `member-media` Supabase Storage bucket. Do not put paid originals in `public/` or the public `shop-product-images` bucket. The app issues short-lived signed URLs only after checking membership or a recorded one-time purchase. For monthly and annual membership checkout, use the matching configured Stripe Price ID. Account entitlements update through webhooks, not a client-side success redirect. Public Shop product images are intentionally accessible without signing in and must be selected as previews/product photos only.
+Keep full paid files in private storage. New subscriber vault uploads can use Supabase's private `member-media` bucket or Cloudflare R2; do not put paid originals in `public/` or the public `shop-product-images` bucket. The app issues short-lived signed URLs only after checking membership or a recorded one-time purchase. For monthly and annual membership checkout, use the matching configured Stripe Price ID. Account entitlements update through webhooks, not a client-side success redirect. Public Shop product images are intentionally accessible without signing in and must be selected as previews/product photos only.
+
+## 8. Optional Cloudflare R2 storage for subscriber uploads
+
+R2 has no internet egress charge. The current Free tier includes 10 GB-month of Standard storage, 1 million Class A operations and 10 million Class B operations per month; storage and operation usage above the included amounts is billed. Check Cloudflare's current R2 pricing before scaling.
+
+1. In Cloudflare, create an R2 bucket such as `impura-member-media`. Keep it private; do not enable public access or attach a public custom domain.
+2. Create an R2 API token scoped only to this bucket with read and write object permissions. Copy the Access Key ID and Secret Access Key once, and note the account ID from the R2 overview.
+3. In the bucket's CORS settings, allow `PUT` and `GET` from `https://www.impuravidamagazine.com`, `https://impuravidamagazine.com`, and `http://localhost:3000`. Allow the `Content-Type` request header. Add any Vercel Preview origin explicitly when needed.
+4. Add `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, and `R2_BUCKET_NAME` to Vercel Production and Preview. Keep these values server-only; never prefix them with `NEXT_PUBLIC_`.
+5. Apply `202611090001_allow_r2_member_media.sql` in Supabase, then redeploy the site. Studio will begin sending new Subscriber vault uploads directly from the browser to R2. Short-lived private links are issued only after the app's existing entitlement check. Existing Supabase objects are not moved automatically.
+
+R2 usage is separate from Supabase's egress quota. This setup moves subscriber vault object storage and downloads to R2; it does not move Supabase database/Auth traffic or the public editorial/shop image paths.
 
 The project retains the prior Verotel endpoint and membership records for continuity, but new checkout buttons use Stripe. Remove old Verotel credentials only after confirming no existing Verotel memberships depend on them.
 
@@ -90,3 +103,6 @@ The project retains the prior Verotel endpoint and membership records for contin
 - [Stripe Customer Portal](https://docs.stripe.com/customer-management)
 - [Apple Pay domain verification](https://docs.stripe.com/apple-pay)
 - [Stripe restricted businesses](https://support.stripe.com/questions/restricted-business-list-and-considerations?locale=en-GB)
+- [Cloudflare R2 pricing](https://developers.cloudflare.com/r2/pricing/)
+- [Cloudflare R2 presigned URLs](https://developers.cloudflare.com/r2/api/s3/presigned-urls/)
+- [Cloudflare R2 CORS](https://developers.cloudflare.com/r2/buckets/cors/)
