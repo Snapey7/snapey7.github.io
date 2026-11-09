@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
 import { CynthiaEditorialStory } from '@/components/site/CynthiaEditorialStory';
+import { AngieDayaEditorialStory } from '@/components/site/AngieDayaEditorialStory';
 import { AnaEditorialStory } from '@/components/site/AnaEditorialStory';
 import { editorialBody, getPublicEditorials } from '@/lib/editorials';
 
@@ -38,6 +39,7 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
   const next = allEditorials[(index + 1) % allEditorials.length];
   const paragraphs = editorialBody(editorial);
   const isCynthia = editorial.slug === 'the-house-keeps-the-shadows';
+  const isDuo = editorial.slug === 'where-the-green-comes-in';
   const isAna = editorial.slug === 'a-private-kind-of-summer';
   const isLucy =
     editorial.slug === 'manzanillo-part-i-nothing-beyond-the-horizon' ||
@@ -58,8 +60,8 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
 
   return (
     <PageShell>
-      <main className={`editorial-story-page editorial-story-layout-${index % 4}${isLucy ? ' editorial-story-lucy' : ''}${isCynthia || isAna ? ' editorial-story-cynthia' : ''}`}>
-        {isAna ? <AnaEditorialStory editorial={editorial} /> : isCynthia ? <CynthiaEditorialStory editorial={editorial} /> : isLucy ? (
+      <main className={`editorial-story-page editorial-story-layout-${index % 4}${isLucy ? ' editorial-story-lucy' : ''}${isCynthia || isAna ? ' editorial-story-cynthia' : ''}${isDuo ? ' editorial-story-duo' : ''}`}>
+        {isAna ? <AnaEditorialStory editorial={editorial} /> : isCynthia ? <CynthiaEditorialStory editorial={editorial} /> : isDuo ? <AngieDayaEditorialStory editorial={editorial} /> : isLucy ? (
           <>
             <figure className="editorial-flow-hero">
               <img src={editorial.image} alt={`${editorial.model} on the Manzanillo shoreline`} />
@@ -120,7 +122,7 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             </section>
           </>
         )}
-        <section className={`editorial-story-body${isLucy || isCynthia || isAna ? ' editorial-story-body-credits' : ''}`}>
+        <section className={`editorial-story-body${isLucy || isCynthia || isAna || isDuo ? ' editorial-story-body-credits' : ''}`}>
           <div className="editorial-story-byline" aria-label="Editorial credits">
             {editorial.model && <p><span>FEATURING</span>{editorial.model}</p>}
             {editorial.photographer && <p><span>PHOTOGRAPHY</span>{editorial.photographer}</p>}
@@ -136,7 +138,7 @@ export default async function EditorialDetailPage({ params }: EditorialPageProps
             </Link>
           </div>
         </section>
-        {!isLucy && !isCynthia && !isAna && editorial.gallery?.length ? (
+        {!isLucy && !isCynthia && !isAna && !isDuo && editorial.gallery?.length ? (
           <section className="editorial-story-gallery" aria-label={`${editorial.model} editorial photographs`}>
             {editorial.gallery.map((photo, photoIndex) => (
               <figure className={`editorial-story-gallery-item editorial-story-gallery-item-${photoIndex % 3}`} key={photo.id || photo.src}>
