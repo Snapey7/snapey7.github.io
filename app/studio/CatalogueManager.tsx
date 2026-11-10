@@ -23,6 +23,12 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
   const [descriptions, setDescriptions] = useState<Record<string, string>>(
     Object.fromEntries(catalogues.map((item) => [item.id, item.description || ''])),
   );
+  const [stripePriceIds, setStripePriceIds] = useState<Record<string, string>>(
+    Object.fromEntries(catalogues.map((item) => [
+      item.id,
+      item.stripe_price_id || (item.model_slug === 'lucy-manzanillo-part-2' ? 'price_1UaKpxEYY8tfl15wNUKOaAzd' : ''),
+    ])),
+  );
   const [issueTitle, setIssueTitle] = useState('');
   const [issueMessage, setIssueMessage] = useState('');
   const [creatingIssue, setCreatingIssue] = useState(false);
@@ -85,6 +91,7 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
     const result = await updateCatalogue({
       catalogueId: catalogue.id,
       description: descriptions[catalogue.id] ?? '',
+      stripePriceId: stripePriceIds[catalogue.id] ?? '',
       publish,
     });
     setMessages((current) => ({ ...current, [catalogue.id]: ('error' in result ? result.error : result.success) ?? 'Could not save this catalogue.' }));
@@ -215,6 +222,16 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
               value={descriptions[catalogue.id] || ''}
             />
           </label>
+          {catalogue.product_type === 'model_catalogue' && <label className="studio-field">
+            <span>Stripe one-time Price ID</span>
+            <input
+              autoComplete="off"
+              onChange={(event) => setStripePriceIds((current) => ({ ...current, [catalogue.id]: event.target.value }))}
+              placeholder="price_…"
+              value={stripePriceIds[catalogue.id] || ''}
+            />
+            <small>Saving this draft connects the catalogue to this Stripe price. The Lucy Part II price you provided is prefilled.</small>
+          </label>}
           <label className="studio-field">
             <span>Add private photographs (JPEG, PNG, WebP or AVIF; up to 20 MB each)</span>
             <input
