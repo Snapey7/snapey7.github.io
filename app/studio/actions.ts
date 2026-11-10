@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireContentAdmin } from '@/lib/content-admin';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { isStripeOneTimePrice } from '@/lib/billing/stripe';
 import { editorials, models } from '@/lib/content';
 import { createR2UploadUrl, deleteR2Object, isR2MediaConfigured, R2_MEDIA_BUCKET_MARKER } from '@/lib/member-media-r2';
 
@@ -311,16 +312,22 @@ export async function moveCataloguePhoto(catalogueId: string, photoId: string, d
   return { moved: Boolean(data) };
 }
 
-export async function updateCatalogue(input: { catalogueId: string; description: string; publish: boolean }) {
+export async function updateCatalogue(input: { catalogueId: string; description: string; stripePriceId: string; publish: boolean }) {
   await requireContentAdmin();
   if (!/^[0-9a-f-]{36}$/i.test(input.catalogueId)) return { error: 'Choose a valid catalogue.' };
   const description = input.description.trim().slice(0, 2000);
+  const stripePriceId = input.stripePriceId.trim();
   const admin = createAdminClient();
+  const { data: currentCatalogue, error: catalogueLookupError } = await admin.from('catalogues')
+    .select('product_type,stripe_price_id').eq('id', input.catalogueId).maybeSingle();
+  if (catalogueLookupError || !currentCatalogue) return { error: 'Could not load this catalogue.' };
+  if (currentCatalogue.product_type === 'model_catalogue' && stripePriceId !== currentCatalogue.stripe_price_id) {
+    if (!/^price_[A-Za-z0-9]+$/.test(stripePriceId) || !await isStripeOneTimePrice(stripePriceId)) {
+      return { error: 'Enter an active one-time Stripe Price ID from the same Stripe mode used by this deployment.' };
+    }
+  }
   if (input.publish) {
-    const { data: currentCatalogue, error: catalogueLookupError } = await admin.from('catalogues')
-      .select('product_type,stripe_price_id').eq('id', input.catalogueId).maybeSingle();
-    if (catalogueLookupError || !currentCatalogue) return { error: 'Could not load this catalogue.' };
-    if (currentCatalogue.product_type === 'model_catalogue' && !currentCatalogue.stripe_price_id) {
+    if (currentCatalogue.product_type === 'model_catalogue' && !stripePriceId) {
       return { error: 'Add a Stripe price to this Muse catalogue before publishing it for purchase.' };
     }
     const { count, error: countError } = await admin.from('member_media')
@@ -328,7 +335,7 @@ export async function updateCatalogue(input: { catalogueId: string; description:
     if (countError || !count) return { error: 'Upload at least one private image before publishing.' };
   }
   const { data: catalogue, error } = await admin.from('catalogues')
-    .update({ description, status: input.publish ? 'published' : 'draft', updated_at: new Date().toISOString() })
+    .update({ description, stripe_price_id: currentCatalogue.product_type === 'model_catalogue' ? stripePriceId : null, status: input.publish ? 'published' : 'draft', updated_at: new Date().toISOString() })
     .eq('id', input.catalogueId).select('id,model_slug,product_type').maybeSingle();
   if (error || !catalogue) return { error: 'Could not save this catalogue.' };
   revalidatePath('/studio');
