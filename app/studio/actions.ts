@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireContentAdmin } from '@/lib/content-admin';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { editorials } from '@/lib/content';
+import { editorials, models } from '@/lib/content';
 import { createR2UploadUrl, deleteR2Object, isR2MediaConfigured, R2_MEDIA_BUCKET_MARKER } from '@/lib/member-media-r2';
 
 const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
@@ -317,6 +317,12 @@ export async function updateCatalogue(input: { catalogueId: string; description:
   const description = input.description.trim().slice(0, 2000);
   const admin = createAdminClient();
   if (input.publish) {
+    const { data: currentCatalogue, error: catalogueLookupError } = await admin.from('catalogues')
+      .select('product_type,stripe_price_id').eq('id', input.catalogueId).maybeSingle();
+    if (catalogueLookupError || !currentCatalogue) return { error: 'Could not load this catalogue.' };
+    if (currentCatalogue.product_type === 'model_catalogue' && !currentCatalogue.stripe_price_id) {
+      return { error: 'Add a Stripe price to this Muse catalogue before publishing it for purchase.' };
+    }
     const { count, error: countError } = await admin.from('member_media')
       .select('id', { count: 'exact', head: true }).eq('catalogue_id', input.catalogueId);
     if (countError || !count) return { error: 'Upload at least one private image before publishing.' };
@@ -345,4 +351,30 @@ export async function createMagazineIssue(titleInput: string) {
   revalidatePath('/studio');
   revalidatePath('/library');
   return { success: 'Subscriber issue created as a draft. Upload its private pages and publish it when ready.' };
+}
+
+export async function createLucyPartTwoCatalogueDraft() {
+  await requireContentAdmin();
+  const model = models.find((item) => item.slug === 'lucy-manzanillo-part-2');
+  if (!model) return { error: 'Lucy Part II is not available in the Muse catalogue.' };
+
+  const admin = createAdminClient();
+  const { data: existing, error: lookupError } = await admin.from('catalogues')
+    .select('id').eq('product_type', 'model_catalogue').eq('model_slug', model.slug).maybeSingle();
+  if (lookupError) return { error: 'Could not check whether Lucy Part II already has an upload slot.' };
+  if (existing) return { success: 'Lucy Part II upload slot is already in Studio.' };
+
+  const { error } = await admin.from('catalogues').insert({
+    title: 'Lucy — Manzanillo Part II',
+    description: '',
+    product_type: 'model_catalogue',
+    model_slug: model.slug,
+    stripe_price_id: null,
+    status: 'draft',
+  });
+  if (error) return { error: 'Could not create the Lucy Part II upload slot. Check that the latest catalogue migration is applied.' };
+
+  revalidatePath('/studio');
+  revalidatePath(`/models/${model.slug}`);
+  return { success: 'Lucy Part II is ready in Studio. Upload its private images to the draft catalogue.' };
 }

@@ -33,6 +33,7 @@ export default async function StudioPage() {
     description: string;
     product_type: 'model_catalogue' | 'magazine_edition';
     model_slug: string | null;
+    stripe_price_id: string | null;
     status: 'draft' | 'published';
     member_media: { id: string; title: string; alt_text: string; preview_url: string; position: number }[];
   }[] = [];
@@ -104,7 +105,7 @@ export default async function StudioPage() {
       });
     }
     const { data, error } = await admin.from('catalogues')
-      .select('id,title,description,product_type,model_slug,status,member_media(id,title,alt_text,bucket,storage_path,position)')
+      .select('id,title,description,product_type,model_slug,stripe_price_id,status,member_media(id,title,alt_text,bucket,storage_path,position)')
       .order('product_type').order('title');
     if (error) loadError = 'Apply the catalogue publishing migration in Supabase to finish connecting the content studio.';
     else {
