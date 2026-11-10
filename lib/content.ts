@@ -339,6 +339,13 @@ export const models = [
     bio: 'Lucy finds a private cove at the edge of the jungle in this sunlit coastal story.',
   },
   {
+    slug: 'lucy-manzanillo-part-2',
+    name: 'Lucy — Part II',
+    image: '/assets/lucy-manzanillo-part-2-cover.jpg',
+    location: 'Manzanillo',
+    bio: 'A standalone second story from Manzanillo, with a more revealing and artistic visual language.',
+  },
+  {
     slug: 'alexis-noir',
     name: 'Alexis',
     image: '/assets/alexis-noir-new.jpg',

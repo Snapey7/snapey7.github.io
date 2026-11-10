@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
-import { createCatalogueUploadTarget, createMagazineIssue, moveCataloguePhoto, removeCataloguePhoto, removeCatalogueUploads, saveCatalogueMedia, updateCatalogue } from './actions';
+import { createCatalogueUploadTarget, createLucyPartTwoCatalogueDraft, createMagazineIssue, moveCataloguePhoto, removeCataloguePhoto, removeCatalogueUploads, saveCatalogueMedia, updateCatalogue } from './actions';
 
 type Catalogue = {
   id: string;
@@ -11,6 +11,7 @@ type Catalogue = {
   description: string;
   product_type: 'model_catalogue' | 'magazine_edition';
   model_slug: string | null;
+  stripe_price_id: string | null;
   status: 'draft' | 'published';
   member_media: { id: string; title: string; alt_text: string; preview_url: string; position: number }[];
 };
@@ -25,6 +26,9 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
   const [issueTitle, setIssueTitle] = useState('');
   const [issueMessage, setIssueMessage] = useState('');
   const [creatingIssue, setCreatingIssue] = useState(false);
+  const [creatingLucyPartTwo, setCreatingLucyPartTwo] = useState(false);
+  const [lucyPartTwoMessage, setLucyPartTwoMessage] = useState('');
+  const hasLucyPartTwoCatalogue = catalogues.some((item) => item.model_slug === 'lucy-manzanillo-part-2');
 
   async function upload(catalogue: Catalogue, fileList: FileList | null) {
     const files = Array.from(fileList || []);
@@ -152,6 +156,24 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
       </div>
       {issueMessage && <p className="studio-feedback" role="status">{issueMessage}</p>}
     </form>
+    {!hasLucyPartTwoCatalogue && <form className="studio-new-product" action={async () => {
+      setCreatingLucyPartTwo(true);
+      const result = await createLucyPartTwoCatalogueDraft();
+      setLucyPartTwoMessage(('error' in result ? result.error : result.success) || 'Could not create Lucy Part II draft.');
+      setCreatingLucyPartTwo(false);
+      if (!('error' in result)) router.refresh();
+    }}>
+      <div className="studio-field">
+        <span>Lucy · Manzanillo Part II</span>
+        <p>This is a separate Muse release. Create its private draft upload slot here; Lucy’s original catalogue stays as it is.</p>
+      </div>
+      <div className="studio-actions">
+        <button className="studio-publish" disabled={creatingLucyPartTwo} type="submit">
+          {creatingLucyPartTwo ? 'Creating…' : 'Create Lucy Part II draft'}
+        </button>
+      </div>
+      {lucyPartTwoMessage && <p className="studio-feedback" role="status">{lucyPartTwoMessage}</p>}
+    </form>}
     <div className="studio-catalogue-list">
       {catalogues.map((catalogue) => (
         <article className="studio-catalogue" key={catalogue.id}>
@@ -179,7 +201,9 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
             </figure>)}
           </div>}
           {catalogue.product_type === 'model_catalogue' && catalogue.status !== 'published' && (
-            <p className="studio-feedback">To show the individual Buy Catalogue option on this muse page, upload at least one private photo and publish this catalogue.</p>
+            <p className="studio-feedback">{catalogue.stripe_price_id
+              ? 'To show the individual Buy Catalogue option on this muse page, upload at least one private photo and publish this catalogue.'
+              : 'This draft can receive private photo uploads now. Add a Stripe price before publishing it for purchase.'}</p>
           )}
           <label className="studio-field">
             <span>Customer description</span>
@@ -213,7 +237,7 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
                 Unpublish
               </button>
             ) : (
-              <button className="studio-publish" disabled={busyId === catalogue.id} onClick={() => void save(catalogue, true)} type="button">
+              <button className="studio-publish" disabled={busyId === catalogue.id || (catalogue.product_type === 'model_catalogue' && !catalogue.stripe_price_id)} onClick={() => void save(catalogue, true)} type="button">
                 Publish
               </button>
             )}
