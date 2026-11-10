@@ -3,6 +3,7 @@ import { PageShell } from '@/components/site/PageShell';
 import { getContentAdminState } from '@/lib/content-admin';
 import { editorials, type Editorial } from '@/lib/content';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createR2ReadUrl, R2_MEDIA_BUCKET_MARKER } from '@/lib/member-media-r2';
 import { CatalogueManager } from './CatalogueManager';
 import { EditorialManager } from './EditorialManager';
 import { ShopProductManager } from './ShopProductManager';
@@ -108,20 +109,25 @@ export default async function StudioPage() {
     if (error) loadError = 'Apply the catalogue publishing migration in Supabase to finish connecting the content studio.';
     else {
       const privateCatalogues = (data || []).filter((item) => item.product_type !== 'physical_shop');
-      const photoPaths = privateCatalogues.flatMap((item) => (item.member_media || [])
-        .filter((photo) => photo.bucket === 'member-media')
-        .map((photo) => photo.storage_path));
-      const { data: signedPhotos } = photoPaths.length
-        ? await admin.storage.from('member-media').createSignedUrls(photoPaths, 600)
+      const privatePhotos = privateCatalogues.flatMap((item) => (item.member_media || [])
+        .filter((photo) => photo.bucket === 'member-media' || photo.bucket === R2_MEDIA_BUCKET_MARKER));
+      const supabasePhotoPaths = privatePhotos.filter((photo) => photo.bucket === 'member-media').map((photo) => photo.storage_path);
+      const r2Photos = privatePhotos.filter((photo) => photo.bucket === R2_MEDIA_BUCKET_MARKER);
+      const { data: signedPhotos } = supabasePhotoPaths.length
+        ? await admin.storage.from('member-media').createSignedUrls(supabasePhotoPaths, 600)
         : { data: [] };
       const signedUrls = new Map((signedPhotos || []).map((photo) => [photo.path, photo.signedUrl || '']));
+      const r2SignedUrls = new Map(await Promise.all(r2Photos.map(async (photo) => {
+        try { return [photo.storage_path, await createR2ReadUrl(photo.storage_path, 600)] as const; }
+        catch { return [photo.storage_path, ''] as const; }
+      })));
       catalogues = privateCatalogues.map((item) => ({
         ...item,
-        member_media: (item.member_media || []).filter((photo) => photo.bucket === 'member-media').map((photo) => ({
+        member_media: (item.member_media || []).filter((photo) => photo.bucket === 'member-media' || photo.bucket === R2_MEDIA_BUCKET_MARKER).map((photo) => ({
           id: photo.id,
           title: photo.title,
           alt_text: photo.alt_text,
-          preview_url: signedUrls.get(photo.storage_path) || '',
+          preview_url: (photo.bucket === R2_MEDIA_BUCKET_MARKER ? r2SignedUrls : signedUrls).get(photo.storage_path) || '',
           position: photo.position,
         })).sort((a, b) => a.position - b.position || a.id.localeCompare(b.id)),
       }));
