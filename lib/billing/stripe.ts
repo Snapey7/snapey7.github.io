@@ -16,7 +16,7 @@ const configuredPrice = (key: string) => /^price_[A-Za-z0-9]+$/.test(process.env
 
 export function isStripeCheckoutReady() {
   return Boolean(
-    /^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY || '') &&
+    /^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY?.trim() || '') &&
     configuredPrice('STRIPE_PRICE_STANDARD_MONTHLY') &&
     configuredPrice('STRIPE_PRICE_STANDARD_YEARLY') &&
     configuredPrice('STRIPE_PRICE_IMPURA_MONTHLY') &&
@@ -31,7 +31,7 @@ export function isStripeCheckoutReady() {
 
 export function isStripeOneTimeCheckoutReady() {
   return Boolean(
-    /^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY || '') &&
+    /^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY?.trim() || '') &&
     /^whsec_\S+$/.test(process.env.STRIPE_WEBHOOK_SECRET || '') &&
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY &&
@@ -53,7 +53,7 @@ export function isPhysicalShopCheckoutReady() {
 }
 
 export async function getStripePriceLabel(priceId: string) {
-  const secret = process.env.STRIPE_SECRET_KEY;
+  const secret = process.env.STRIPE_SECRET_KEY?.trim();
   if (!/^price_[A-Za-z0-9]+$/.test(priceId) || !secret || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(secret)) return null;
   try {
     const response = await fetch(`https://api.stripe.com/v1/prices/${encodeURIComponent(priceId)}`, {
@@ -70,24 +70,54 @@ export async function getStripePriceLabel(priceId: string) {
   }
 }
 
-export async function isStripeOneTimePrice(priceId: string) {
-  const secret = process.env.STRIPE_SECRET_KEY;
-  if (!/^price_[A-Za-z0-9]+$/.test(priceId) || !secret || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(secret)) return false;
+export async function validateStripeOneTimePrice(priceId: string) {
+  if (!/^price_[A-Za-z0-9]+$/.test(priceId)) {
+    return { error: 'Enter a valid Stripe Price ID beginning with price_.' };
+  }
+  const secret = process.env.STRIPE_SECRET_KEY?.trim();
+  if (!secret || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(secret)) {
+    return { error: 'This deployment has no valid STRIPE_SECRET_KEY. Check its server environment and redeploy.' };
+  }
+  const mode = secret.startsWith('sk_live_') || secret.startsWith('rk_live_') ? 'live' : 'test';
   try {
-    const response = await fetch(`https://api.stripe.com/v1/prices/${encodeURIComponent(priceId)}`, {
+    const response = await fetch(`https://api.stripe.com/v1/prices/${encodeURIComponent(priceId)}?expand[]=product`, {
       headers: { Authorization: `Bearer ${secret}` },
       cache: 'no-store',
+      signal: AbortSignal.timeout(10000),
     });
-    if (!response.ok) return false;
-    const price = await response.json() as { active?: boolean; recurring?: unknown; unit_amount?: number | null; currency?: string };
-    return price.active === true && !price.recurring && typeof price.unit_amount === 'number' && Boolean(price.currency);
+    if (!response.ok) {
+      // Keep credentials and Stripe's raw error text out of logs and action responses.
+      console.error('Stripe price lookup failed:', { status: response.status, requestId: response.headers.get('request-id'), mode });
+      if (response.status === 401) return { error: 'Stripe rejected this deployment’s secret key. Check STRIPE_SECRET_KEY and redeploy.' };
+      if (response.status === 403) return { error: 'This deployment’s Stripe key does not have permission to read prices and products.' };
+      if (response.status === 404) return { error: `Stripe could not find this price in the account connected to this deployment (${mode} mode). Check the account and Price ID.` };
+      return { error: 'Stripe could not verify this price right now. Please try saving again.' };
+    }
+    const price = await response.json() as {
+      id?: string; active?: boolean; type?: string; livemode?: boolean;
+      unit_amount?: number | null; currency?: string;
+      product?: string | { name?: string; active?: boolean; deleted?: boolean };
+    };
+    if (price.id !== priceId || price.livemode !== (mode === 'live')) {
+      return { error: `Stripe returned a price that does not match this deployment’s ${mode} mode.` };
+    }
+    if (!price.active || price.type !== 'one_time') return { error: 'Choose an active one-time Stripe price, rather than a recurring or archived price.' };
+    if (typeof price.unit_amount !== 'number' || !price.currency) return { error: 'Choose a Stripe price with a fixed amount and currency.' };
+    if (!price.product || typeof price.product === 'string' || price.product.deleted || price.product.active !== true) {
+      return { error: 'Choose a Stripe price attached to an active product.' };
+    }
+    return { priceId: price.id, productName: price.product.name || 'Catalogue', mode };
   } catch {
-    return false;
+    return { error: 'Could not reach Stripe to verify this price. Please try saving again.' };
   }
 }
 
+export async function isStripeOneTimePrice(priceId: string) {
+  return !('error' in await validateStripeOneTimePrice(priceId));
+}
+
 export async function createStripeCheckout(fields: Record<string, string>, successPath: string, cancelPath: string) {
-  const secret = process.env.STRIPE_SECRET_KEY;
+  const secret = process.env.STRIPE_SECRET_KEY?.trim();
   if (!secret || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(secret)) throw new Error('Stripe is not configured.');
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.impuravidamagazine.com').replace(/\/$/, '');
   const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
@@ -107,7 +137,7 @@ export async function createStripeCheckout(fields: Record<string, string>, succe
 }
 
 export async function createStripePortal(customerId: string) {
-  const secret = process.env.STRIPE_SECRET_KEY;
+  const secret = process.env.STRIPE_SECRET_KEY?.trim();
   if (!secret || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(secret)) throw new Error('Stripe is not configured.');
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.impuravidamagazine.com').replace(/\/$/, '');
   const response = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
@@ -126,7 +156,7 @@ export async function startMembershipCheckout(tierInput: string, intervalInput: 
   const tier = tierInput as MembershipTier;
   const interval = intervalInput as BillingInterval;
   const price = process.env[priceEnv[tier][interval]];
-  if (!price || !configuredPrice(priceEnv[tier][interval]) || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY || '')) redirect('/members?checkout=setup');
+  if (!price || !configuredPrice(priceEnv[tier][interval]) || !/^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY?.trim() || '')) redirect('/members?checkout=setup');
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

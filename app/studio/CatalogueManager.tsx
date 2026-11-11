@@ -26,7 +26,7 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
   const [stripePriceIds, setStripePriceIds] = useState<Record<string, string>>(
     Object.fromEntries(catalogues.map((item) => [
       item.id,
-      item.stripe_price_id || (item.model_slug === 'lucy-manzanillo-part-2' ? 'price_1UaKpxEYY8tfl15wNUKOaAzd' : ''),
+      item.stripe_price_id || (item.model_slug === 'lucy-manzanillo-part-2' ? 'price_1UaNp7EYY8tfl15wMCchKu1r' : ''),
     ])),
   );
   const [issueTitle, setIssueTitle] = useState('');
@@ -88,15 +88,20 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
 
   async function save(catalogue: Catalogue, publish: boolean) {
     setBusyId(catalogue.id);
-    const result = await updateCatalogue({
-      catalogueId: catalogue.id,
-      description: descriptions[catalogue.id] ?? '',
-      stripePriceId: stripePriceIds[catalogue.id] ?? '',
-      publish,
-    });
-    setMessages((current) => ({ ...current, [catalogue.id]: ('error' in result ? result.error : result.success) ?? 'Could not save this catalogue.' }));
-    setBusyId(null);
-    if (!('error' in result)) router.refresh();
+    try {
+      const result = await updateCatalogue({
+        catalogueId: catalogue.id,
+        description: descriptions[catalogue.id] ?? '',
+        stripePriceId: stripePriceIds[catalogue.id] ?? '',
+        publish,
+      });
+      setMessages((current) => ({ ...current, [catalogue.id]: ('error' in result ? result.error : result.success) ?? 'Could not save this catalogue.' }));
+      if (!('error' in result)) router.refresh();
+    } catch {
+      setMessages((current) => ({ ...current, [catalogue.id]: 'Could not save this catalogue. Please try again.' }));
+    } finally {
+      setBusyId(null);
+    }
   }
 
   async function removePhoto(catalogue: Catalogue, photo: Catalogue['member_media'][number]) {
@@ -230,7 +235,7 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
               placeholder="price_…"
               value={stripePriceIds[catalogue.id] || ''}
             />
-            <small>Saving this draft connects the catalogue to this Stripe price. The Lucy Part II price you provided is prefilled.</small>
+            <small>Saving verifies this price against the Stripe account configured for this deployment. Publishing checks it again.</small>
           </label>}
           <label className="studio-field">
             <span>Add private photographs (JPEG, PNG, WebP or AVIF; up to 20 MB each)</span>
@@ -254,7 +259,7 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
                 Unpublish
               </button>
             ) : (
-              <button className="studio-publish" disabled={busyId === catalogue.id || (catalogue.product_type === 'model_catalogue' && !catalogue.stripe_price_id)} onClick={() => void save(catalogue, true)} type="button">
+              <button className="studio-publish" disabled={busyId === catalogue.id || (catalogue.product_type === 'model_catalogue' && !(stripePriceIds[catalogue.id] || '').trim())} onClick={() => void save(catalogue, true)} type="button">
                 Publish
               </button>
             )}
