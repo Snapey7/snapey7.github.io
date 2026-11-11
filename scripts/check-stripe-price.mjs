@@ -10,7 +10,7 @@ console.log('STRIPE_DIAGNOSTIC', JSON.stringify({
   validFormat: /^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(secret),
 }));
 try {
-  for (const path of ['/v1/account', `/v1/prices/${priceId}?expand[]=product`]) {
+  for (const path of [`/v1/prices/${priceId}?expand[]=product`]) {
     const response = await fetch(`https://api.stripe.com${path}`, {
       headers: { Authorization: `Bearer ${secret}` }, signal: AbortSignal.timeout(10000),
     });
@@ -18,7 +18,7 @@ try {
     console.log('STRIPE_DIAGNOSTIC', JSON.stringify({
       status: response.status, id: data.id, active: data.active, type: data.type,
       livemode: data.livemode, amount: data.unit_amount, currency: data.currency,
-      product: data.product?.name, errorCode: data.error?.code, errorType: data.error?.type,
+      productId: data.product?.id, product: data.product?.name, errorCode: data.error?.code, errorType: data.error?.type,
       requestId: response.headers.get('request-id'),
     }));
     if (!response.ok) process.exitCode = 1;
