@@ -353,20 +353,6 @@ export const models = [
     bio: 'A jungle muse whose editorials lean into shadow, strength, and quiet sensuality.',
   },
   {
-    slug: 'monica-riviera',
-    name: 'Monica Riviera',
-    image: '/assets/editorial-monica-riviera.png',
-    location: 'Nosara, Costa Rica',
-    bio: 'Monica brings a cinematic stillness to humid interiors and late-night coastal stories.',
-  },
-  {
-    slug: 'isabella',
-    name: 'Isabella',
-    image: '/assets/editorial-isabella.png',
-    location: 'Papagayo, Costa Rica',
-    bio: 'A bold, sun-warmed presence shaped by resort architecture and coastal evenings.',
-  },
-  {
     slug: 'angie',
     name: 'Angie',
     image: '/assets/angie-muse.jpg',
