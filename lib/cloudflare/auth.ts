@@ -33,12 +33,12 @@ export async function sendAccountEmail(to: string, subject: string, text: string
 export function createCloudflareAuth(email = { configured: accountEmailConfigured, send: sendAccountEmail }) {
   const secret = process.env.AUTH_SECRET;
   if (!secret || secret.length < 32) throw new Error('Account services are not configured.');
-  const baseURL = process.env.AUTH_BASE_URL ||
-    (process.env.VERCEL_ENV === 'preview' && process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000');
+  const previewOrigin = process.env.VERCEL_ENV === 'preview' && process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined;
+  const baseURL = process.env.AUTH_BASE_URL || previewOrigin || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
   return betterAuth({
     appName: 'IMPURA VIDA', baseURL, secret,
     database: { db: authDatabase, type: 'sqlite', transaction: false },
-    trustedOrigins: [baseURL, ...(process.env.NEXT_PUBLIC_SITE_URL ? [process.env.NEXT_PUBLIC_SITE_URL] : [])],
+    trustedOrigins: [...new Set([baseURL, ...(previewOrigin ? [previewOrigin] : []), ...(process.env.NEXT_PUBLIC_SITE_URL ? [process.env.NEXT_PUBLIC_SITE_URL] : [])])],
     user: { modelName: 'auth_users', additionalFields: {
       bannedUntil: { type: 'date', required: false, input: false },
       rawMetadata: { type: 'string', required: false, input: false },

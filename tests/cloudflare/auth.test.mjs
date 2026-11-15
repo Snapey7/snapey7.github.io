@@ -76,3 +76,17 @@ test('Missing email delivery rejects signup without creating an unusable account
     assert.equal(f.database.prepare('SELECT count(*) AS n FROM auth_users').get().n, 0);
   } finally { f.close(); }
 });
+
+test('Preview login accepts its stable alias and deployment origin but rejects unrelated sites', async () => {
+  const f=createFixture();
+  const saved={AUTH_BASE_URL:process.env.AUTH_BASE_URL,VERCEL_ENV:process.env.VERCEL_ENV,VERCEL_URL:process.env.VERCEL_URL};
+  try {
+    process.env.AUTH_SECRET='synthetic-test-auth-secret-at-least-32-characters';
+    process.env.AUTH_BASE_URL='https://branch.example.test';process.env.VERCEL_ENV='preview';process.env.VERCEL_URL='deployment.example.test';
+    const auth=createCloudflareAuth({configured:()=>true,send:async()=>{throw new Error('No email should be sent');}});
+    for(const [origin,status] of [['https://branch.example.test',401],['https://deployment.example.test',401],['https://unrelated.example.test',403]]) {
+      const response=await auth.handler(new Request(origin+'/api/auth/sign-in/email',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','x-forwarded-for':'203.0.113.88'},body:JSON.stringify({email:'missing@example.test',password:'synthetic-password'})}));
+      assert.equal(response.status,status,await response.clone().text());
+    }
+  } finally {for(const [key,value] of Object.entries(saved)){if(value===undefined)delete process.env[key];else process.env[key]=value;}f.close();}
+});
