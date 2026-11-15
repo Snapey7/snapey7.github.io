@@ -143,3 +143,15 @@ test('Legacy Verotel memberships preserve cancellation and event idempotency', a
     assert.equal(f.database.prepare('SELECT current_period_end FROM memberships').get().current_period_end, '2030-01-02T00:00:00.000Z');
   } finally { f.close(); }
 });
+
+test('Authentication startup inspects its schema through D1-compatible table functions', async () => {
+  const f = createFixture();
+  try {
+    const {authDatabase} = await import('../../lib/cloudflare/dialect.ts');
+    const tables = await authDatabase.introspection.getTables();
+    assert.deepEqual(tables.map(t=>t.name).sort(),['auth_accounts','auth_rate_limits','auth_sessions','auth_users','auth_verifications']);
+    const users=tables.find(t=>t.name==='auth_users');
+    assert.ok(users.columns.some(c=>c.name==='emailVerified' && c.dataType==='INTEGER'));
+    assert.ok(users.columns.some(c=>c.name==='bannedUntil'));
+  } finally { f.close(); }
+});
