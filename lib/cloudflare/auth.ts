@@ -6,11 +6,21 @@ import { createTransport } from 'nodemailer';
 import { authDatabase } from './dialect';
 
 export function accountEmailConfigured() {
+  if (process.env.AUTH_RESEND_API_KEY && process.env.AUTH_EMAIL_FROM) return true;
   return Boolean(process.env.AUTH_SMTP_HOST && process.env.AUTH_SMTP_USER && process.env.AUTH_SMTP_PASSWORD && process.env.AUTH_EMAIL_FROM);
 }
 
-async function sendAccountEmail(to: string, subject: string, text: string) {
+export async function sendAccountEmail(to: string, subject: string, text: string) {
   if (!accountEmailConfigured()) throw new Error('Account email delivery is not configured.');
+  if (process.env.AUTH_RESEND_API_KEY) {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST', headers: { Authorization: `Bearer ${process.env.AUTH_RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: process.env.AUTH_EMAIL_FROM, to: [to], subject, text }),
+      cache: 'no-store', signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) throw new Error('Account email delivery is temporarily unavailable.');
+    return;
+  }
   const port = Number(process.env.AUTH_SMTP_PORT || 587);
   const transport = createTransport({
     host: process.env.AUTH_SMTP_HOST, port, secure: port === 465, requireTLS: port !== 465,

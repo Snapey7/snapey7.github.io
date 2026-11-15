@@ -20,7 +20,7 @@ No source storage, source accounts or source database records should be deleted.
   keys are copied under `<source-bucket>/<source-path>`; their database references remain
   unchanged and the storage adapter adds the bucket prefix. New private releases,
   editorials and shop photos upload directly with short-lived signed URLs.
-- The current Resend SMTP service can send account mail. Email verification stays
+- The current Resend service sends account mail over HTTPS; SMTP remains available as a fallback configuration. Email verification stays
   required; do not enable signup without confirmed delivery and password recovery.
 
 ## Preserved source export
@@ -88,7 +88,7 @@ No records need to be rewritten to point at the prefixed legacy object keys.
 4. Deploy the Worker and set `CLOUDFLARE_BACKEND_URL` to its HTTPS URL in a preview.
    Generate an independent random `AUTH_SECRET`. Set `AUTH_BASE_URL` to the preview
    origin if necessary; the app otherwise uses Vercel's preview hostname.
-5. Configure `AUTH_SMTP_HOST`, `AUTH_SMTP_PORT`, `AUTH_SMTP_USER`,
+5. Prefer `AUTH_RESEND_API_KEY` with `AUTH_EMAIL_FROM` for Resend HTTPS delivery. For another SMTP provider configure `AUTH_SMTP_HOST`, `AUTH_SMTP_PORT`, `AUTH_SMTP_USER`,
    `AUTH_SMTP_PASSWORD` and `AUTH_EMAIL_FROM` using the existing verified Resend
    sender. Enter sending credentials directly into the environment, not a chat.
 6. Set preview `CONTENT_ADMIN_EMAILS`, the existing R2 configuration and Stripe
@@ -132,3 +132,7 @@ Keep source backups and Supabase resources until production verification is comp
 Before rollback, reconcile new users, orders and edits created on Cloudflare: changing
 the provider flag alone after new writes would make those records disappear from the
 active backend. No migration utility deletes source data.
+
+## Staging progress — 15 November 2026
+
+The D1 database is created and its source snapshot imported, with 5 accounts, 8 catalogues, 62 private media records and 2 memberships. The authenticated data Worker is deployed at `https://impura-vida-data.impuravidamagazine.workers.dev`. Backend and restricted Resend sending credentials are configured only for the migration branch preview in Vercel. Production remains on its existing provider. Email delivery, hosted checkout, uploads and full image integrity still require verification before cutover. The Supabase export request has been submitted; 17 originals remain blocked.

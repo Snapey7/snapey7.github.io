@@ -9,7 +9,7 @@
     {
       "binding": "DB",
       "database_name": "impura-vida-backend",
-      "database_id": "CONFIGURE_AFTER_DATABASE_CREATION",
+      "database_id": "66a2d724-4295-49b1-bf8c-7747c4e4080a",
       "migrations_dir": "migrations"
     }
   ]
