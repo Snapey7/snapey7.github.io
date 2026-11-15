@@ -115,7 +115,7 @@ export function ShopProductManager({ products }: { products: ShopProduct[] }) {
       <p className="studio-count">{product.shop_product_images.length} public display photo{product.shop_product_images.length === 1 ? '' : 's'}</p>
       {product.shop_product_images.length > 0 && <div className="studio-shop-image-list">
         {product.shop_product_images.map((image) => <div className="studio-shop-image" key={image.id}>
-          <img alt={image.alt_text} src={`${image.preview_url || urlForStorage(image.storage_path)}`} />
+          <img alt={image.alt_text} src={`${image.preview_url || urlForStorage(image.storage_path)}`} loading="lazy" decoding="async" />
           <button disabled={busyId === product.id} onClick={() => void remove(product, image.id)} type="button">Remove</button>
         </div>)}
       </div>}

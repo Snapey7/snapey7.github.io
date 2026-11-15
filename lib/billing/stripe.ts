@@ -96,8 +96,15 @@ export async function createStripeCheckout(fields: Record<string, string>, succe
     }),
     cache: 'no-store',
   });
-  const result = await response.json() as { url?: string; error?: { message?: string } };
-  if (!response.ok || !result.url) throw new Error(result.error?.message || 'Stripe could not start checkout.');
+  const result = await response.json() as { url?: string; error?: { message?: string; code?: string; type?: string } };
+  if (!response.ok || !result.url) {
+    console.error('Stripe checkout request rejected:', {
+      mode: secret.includes('_live_') ? 'live' : 'test',
+      status: response.status, code: result.error?.code, type: result.error?.type,
+      requestId: response.headers.get('request-id'),
+    });
+    throw new Error(result.error?.message || 'Stripe could not start checkout.');
+  }
   return result.url;
 }
 
