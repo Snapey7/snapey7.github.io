@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
 import { manageStripeSubscription, signOut } from '@/app/actions/auth';
-import { getSupabaseConfig } from '@/lib/supabase/config';
+import { isAccountBackendConfigured } from '@/lib/account-service';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentMembership } from '@/lib/membership';
 import { createCancelSubscriptionUrl } from '@/lib/billing/verotel';
@@ -9,13 +9,13 @@ import { createCancelSubscriptionUrl } from '@/lib/billing/verotel';
 export const dynamic = 'force-dynamic';
 
 export default async function AccountPage({ searchParams }: { searchParams: Promise<{ passwordUpdated?: string; checkout?: string; membership?: string }> }) {
-  if (!getSupabaseConfig()) {
+  if (!isAccountBackendConfigured()) {
     return (
       <PageShell>
         <main className="auth-page">
           <section className="auth-panel">
             <h1>ACCOUNT</h1>
-            <p className="auth-notice">Account services are ready to connect. Add the Supabase project URL and publishable key to start accepting sign-ups.</p>
+            <p className="auth-notice">Account services are temporarily unavailable. Please try again shortly.</p>
           </section>
         </main>
       </PageShell>

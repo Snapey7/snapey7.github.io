@@ -1,3 +1,4 @@
+import { usesCloudflareBackend } from '@/lib/cloudflare/config';
 import { redirect } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
 import { getContentAdminState } from '@/lib/content-admin';
@@ -52,7 +53,7 @@ export default async function StudioPage() {
     title: string;
     description: string;
     status: 'draft' | 'published' | 'coming_soon';
-    shop_product_images: { id: string; storage_path: string; alt_text: string; position: number }[];
+    shop_product_images: { id: string; storage_path: string; preview_url?: string; alt_text: string; position: number }[];
   }[] = [];
   let shopOrders: {
     id: string;
@@ -138,10 +139,13 @@ export default async function StudioPage() {
         .select('id,title,description,status,shop_product_images(id,storage_path,alt_text,position)')
         .order('created_at');
       if (productsError) loadError = 'Apply the shop product migration in Supabase to manage public shop photos.';
-      else shopProducts = (products || []).map((item) => ({
+      else shopProducts = await Promise.all((products || []).map(async (item) => ({
         ...item,
-        shop_product_images: [...(item.shop_product_images || [])].sort((a, b) => a.position - b.position),
-      }));
+        shop_product_images: await Promise.all([...(item.shop_product_images || [])].sort((a, b) => a.position - b.position).map(async (photo) => ({
+          ...photo,
+          ...(usesCloudflareBackend() ? { preview_url: (await admin.storage.from('shop-product-images').createSignedUrl(photo.storage_path, 600)).data?.signedUrl || '' } : {}),
+        }))),
+      })));
       if (!productsError) {
         const { data: orders, error: ordersError } = await admin.from('shop_orders')
           .select('id,status,created_at,customer_email,shipping_details,shop_products(title)')

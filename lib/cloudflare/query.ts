@@ -102,6 +102,10 @@ export class CloudflareQuery implements PromiseLike<{ data: any; error: any; cou
     try {
       if (this.currentUser && this.operation !== 'select') throw new BackendError('FORBIDDEN', 403);
       const localFilters = this.filters.filter(f => !f.column.includes('.'));
+      if (this.currentUser && ['member_media', 'stripe_events', 'verotel_events'].includes(this.table)) throw new BackendError('FORBIDDEN', 403);
+      if (this.currentUser && ['catalogues', 'editorial_stories'].includes(this.table)) localFilters.push({ column: 'status', op: '=', value: 'published' });
+      if (this.currentUser && this.table === 'shop_products') localFilters.push({ column: 'status', op: 'in', value: ['published', 'coming_soon'] });
+      if (this.currentUser && this.table === 'editorial_images') localFilters.push({ column: 'published', op: '=', value: true });
       if (this.currentUser && ownedTables.has(this.table)) {
         const userId = await this.currentUser();
         if (!userId) return { data: this.one ? null : [], error: null, count: this.countRequested ? 0 : null };
@@ -109,6 +113,8 @@ export class CloudflareQuery implements PromiseLike<{ data: any; error: any; cou
       }
       const parsed = selection(this.fields);
       const condition = where(this.table, localFilters, this.operation === 'select' ? 'parent' : undefined);
+      if (this.currentUser && this.table === 'editorial_images') condition.clauses.push("EXISTS (SELECT 1 FROM editorial_stories WHERE slug=parent.editorial_slug AND status='published')");
+      if (this.currentUser && this.table === 'shop_product_images') condition.clauses.push("EXISTS (SELECT 1 FROM shop_products WHERE id=parent.shop_product_id AND status IN ('published','coming_soon'))");
       for (const r of parsed.relations.filter(r => r.inner)) {
         const relation = relationships[this.table]?.[r.name];
         if (!relation) throw new Error('Unknown relationship.');
@@ -154,7 +160,7 @@ export class CloudflareQuery implements PromiseLike<{ data: any; error: any; cou
       rows = rows.map(decode);
       for (const row of rows) for (const r of parsed.relations) {
         const relation = relationships[this.table][r.name];
-        const child = new CloudflareQuery(relation.table).select(r.select).eq(relation.foreign, row[relation.local]);
+        const child = new CloudflareQuery(relation.table, this.currentUser).select(r.select).eq(relation.foreign, row[relation.local]);
         for (const f of this.filters.filter(f => f.column.startsWith(r.name + '.'))) child.filters.push({ ...f, column: f.column.slice(r.name.length + 1) });
         const result = await child;
         if (result.error) throw new BackendError(result.error.code);

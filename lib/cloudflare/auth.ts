@@ -20,7 +20,7 @@ async function sendAccountEmail(to: string, subject: string, text: string) {
   await transport.sendMail({ from: process.env.AUTH_EMAIL_FROM, to, subject, text });
 }
 
-function createAuth() {
+export function createCloudflareAuth(email = { configured: accountEmailConfigured, send: sendAccountEmail }) {
   const secret = process.env.AUTH_SECRET;
   if (!secret || secret.length < 32) throw new Error('Account services are not configured.');
   const baseURL = process.env.AUTH_BASE_URL ||
@@ -47,15 +47,15 @@ function createAuth() {
         },
         verify: ({ hash: storedHash, password }) => compare(password, storedHash),
       },
-      sendResetPassword: async ({ user, url }) => sendAccountEmail(user.email, 'Reset your IMPURA VIDA password', `Use this link to choose a new password:\n\n${url}\n\nIf you did not request this, you can ignore this email.`),
+      sendResetPassword: async ({ user, url }) => email.send(user.email, 'Reset your IMPURA VIDA password', `Use this link to choose a new password:\n\n${url}\n\nIf you did not request this, you can ignore this email.`),
     },
     emailVerification: {
       sendOnSignUp: true, sendOnSignIn: true, autoSignInAfterVerification: true,
-      sendVerificationEmail: async ({ user, url }) => sendAccountEmail(user.email, 'Confirm your IMPURA VIDA account', `Confirm your email address to finish creating your account:\n\n${url}`),
+      sendVerificationEmail: async ({ user, url }) => email.send(user.email, 'Confirm your IMPURA VIDA account', `Confirm your email address to finish creating your account:\n\n${url}`),
     },
     databaseHooks: {
       user: { create: { before: async () => {
-        if (!accountEmailConfigured()) throw new APIError('SERVICE_UNAVAILABLE', { message: 'Account registration is temporarily unavailable. Please try again shortly.' });
+        if (!email.configured()) throw new APIError('SERVICE_UNAVAILABLE', { message: 'Account registration is temporarily unavailable. Please try again shortly.' });
       } } },
       session: { create: { before: async (session) => {
         const user = await authDatabase.selectFrom('auth_users').select('bannedUntil').where('id', '=', session.userId).executeTakeFirst();
@@ -66,5 +66,5 @@ function createAuth() {
   });
 }
 
-let instance: ReturnType<typeof createAuth> | undefined;
-export function getCloudflareAuth() { return instance ||= createAuth(); }
+let instance: ReturnType<typeof createCloudflareAuth> | undefined;
+export function getCloudflareAuth() { return instance ||= createCloudflareAuth(); }

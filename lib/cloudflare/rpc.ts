@@ -8,6 +8,9 @@ const now = () => new Date().toISOString();
 async function stripeEvent(args: Payload) {
   const eventId = args.p_event_id, type = args.p_event_type, object = args.p_object;
   if (typeof eventId !== 'string' || typeof type !== 'string' || !object || typeof object !== 'object') throw new BackendError('INVALID_EVENT', 400);
+  // A replay must remain a success even if the catalogue was later unpublished.
+  // The per-attempt marker still protects simultaneous first deliveries.
+  if ((await sql('SELECT event_id FROM stripe_events WHERE event_id=?', [eventId])).results.length) return;
   const marker = randomUUID();
   const guard = 'EXISTS (SELECT 1 FROM stripe_events WHERE event_id=? AND processing_token=?)';
   const token = [eventId, marker];

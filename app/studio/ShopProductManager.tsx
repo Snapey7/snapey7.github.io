@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { uploadStudioFile } from '@/lib/studio-upload';
 import { useRouter } from 'next/navigation';
 import { createShopImageUploadTarget, createShopProduct, removeShopImage, removeUnusedShopUploads, saveShopImages, updateShopProduct } from './shop-actions';
 
@@ -10,7 +10,7 @@ type ShopProduct = {
   title: string;
   description: string;
   status: 'draft' | 'published' | 'coming_soon';
-  shop_product_images: { id: string; storage_path: string; alt_text: string; position: number }[];
+  shop_product_images: { id: string; storage_path: string; preview_url?: string; alt_text: string; position: number }[];
 };
 
 export function ShopProductManager({ products }: { products: ShopProduct[] }) {
@@ -28,15 +28,8 @@ export function ShopProductManager({ products }: { products: ShopProduct[] }) {
   async function upload(product: ShopProduct, fileList: FileList | null) {
     const files = Array.from(fileList || []);
     if (!files.length) return;
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-    if (!url || !key) {
-      setMessages((current) => ({ ...current, [product.id]: 'Supabase is not configured for browser uploads.' }));
-      return;
-    }
     setBusyId(product.id);
     setMessages((current) => ({ ...current, [product.id]: 'Uploading public shop photos…' }));
-    const supabase = createBrowserClient(url, key);
     const uploadedPaths: string[] = [];
     try {
       for (const file of files) {
@@ -47,9 +40,7 @@ export function ShopProductManager({ products }: { products: ShopProduct[] }) {
           size: file.size,
         });
         if ('error' in target) throw new Error(target.error);
-        const { error } = await supabase.storage.from('shop-product-images')
-          .uploadToSignedUrl(target.path, target.token, file, { contentType: file.type, upsert: false });
-        if (error) throw new Error(error.message);
+        await uploadStudioFile(target, file, 'shop-product-images');
         uploadedPaths.push(target.path);
       }
       const result = await saveShopImages(product.id, uploadedPaths);
@@ -124,7 +115,7 @@ export function ShopProductManager({ products }: { products: ShopProduct[] }) {
       <p className="studio-count">{product.shop_product_images.length} public display photo{product.shop_product_images.length === 1 ? '' : 's'}</p>
       {product.shop_product_images.length > 0 && <div className="studio-shop-image-list">
         {product.shop_product_images.map((image) => <div className="studio-shop-image" key={image.id}>
-          <img alt={image.alt_text} src={`${urlForStorage(image.storage_path)}`} />
+          <img alt={image.alt_text} src={`${image.preview_url || urlForStorage(image.storage_path)}`} />
           <button disabled={busyId === product.id} onClick={() => void remove(product, image.id)} type="button">Remove</button>
         </div>)}
       </div>}

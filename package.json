@@ -7,9 +7,10 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:migration": "node --import ./tests/cloudflare/register.mjs --test tests/cloudflare/*.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

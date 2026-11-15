@@ -1,5 +1,9 @@
 'use server';
 
+import { usesCloudflareBackend } from '@/lib/cloudflare/config';
+import { submitCloudflareAuth, updateCloudflarePassword, signOutCloudflare } from '@/lib/cloudflare/auth-actions';
+import { accountErrorMessage } from '@/lib/account-service';
+
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getSupabaseConfig } from '@/lib/supabase/config';
@@ -14,6 +18,7 @@ const safeNextPath = (value: FormDataEntryValue | null) => {
 };
 
 export async function submitAuth(_previousState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  if (usesCloudflareBackend()) return submitCloudflareAuth(formData);
   if (!getSupabaseConfig()) {
     return { type: 'error', message: 'Account signup is not connected yet. Add the Supabase project URL and publishable key to the deployment environment.' };
   }
@@ -28,7 +33,7 @@ export async function submitAuth(_previousState: AuthFormState, formData: FormDa
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${siteUrl()}/auth/callback?next=%2Freset-password`,
     });
-    if (error) return { type: 'error', message: 'We could not send a reset link. Check the email address and try again.' };
+    if (error) return { type: 'error', message: accountErrorMessage(error, 'We could not send a reset link. Check the email address and try again.') };
     return { type: 'success', message: 'If an account exists for that address, a password reset link is on its way.' };
   }
 
@@ -46,18 +51,19 @@ export async function submitAuth(_previousState: AuthFormState, formData: FormDa
         emailRedirectTo: `${siteUrl()}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     });
-    if (error) return { type: 'error', message: 'We could not create your account. Check your details and try again.' };
+    if (error) return { type: 'error', message: accountErrorMessage(error, 'We could not create your account. Check your details and try again.') };
     if (data.session) redirect(next);
     return { type: 'success', message: 'Check your inbox for a confirmation link to finish creating your account.' };
   }
 
   if (mode !== 'login') return { type: 'error', message: 'Choose sign in or create an account.' };
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { type: 'error', message: 'Those sign-in details did not work. Check them and try again.' };
+  if (error) return { type: 'error', message: accountErrorMessage(error, 'Those sign-in details did not work. Check them and try again.') };
   redirect(next);
 }
 
 export async function updatePassword(_previousState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  if (usesCloudflareBackend()) return updateCloudflarePassword(formData);
   if (!getSupabaseConfig()) return { type: 'error', message: 'Account services are not configured yet.' };
   const password = String(formData.get('password') || '');
   if (password.length < 8) return { type: 'error', message: 'Use a password with at least 8 characters.' };
@@ -66,12 +72,14 @@ export async function updatePassword(_previousState: AuthFormState, formData: Fo
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
   const { error } = await supabase.auth.updateUser({ password });
-  if (error) return { type: 'error', message: 'We could not update your password. Request another reset link and try again.' };
+  if (error) return { type: 'error', message: accountErrorMessage(error, 'We could not update your password. Request another reset link and try again.') };
   redirect('/account?passwordUpdated=1');
 }
 
 export async function signOut() {
-  if (getSupabaseConfig()) {
+  if (usesCloudflareBackend()) {
+    await signOutCloudflare();
+  } else if (getSupabaseConfig()) {
     const supabase = await createClient();
     await supabase.auth.signOut();
   }

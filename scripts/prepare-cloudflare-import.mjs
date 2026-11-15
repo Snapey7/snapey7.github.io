@@ -21,6 +21,16 @@ const foreign = {
  shop_orders:[['user_id','auth_users','id'],['shop_product_id','shop_products','id']],
  editorial_images:[['editorial_slug','editorial_stories','slug']],
 };
+const checks = {
+ catalogues: ["product_type IN ('model_catalogue','magazine_edition','physical_shop')", "status IN ('draft','published')", "(product_type='model_catalogue' AND model_slug IS NOT NULL) OR product_type IN ('magazine_edition','physical_shop')"],
+ memberships: ["provider IN ('stripe','verotel')", "tier IN ('standard','impura')", "status IN ('active','canceled','expired','refunded','chargeback')", "billing_interval IS NULL OR billing_interval IN ('monthly','yearly')"],
+ member_media: ["bucket IN ('member-media','member-media-r2')", "min_tier IN ('standard','impura')"],
+ portfolio_purchases: ["status IN ('paid','refunded','disputed')", '(media_id IS NOT NULL)+(catalogue_id IS NOT NULL)=1'],
+ shop_products: ["status IN ('draft','published','coming_soon')"],
+ shop_orders: ["status IN ('paid','refunded','disputed')"],
+ editorial_stories: ["status IN ('draft','published')", "slug<>'' AND slug NOT GLOB '*[^a-z0-9-]*' AND substr(slug,1,1)<>'-' AND substr(slug,-1)<>'-' AND instr(slug,'--')=0"],
+ editorial_images: ['(storage_path IS NOT NULL)+(public_url IS NOT NULL)=1', 'published IN (0,1)'],
+};
 for (const table of tables) {
  const columns=source.schema.filter((c)=>c.table_name===table);
  if (!columns.length || !Array.isArray(source[table])) throw new Error('Missing table: '+table);
@@ -39,11 +49,13 @@ for (const table of tables) {
   }
   return text;
  });
- for(const [column,target,key] of foreign[table]||[]) definitions.push(`FOREIGN KEY(${identifier(column)}) REFERENCES ${identifier(target)}(${identifier(key)})`);
+ for(const [column,target,key] of foreign[table]||[]) definitions.push(`FOREIGN KEY(${identifier(column)}) REFERENCES ${identifier(target)}(${identifier(key)}) ON DELETE ${table==='shop_orders' && column==='shop_product_id' ? 'RESTRICT' : 'CASCADE'}`);
+ for(const check of checks[table]||[]) definitions.push(`CHECK (${check})`);
  schema+=`CREATE TABLE IF NOT EXISTS ${identifier(table)} (${definitions.join(',')});\n`;
 }
 for(const [name,table,columns] of [
  ['catalogue_price','catalogues','stripe_price_id'],['membership_subscription','memberships','provider_subscription_id'],
+ ['membership_reference','memberships','provider_reference_id'],
  ['media_path','member_media','storage_path'],['portfolio_media','portfolio_purchases','user_id,media_id'],
  ['portfolio_catalogue','portfolio_purchases','user_id,catalogue_id'],['portfolio_session','portfolio_purchases','stripe_checkout_session_id'],
  ['shop_price','shop_products','stripe_price_id'],['shop_image_path','shop_product_images','storage_path'],

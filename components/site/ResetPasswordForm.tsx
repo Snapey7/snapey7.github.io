@@ -3,12 +3,13 @@
 import { useActionState } from 'react';
 import { updatePassword, type AuthFormState } from '@/app/actions/auth';
 
-export function ResetPasswordForm() {
+export function ResetPasswordForm({ token }: { token?: string }) {
   const [state, action, pending] = useActionState<AuthFormState, FormData>(updatePassword, {});
   return (
     <section className="auth-panel" aria-labelledby="reset-heading">
       <h1 id="reset-heading">CHOOSE A NEW PASSWORD</h1>
       <form action={action}>
+        {token && <input name="token" type="hidden" value={token} />}
         <label>
           New password
           <input autoComplete="new-password" minLength={8} name="password" placeholder="At least 8 characters" required type="password" />

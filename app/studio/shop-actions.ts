@@ -1,5 +1,7 @@
 'use server';
 
+import { usesCloudflareBackend } from '@/lib/cloudflare/config';
+import { cloudflareStorage } from '@/lib/cloudflare/storage';
 import { revalidatePath } from 'next/cache';
 import { requireContentAdmin } from '@/lib/content-admin';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -39,6 +41,11 @@ export async function createShopImageUploadTarget(input: {
   const { data: product } = await admin.from('shop_products').select('id').eq('id', input.productId).maybeSingle();
   if (!product) return { error: 'Shop product not found.' };
   const path = `${input.productId}/${crypto.randomUUID()}.${extension}`;
+  if (usesCloudflareBackend()) {
+    const { data, error } = await cloudflareStorage('shop-product-images').createSignedUploadUrl(path);
+    if (error || !data) return { error: 'Image uploads are temporarily unavailable.' };
+    return { path, uploadUrl: data.signedUrl };
+  }
   const { data, error } = await admin.storage.from('shop-product-images').createSignedUploadUrl(path, { upsert: false });
   if (error || !data?.token) return { error: 'Could not prepare the shop photo upload. Check the shop image bucket migration.' };
   return { path, token: data.token };
