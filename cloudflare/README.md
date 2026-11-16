@@ -133,6 +133,14 @@ Before rollback, reconcile new users, orders and edits created on Cloudflare: ch
 the provider flag alone after new writes would make those records disappear from the
 active backend. No migration utility deletes source data.
 
-## Staging progress — 15 November 2026
+## Staging progress — 16 November 2026
 
-The D1 database is created and its source snapshot imported, with 5 accounts, 8 catalogues, 62 private media records and 2 memberships. The authenticated data Worker is deployed at `https://impura-vida-data.impuravidamagazine.workers.dev`. Backend and restricted Resend sending credentials are configured only for the migration branch preview in Vercel. Production remains on its existing provider. Email delivery, hosted checkout, uploads and full image integrity still require verification before cutover. The Supabase export request has been submitted; 17 originals remain blocked.
+Production remains on its existing provider. The migration branch preview uses the imported D1 database and authenticated Worker, with restricted Resend sending credentials and a separate restricted Stripe test key. Existing account sign-in, membership, Studio admin access, new signup confirmation and password reset have passed in the hosted preview.
+
+A private test photograph was uploaded, checksum verified, saved and reloaded, published, and opened through the member library; its release was returned to draft. A separate disposable draft shop product also accepted a photograph and displayed it from R2. No existing public editorial was changed for that test; the hosted editorial upload flow still needs an isolated verification.
+
+Unpaid hosted checkout opens Stripe Sandbox at £14.99 using a separate test price, with success/cancel URLs confined to the preview. The preserved Lucy II live price is unchanged. Signed synthetic events sent to the hosted webhook confirmed rejection of invalid signatures, one purchase after duplicate delivery, access granted after payment, and access revoked after refund. Synthetic payment records were removed. An actual Stripe payment and Stripe-to-Vercel event delivery have not been exercised.
+
+All 51 pre-existing R2 originals are privately backed up and verified against their ETag MD5 checksums (436,167,549 bytes). Two of the 19 Supabase originals were recovered locally, but 17 remain inaccessible: a fresh download check still returns HTTP 402 `exceed_egress_quota`. The approved support export request was submitted; its response is required to complete preservation. No paid Supabase plan was purchased and no source data was deleted.
+
+The 16 integration tests and production build passed at source commit `f22a615`. Keep the PR in draft and preserve the source backup until all originals, remaining checks, payment reconciliation and fixture cleanup are complete. No live cutover has been performed.
