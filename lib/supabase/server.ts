@@ -1,8 +1,11 @@
+import { usesCloudflareBackend } from '@/lib/cloudflare/config';
+import { createCloudflareUserClient } from '@/lib/cloudflare/session';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { getSupabaseConfig } from './config';
 
 export async function createClient() {
+  if (usesCloudflareBackend()) return createCloudflareUserClient();
   const config = getSupabaseConfig();
   if (!config) throw new Error('Supabase is not configured.');
 

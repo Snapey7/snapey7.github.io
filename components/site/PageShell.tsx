@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react';
 import { Footer } from './Footer';
 import { Header } from './Header';
-import { getSupabaseConfig } from '@/lib/supabase/config';
+import { isAccountBackendConfigured } from '@/lib/account-service';
 import { createClient } from '@/lib/supabase/server';
 
 export async function PageShell({ children }: { children: ReactNode }) {
   let isAuthenticated = false;
   let isContentAdmin = false;
 
-  if (getSupabaseConfig()) {
+  if (isAccountBackendConfigured()) {
     try {
       const supabase = await createClient();
       const { data: { user } } = await supabase.auth.getUser();

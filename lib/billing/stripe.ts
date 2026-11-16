@@ -1,3 +1,4 @@
+import { isAccountBackendConfigured } from '@/lib/account-service';
 import 'server-only';
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
@@ -22,10 +23,7 @@ export function isStripeCheckoutReady() {
     configuredPrice('STRIPE_PRICE_IMPURA_MONTHLY') &&
     configuredPrice('STRIPE_PRICE_IMPURA_YEARLY') &&
     /^whsec_\S+$/.test(process.env.STRIPE_WEBHOOK_SECRET || '') &&
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY &&
-    process.env.SUPABASE_SERVICE_ROLE_KEY &&
-    !process.env.SUPABASE_SERVICE_ROLE_KEY.startsWith('your-'),
+    isAccountBackendConfigured(),
   );
 }
 
@@ -33,10 +31,7 @@ export function isStripeOneTimeCheckoutReady() {
   return Boolean(
     /^(sk|rk)_(test|live)_[A-Za-z0-9]+$/.test(process.env.STRIPE_SECRET_KEY || '') &&
     /^whsec_\S+$/.test(process.env.STRIPE_WEBHOOK_SECRET || '') &&
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY &&
-    process.env.SUPABASE_SERVICE_ROLE_KEY &&
-    !process.env.SUPABASE_SERVICE_ROLE_KEY.startsWith('your-'),
+    isAccountBackendConfigured(),
   );
 }
 
@@ -101,8 +96,15 @@ export async function createStripeCheckout(fields: Record<string, string>, succe
     }),
     cache: 'no-store',
   });
-  const result = await response.json() as { url?: string; error?: { message?: string } };
-  if (!response.ok || !result.url) throw new Error(result.error?.message || 'Stripe could not start checkout.');
+  const result = await response.json() as { url?: string; error?: { message?: string; code?: string; type?: string } };
+  if (!response.ok || !result.url) {
+    console.error('Stripe checkout request rejected:', {
+      mode: secret.includes('_live_') ? 'live' : 'test',
+      status: response.status, code: result.error?.code, type: result.error?.type,
+      requestId: response.headers.get('request-id'),
+    });
+    throw new Error(result.error?.message || 'Stripe could not start checkout.');
+  }
   return result.url;
 }
 

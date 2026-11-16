@@ -1,8 +1,10 @@
+import { usesCloudflareBackend } from '@/lib/cloudflare/config';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getSupabaseConfig } from './config';
 
 export async function updateSession(request: NextRequest) {
+  if (usesCloudflareBackend()) return NextResponse.next({ request });
   const config = getSupabaseConfig();
   if (!config) return NextResponse.next({ request });
 

@@ -19,7 +19,7 @@ export default async function ModelDetailPage({ params, searchParams }: ModelPag
   const model = models.find((item) => item.slug === slug);
   if (!model) notFound();
   const admin = createAdminClient();
-  const [{ data: catalogue }, { data: { user } }, membership] = await Promise.all([
+  const [{ data: catalogue, error: catalogueError }, { data: { user } }, membership] = await Promise.all([
     admin.from('catalogues').select('id,title,description,stripe_price_id,status')
       .eq('model_slug', slug).eq('product_type', 'model_catalogue').maybeSingle(),
     createClient().then((client) => client.auth.getUser()),
@@ -52,6 +52,7 @@ export default async function ModelDetailPage({ params, searchParams }: ModelPag
             <div className="model-entry-copy">
               <h1>{model.name} | {model.location}</h1>
               <p className="model-entry-meta">GALLERY <span>·</span> IMPURA | EXCLUSIVE PHOTOS</p>
+              {catalogueError && <p className="auth-notice is-error" role="status">Catalogue access is temporarily unavailable. Please try again shortly.</p>}
               {query.checkout === 'setup' && <p className="auth-notice is-error" role="status">Checkout could not start. Please try again or contact us if this keeps happening.</p>}
               {query.checkout === 'cancelled' && <p className="auth-notice" role="status">Checkout was cancelled. You can try again whenever you’re ready.</p>}
               {catalogue?.status === 'published' && catalogue.description && <p className="model-entry-description">{catalogue.description}</p>}

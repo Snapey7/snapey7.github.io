@@ -1,3 +1,4 @@
+import { usesCloudflareBackend } from '@/lib/cloudflare/config';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getSupabaseConfig } from '@/lib/supabase/config';
 import { createClient } from '@/lib/supabase/server';
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
   const next = url.searchParams.get('next') || '/account';
   const safeNext = next.startsWith('/') && !next.startsWith('//') && !next.includes('\\') ? next : '/account';
 
-  if (code && getSupabaseConfig()) {
+  if (!usesCloudflareBackend() && code && getSupabaseConfig()) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) return NextResponse.redirect(new URL(safeNext, url.origin));

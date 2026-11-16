@@ -1,0 +1,16 @@
+{
+  "name": "impura-vida-data",
+  "main": "data-worker.mjs",
+  "compatibility_date": "2026-11-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "40d2fe0c31d6aa86f1012adf5e1ce970",
+  "observability": { "enabled": false },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "impura-vida-backend",
+      "database_id": "66a2d724-4295-49b1-bf8c-7747c4e4080a",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

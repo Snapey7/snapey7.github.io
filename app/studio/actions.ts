@@ -1,5 +1,7 @@
 'use server';
 
+import { usesCloudflareBackend } from '@/lib/cloudflare/config';
+import { cloudflareStorage } from '@/lib/cloudflare/storage';
 import { revalidatePath } from 'next/cache';
 import { requireContentAdmin } from '@/lib/content-admin';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -43,6 +45,7 @@ export async function createCatalogueUploadTarget(input: {
       return { error: 'Could not prepare a Cloudflare upload. Check the R2 credentials in the server environment.' };
     }
   }
+  if (usesCloudflareBackend()) return { error: 'Private image uploads are temporarily unavailable.' };
   const { data, error } = await admin.storage.from('member-media').createSignedUploadUrl(path, { upsert: false });
   if (error || !data?.token) return { error: 'Could not prepare a secure upload. Check the private Supabase storage bucket.' };
   return { path, bucket: 'member-media' as const, token: data.token };
@@ -83,6 +86,11 @@ export async function createEditorialUploadTarget(input: {
   }
 
   const path = `${input.slug}/${crypto.randomUUID()}.${extension}`;
+  if (usesCloudflareBackend()) {
+    const { data, error } = await cloudflareStorage('editorial-media').createSignedUploadUrl(path);
+    if (error || !data) return { error: 'Image uploads are temporarily unavailable.' };
+    return { path, uploadUrl: data.signedUrl };
+  }
   const { data, error } = await admin.storage.from('editorial-media').createSignedUploadUrl(path, { upsert: false });
   if (error || !data?.token) return { error: 'Could not prepare a private upload. Check the editorial-media bucket in Supabase.' };
   return { path, token: data.token };

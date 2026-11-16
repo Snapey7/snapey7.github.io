@@ -26,7 +26,7 @@ export function CatalogueManager({ catalogues }: { catalogues: Catalogue[] }) {
   const [stripePriceIds, setStripePriceIds] = useState<Record<string, string>>(
     Object.fromEntries(catalogues.map((item) => [
       item.id,
-      item.stripe_price_id || (item.model_slug === 'lucy-manzanillo-part-2' ? 'price_1UaKpxEYY8tfl15wNUKOaAzd' : ''),
+      item.stripe_price_id || (item.model_slug === 'lucy-manzanillo-part-2' ? 'price_1UaNp7EYY8tfl15wMCchKu1r' : ''),
     ])),
   );
   const [issueTitle, setIssueTitle] = useState('');

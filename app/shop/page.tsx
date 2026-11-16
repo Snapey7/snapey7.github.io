@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { usesCloudflareBackend } from '@/lib/cloudflare/config';
 import { PageShell } from '@/components/site/PageShell';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripePriceLabel, isPhysicalShopCheckoutReady } from '@/lib/billing/stripe';
@@ -7,13 +8,19 @@ import { beginShopProductCheckout } from '@/app/actions/auth';
 export const dynamic = 'force-dynamic';
 
 export default async function ShopPage() {
-  const { data: products } = await createAdminClient().from('shop_products')
+  const admin = createAdminClient();
+  const { data: products } = await admin.from('shop_products')
     .select('id,title,description,stripe_price_id,status,shop_product_images(id,storage_path,alt_text,position)')
     .in('status', ['published', 'coming_soon']).order('created_at');
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
   const items = await Promise.all((products || []).map(async (product, index) => ({
     product,
-    images: [...(product.shop_product_images || [])].sort((a, b) => a.position - b.position),
+    images: await Promise.all([...(product.shop_product_images || [])].sort((a, b) => a.position - b.position).map(async (photo) => ({
+      ...photo,
+      url: usesCloudflareBackend()
+        ? (await admin.storage.from('shop-product-images').createSignedUrl(photo.storage_path, 600)).data?.signedUrl || ''
+        : supabaseUrl ? `${supabaseUrl}/storage/v1/object/public/shop-product-images/${photo.storage_path.split('/').map(encodeURIComponent).join('/')}` : '',
+    }))),
     priceLabel: product.status === 'published'
       ? await getStripePriceLabel(product.stripe_price_id)
       : /edition\s*0?1/i.test(product.title) ? '£500.00' : null,
@@ -34,18 +41,16 @@ export default async function ShopPage() {
           <div className="shop-editions">
             {items.map(({ product, images, priceLabel, coverPosition, href }) => {
               const firstImage = images[0];
-              const firstImageUrl = firstImage && supabaseUrl
-                ? `${supabaseUrl}/storage/v1/object/public/shop-product-images/${firstImage.storage_path.split('/').map(encodeURIComponent).join('/')}`
-                : null;
+              const firstImageUrl = firstImage?.url || null;
               return <article className="shop-edition" key={product.id}>
                 <div aria-label={`${product.title} product photo`} className={`shop-cover ${coverPosition}${firstImageUrl ? ' shop-cover-product' : ''}`} role="img">
                   {firstImageUrl && <img alt={firstImage.alt_text} src={firstImageUrl} />}
                 </div>
                 <h2>{product.title}</h2>
                 {product.description && <p className="shop-product-description">{product.description}</p>}
-                {images.length > 1 && supabaseUrl && <div aria-label={`${product.title} product photos`} className="shop-product-gallery">
+                {images.length > 1 && <div aria-label={`${product.title} product photos`} className="shop-product-gallery">
                   {images.slice(1).map((image) => <img alt={image.alt_text} key={image.id}
-                    src={`${supabaseUrl}/storage/v1/object/public/shop-product-images/${image.storage_path.split('/').map(encodeURIComponent).join('/')}`} />)}
+                    src={image.url} />)}
                 </div>}
                 {product.status === 'coming_soon' && !/edition\s*0?1/i.test(product.title) ? (
                   <p className="shop-price">COMING SOON</p>

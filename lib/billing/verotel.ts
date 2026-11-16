@@ -1,3 +1,4 @@
+import { isAccountBackendConfigured } from '@/lib/account-service';
 import 'server-only';
 
 import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
@@ -21,10 +22,7 @@ export function getVerotelConfig() {
 export function isMembershipCheckoutReady() {
   return Boolean(
     getVerotelConfig() &&
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY &&
-    process.env.SUPABASE_SERVICE_ROLE_KEY &&
-    !process.env.SUPABASE_SERVICE_ROLE_KEY.startsWith('your-'),
+    isAccountBackendConfigured(),
   );
 }
 

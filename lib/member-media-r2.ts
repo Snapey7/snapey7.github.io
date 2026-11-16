@@ -30,7 +30,7 @@ function signingKey(secret: string, date: string) {
   return hmac(serviceKey, 'aws4_request');
 }
 
-async function signR2Request(method: 'GET' | 'PUT' | 'DELETE', path: string, expiresSeconds: number) {
+async function signR2Request(method: 'GET' | 'PUT' | 'DELETE' | 'HEAD', path: string, expiresSeconds: number) {
   const config = getR2Config();
   if (!config) throw new Error('Cloudflare R2 is not configured.');
   const host = `${config.accountId}.r2.cloudflarestorage.com`;
@@ -66,4 +66,10 @@ export async function deleteR2Object(path: string) {
   const url = await signR2Request('DELETE', path, 60);
   const response = await fetch(url, { method: 'DELETE', cache: 'no-store' });
   if (!response.ok) throw new Error(`R2 object deletion failed (${response.status}).`);
+}
+
+export async function getR2ObjectInfo(path: string) {
+  const response = await fetch(await signR2Request('HEAD', path, 60), { method: 'HEAD', cache: 'no-store' });
+  if (!response.ok) throw new Error(`R2 object lookup failed (${response.status}).`);
+  return { bytes: Number(response.headers.get('content-length')), etag: response.headers.get('etag')?.replaceAll('"', '') || '' };
 }

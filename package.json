@@ -7,16 +7,21 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:migration": "node --import ./tests/cloudflare/register.mjs --test tests/cloudflare/*.test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
+    "bcryptjs": "^3.0.3",
+    "better-auth": "^1.7.25",
     "clsx": "2.1.1",
+    "kysely": "^0.29.9",
     "lucide-react": "1.31.0",
-    "next": "latest",
+    "next": "^16.4.6",
+    "nodemailer": "^10.5.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "tailwind-merge": "3.6.0"
@@ -24,10 +29,12 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
+    "@types/nodemailer": "^8.0.2",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "tailwindcss": "4.2.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "wrangler": "^4.162.0"
   },
   "type": "module"
 }

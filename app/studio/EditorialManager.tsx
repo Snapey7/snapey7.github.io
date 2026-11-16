@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { uploadStudioFile } from '@/lib/studio-upload';
 import { useRouter } from 'next/navigation';
 import type { Editorial } from '@/lib/content';
 import { createEditorialUploadTarget, removeEditorialUpload, saveEditorialPhoto, updateEditorial } from './actions';
@@ -63,22 +63,13 @@ export function EditorialManager({ editorials }: { editorials: ManagedEditorial[
 
   async function upload(item: ManagedEditorial, file: File | undefined) {
     if (!file) return;
-    const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const publicKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-    if (!publicUrl || !publicKey) {
-      setMessages((current) => ({ ...current, [item.slug]: 'Supabase is not configured for browser uploads.' }));
-      return;
-    }
     setBusy(item.slug);
     setMessages((current) => ({ ...current, [item.slug]: 'Uploading image to private storage…' }));
     let uploadedPath = '';
     try {
       const target = await createEditorialUploadTarget({ slug: item.slug, fileName: file.name, contentType: file.type, size: file.size });
       if ('error' in target) throw new Error(target.error);
-      const supabase = createBrowserClient(publicUrl, publicKey);
-      const { error } = await supabase.storage.from('editorial-media')
-        .uploadToSignedUrl(target.path, target.token, file, { contentType: file.type, upsert: false });
-      if (error) throw new Error(error.message);
+      await uploadStudioFile(target, file, 'editorial-media');
       uploadedPath = target.path;
       const result = await saveEditorialPhoto(item.slug, uploadedPath, altText[item.slug] || '');
       if ('error' in result) throw new Error(result.error);
