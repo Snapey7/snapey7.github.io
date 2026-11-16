@@ -128,7 +128,8 @@ export class CloudflareQuery implements PromiseLike<{ data: any; error: any; cou
         const relation = relationships[this.table]?.[r.name]; if (!relation) throw new Error('Unknown relationship.'); return relation.local;
       })])].map(c => column(this.table, c)).join(',');
       const orderSql = this.orders.length ? ' ORDER BY ' + this.orders.map(o => column(this.table, o.column) + (o.ascending ? ' ASC' : ' DESC')).join(',') : '';
-      const limitSql = ' LIMIT ' + (this.one ? 2 : this.rowLimit || 10000);
+      // Keep explicit limits while fetching up to two rows to detect ambiguous single results.
+      const limitSql = ' LIMIT ' + (this.one ? Math.min(this.rowLimit ?? 2, 2) : this.rowLimit ?? 10000);
       let rows: Row[] = [], count: number | null = null;
       if (this.operation === 'select') {
         if (this.countRequested) count = Number((await sql('SELECT count(*) AS total FROM ' + ident(this.table) + ' AS parent' + whereSql, condition.params)).results[0]?.total || 0);

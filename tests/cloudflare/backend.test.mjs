@@ -56,6 +56,28 @@ test('Studio queries preserve relationships, filters, JSON, counts and duplicate
   } finally { f.close(); }
 });
 
+test('Studio can append photos after two uploads while single-record queries still reject multiple matches', async () => {
+  const f = createFixture();
+  try {
+    const cat = await catalogue();
+    for (const position of [0, 1, 2, 3]) {
+      const last = await query('member_media').select('position').eq('catalogue_id', cat.id)
+        .order('position', { ascending: false }).limit(1).maybeSingle();
+      assert.equal(last.error, null);
+      assert.equal(last.data?.position ?? -1, position - 1);
+      await photo(cat.id, (last.data?.position ?? -1) + 1);
+    }
+    assert.deepEqual((await query('member_media').select('position').eq('catalogue_id', cat.id).order('position')).data.map(x => x.position), [0, 1, 2, 3]);
+    assert.equal((await query('member_media').select('position').eq('catalogue_id', cat.id).maybeSingle()).error.code, 'PGRST116');
+    assert.equal((await query('member_media').select('position').eq('catalogue_id', cat.id).limit(3).maybeSingle()).error.code, 'PGRST116');
+    await insert('editorial_stories', { slug: 'append-test', title: 'Append test', body: [], status: 'draft' });
+    for (const position of [4, 9]) await insert('editorial_images', { editorial_slug: 'append-test', storage_path: `append-test/${position}.jpg`, position });
+    const lastEditorial = await query('editorial_images').select('position').eq('editorial_slug', 'append-test').order('position', { ascending: false }).limit(1).maybeSingle();
+    assert.equal(lastEditorial.error, null);
+    assert.equal(lastEditorial.data.position, 9);
+  } finally { f.close(); }
+});
+
 test('Customer queries cannot read other customers, drafts, originals or payment logs', async () => {
   const f = createFixture();
   try {
