@@ -36,7 +36,7 @@ export default async function CountryDestinationsPage({
           </header>
           {country === 'usa' && <div className="destination-grid">
             <Link className="destination-card" href="/destinations/miami">
-              <img alt="Ana in Miami" src="/assets/editorial-ana-cover.jpg" />
+              <img alt="Miami skyline glowing with pink and turquoise neon above the waterfront" src="/assets/miami-neon-city.jpg" />
               <span className="destination-name"><strong>MIAMI</strong><small>USA</small><i aria-hidden="true" /></span>
             </Link>
           </div>}
