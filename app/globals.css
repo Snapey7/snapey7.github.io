@@ -4040,6 +4040,11 @@ button.under-link {
 }
 
 .creators-page { background: #080706; color: #f8efe8; }
+.creators-masthead { padding: 1.25rem clamp(1.5rem, 5vw, 5rem); background: #110e0d; border-bottom: 1px solid #342323; }
+.creators-masthead > div { border-left: 3px solid #f27f7e; padding-left: 1rem; }
+.creators-masthead p { margin: 0 0 .25rem; color: #f27f7e; font-size: .62rem; font-weight: 700; letter-spacing: .2em; }
+.creators-masthead h2 { margin: 0; font-family: var(--font-display), Georgia, serif; font-size: 1.8rem; font-weight: 400; line-height: 1.1; }
+.creators-masthead span { display: block; margin-top: .25rem; color: #b7aaa6; font-size: .75rem; }
 .creators-hero { min-height: 78vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 9rem 1.5rem 6rem; background: linear-gradient(180deg, rgba(0,0,0,.62), #080706), url('/assets/section-2-background.png') center/cover; }
 .creators-hero h1, .creators-intro h2, .creators-section-heading h2, .creators-invite h2 { font-family: var(--font-display), Georgia, serif; font-weight: 400; line-height: .98; }
 .creators-hero h1 { margin: 1.5rem 0; font-size: clamp(3.7rem, 9vw, 8rem); }
