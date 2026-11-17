@@ -14,28 +14,28 @@ export default function DestinationsPage() {
             <p>Six corners of Costa Rica. A thousand ways to lose yourself.</p>
           </header>
           <div className="destination-grid">
-            {destinations.map((destination) => (
-              <Link
-                className="destination-card"
-                href="/destinations/costa-rica"
-                key={destination.name}
-              >
+            {destinations.map((destination) => {
+              const available = destination.name === 'Santa Teresa';
+              const content = <>
                 <img
                   alt={`${destination.name}, Costa Rica`}
                   src={destination.image}
                   style={{ objectPosition: destination.position }}
                 />
                 <span className="destination-lock">
-                  <LockKeyhole aria-hidden="true" size={10} />
-                  MEMBERS ONLY
+                  {available && <LockKeyhole aria-hidden="true" size={10} />}
+                  {available ? 'MEMBERS ONLY' : 'COMING SOON'}
                 </span>
                 <span className="destination-name">
                   <strong>{destination.name}</strong>
                   <small>COSTA RICA</small>
                   <i aria-hidden="true" />
                 </span>
-              </Link>
-            ))}
+              </>;
+              return available
+                ? <Link className="destination-card" href="/destinations/costa-rica" key={destination.name}>{content}</Link>
+                : <article className="destination-card destination-card-coming-soon" key={destination.name} aria-label={`${destination.name} — coming soon`}>{content}</article>;
+            })}
           </div>
           <footer className="destinations-cta">
             <p>The wild has a way of finding you.</p>

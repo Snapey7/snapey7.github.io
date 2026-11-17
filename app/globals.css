@@ -982,6 +982,15 @@ button.under-link {
   transform: scale(1.045);
 }
 
+.destination-card-coming-soon {
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+
+.destination-card-coming-soon:hover img {
+  transform: none;
+}
+
 .destination-lock {
   position: absolute;
   top: 13px;
@@ -1685,6 +1694,26 @@ button.under-link {
   margin: 0.5rem 0 0;
   color: rgba(248, 239, 232, 0.58);
   font-size: 0.72rem;
+}
+
+.shop-shipping-destination {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1rem auto 0;
+  max-width: 25rem;
+  color: #c9c1ba;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.shop-shipping-destination select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(248, 239, 232, 0.35);
+  padding: 0.75rem;
+  background: #141210;
+  color: #f8efe8;
+  font: inherit;
 }
 
 .shop-edition-link {

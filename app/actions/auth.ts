@@ -104,7 +104,8 @@ export async function beginCatalogueCheckout(formData: FormData) {
 
 export async function beginShopProductCheckout(formData: FormData) {
   const productId = String(formData.get('productId') || '');
-  await startShopProductCheckout(productId);
+  const shippingCountry = String(formData.get('shippingCountry') || '');
+  await startShopProductCheckout(productId, shippingCountry);
 }
 
 export async function manageStripeSubscription() {

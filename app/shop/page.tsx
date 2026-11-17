@@ -4,6 +4,7 @@ import { PageShell } from '@/components/site/PageShell';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getStripePriceLabel, isPhysicalShopCheckoutReady } from '@/lib/billing/stripe';
 import { beginShopProductCheckout } from '@/app/actions/auth';
+import { getShopShippingDestinations } from '@/lib/shop-shipping';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +30,7 @@ export default async function ShopPage() {
   })));
   const showComingSoonEdition = !items.some(({ product }) => /edition\s*0?2/i.test(product.title));
   const checkoutReady = isPhysicalShopCheckoutReady();
+  const shippingDestinations = getShopShippingDestinations();
   return (
     <PageShell>
       <main className="shop-page">
@@ -52,12 +54,18 @@ export default async function ShopPage() {
                   {images.slice(1).map((image) => <img alt={image.alt_text} key={image.id}
                     src={image.url} />)}
                 </div>}
-                {product.status === 'coming_soon' && !/edition\s*0?1/i.test(product.title) ? (
+                {product.status === 'coming_soon' ? (
                   <p className="shop-price">COMING SOON</p>
                 ) : <>
                   <p className="shop-price">{priceLabel || 'Price at checkout'}</p>
                   <form action={beginShopProductCheckout}>
                     <input name="productId" type="hidden" value={product.id} />
+                    {checkoutReady && <label className="shop-shipping-destination">
+                      Delivery country
+                      <select name="shippingCountry" defaultValue="GB" required>
+                        {shippingDestinations.map(destination => <option key={destination.country} value={destination.country}>{destination.label}</option>)}
+                      </select>
+                    </label>}
                     <button className="shop-edition-link" disabled={!checkoutReady} type="submit">BUY NOW <span aria-hidden="true">→</span></button>
                   </form>
                   {!checkoutReady && <p className="shop-shipping-note">Checkout opens once shipping regions and rates are set up.</p>}
