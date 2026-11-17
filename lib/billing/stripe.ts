@@ -4,6 +4,7 @@ import 'server-only';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { shopShippingConfigured, shopShippingCheckoutFields } from '@/lib/shop-shipping';
 
 type MembershipTier = 'standard' | 'impura';
 type BillingInterval = 'monthly' | 'yearly';
@@ -35,16 +36,8 @@ export function isStripeOneTimeCheckoutReady() {
   );
 }
 
-function shopShippingConfig() {
-  const countries = (process.env.SHOP_SHIPPING_COUNTRIES || '').split(',').map((item) => item.trim().toUpperCase()).filter(Boolean);
-  const rates = (process.env.SHOP_SHIPPING_RATE_IDS || '').split(',').map((item) => item.trim()).filter(Boolean);
-  if (!countries.length || countries.some((country) => !/^[A-Z]{2}$/.test(country))) return null;
-  if (!rates.length || rates.some((rate) => !/^shr_[A-Za-z0-9]+$/.test(rate))) return null;
-  return { countries, rates };
-}
-
 export function isPhysicalShopCheckoutReady() {
-  return isStripeOneTimeCheckoutReady() && Boolean(shopShippingConfig());
+  return isStripeOneTimeCheckoutReady() && shopShippingConfigured();
 }
 
 export async function getStripePriceLabel(priceId: string) {
@@ -229,9 +222,9 @@ export async function startCatalogueCheckout(catalogueId: string) {
   }
 }
 
-export async function startShopProductCheckout(productId: string) {
+export async function startShopProductCheckout(productId: string, shippingCountry: string) {
   if (!/^[0-9a-f-]{36}$/i.test(productId) || !isPhysicalShopCheckoutReady()) redirect('/shop?checkout=unavailable');
-  const shipping = shopShippingConfig();
+  const shipping = shopShippingCheckoutFields(shippingCountry);
   if (!shipping) redirect('/shop?checkout=unavailable');
   const admin = (await import('@/lib/supabase/admin')).createAdminClient();
   const { data: product } = await admin.from('shop_products').select('id,stripe_price_id,status').eq('id', productId).maybeSingle();
@@ -255,12 +248,8 @@ export async function startShopProductCheckout(productId: string) {
     'metadata[shop_product_id]': product.id,
     'payment_intent_data[metadata][user_id]': user.id,
     'payment_intent_data[metadata][shop_product_id]': product.id,
-    'shipping_address_collection[allowed_countries][0]': shipping.countries[0],
+    ...shipping,
   };
-  shipping.countries.slice(1).forEach((country, index) => {
-    fields[`shipping_address_collection[allowed_countries][${index + 1}]`] = country;
-  });
-  shipping.rates.forEach((rate, index) => { fields[`shipping_options[${index}][shipping_rate]`] = rate; });
 
   try {
     const sessionUrl = await createStripeCheckout(fields, '/account?purchase=shop-returned', '/shop?checkout=cancelled');

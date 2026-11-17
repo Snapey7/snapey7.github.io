@@ -32,8 +32,14 @@ export default async function CountryDestinationsPage({
           <header className="destinations-heading">
             <p className="eyebrow">EXPLORE THE EXTRAORDINARY</p>
             <h1>{name} DESTINATIONS</h1>
-            <p>Stories and places from {name} are coming soon.</p>
+            <p>{country === 'usa' ? 'Explore our muses and stories from the USA.' : `Stories and places from ${name} are coming soon.`}</p>
           </header>
+          {country === 'usa' && <div className="destination-grid">
+            <Link className="destination-card" href="/destinations/miami">
+              <img alt="Ana in Miami" src="/assets/editorial-ana-cover.jpg" />
+              <span className="destination-name"><strong>MIAMI</strong><small>USA</small><i aria-hidden="true" /></span>
+            </Link>
+          </div>}
           <footer className="destinations-cta">
             <Link className="outline-cta" href="/destinations">
               EXPLORE ALL DESTINATIONS

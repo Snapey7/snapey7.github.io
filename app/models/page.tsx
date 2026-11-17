@@ -1,17 +1,7 @@
 import Link from 'next/link';
-import { LockKeyhole } from 'lucide-react';
+import { MuseGrid } from '@/components/site/MuseGrid';
 import { PageShell } from '@/components/site/PageShell';
 import { models } from '@/lib/content';
-
-function MuseDetails({ name, location }: { name: string; location: string }) {
-  return (
-    <div className="muse-hover-details">
-      <span className="muse-unlock"><LockKeyhole aria-hidden="true" /> UNLOCK</span>
-      <span className="muse-person">{name} | {location}</span>
-      <span className="muse-meta">GALLERY <i>·</i> IMPURA | EXCLUSIVE PHOTOS</span>
-    </div>
-  );
-}
 
 export default function ModelsPage() {
   return (
@@ -28,14 +18,7 @@ export default function ModelsPage() {
           <Link href="#behind-the-scenes">BEHIND THE SCENES</Link>
           <Link href="#interviews">INTERVIEWS</Link>
         </nav>
-        <section className="model-grid">
-          {models.map((model) => (
-            <Link className="model-card" href={`/models/${model.slug}`} key={model.slug}>
-              <img alt={model.name} src={model.image} />
-              <MuseDetails name={model.name} location={model.location} />
-            </Link>
-          ))}
-        </section>
+        <MuseGrid muses={models} />
       </main>
     </PageShell>
   );
