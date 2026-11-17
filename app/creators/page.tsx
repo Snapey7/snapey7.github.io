@@ -5,6 +5,7 @@ import { editorials } from '@/lib/content';
 export default function CreatorsPage() {
   const featured = editorials.slice(0, 3);
   return <PageShell><main className="creators-page">
+    <div className="creators-masthead"><div><p>IMPURA VIDA</p><h2>Creators</h2><span>Original work from our creative community</span></div></div>
     <section className="creators-hero">
       <p className="eyebrow">IMPURA VIDA · CREATIVE COMMUNITY</p>
       <h1>Make something<br /><em>worth feeling.</em></h1>
