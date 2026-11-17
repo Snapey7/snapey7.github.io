@@ -1,4 +1,5 @@
 import { usesCloudflareBackend } from '@/lib/cloudflare/config';
+import { sql } from '@/lib/cloudflare/sql';
 import { redirect } from 'next/navigation';
 import { PageShell } from '@/components/site/PageShell';
 import { getContentAdminState } from '@/lib/content-admin';
@@ -38,6 +39,12 @@ export default async function StudioPage() {
     status: 'draft' | 'published';
     member_media: { id: string; title: string; alt_text: string; preview_url: string; position: number }[];
   }[] = [];
+  let creatorApplications: { id: string; name: string; email: string; discipline: string; portfolio_url: string; message: string; created_at: string; email_status: string }[] = [];
+  let creatorApplicationsError = '';
+  if (usesCloudflareBackend()) {
+    try { creatorApplications = (await sql('SELECT id,name,email,discipline,portfolio_url,message,created_at,email_status FROM creator_applications ORDER BY created_at DESC LIMIT 200')).results as typeof creatorApplications; }
+    catch { creatorApplicationsError = 'Creator applications are temporarily unavailable.'; }
+  }
   let loadError = '';
   let editorialLoadError = '';
   let editorialItems: (Editorial & { status: 'draft' | 'published'; images: { id: string; storage_path: string | null; preview_url: string; alt_text: string }[] })[] = editorials.map((item) => ({
@@ -165,6 +172,16 @@ export default async function StudioPage() {
         <h1>Content studio</h1>
         <p className="studio-intro">Private releases are stored in the subscriber vault. Public shop photos are managed separately and visible to everyone.</p>
         {loadError && <p className="studio-feedback" role="status">{loadError}</p>}
+        <section aria-labelledby="studio-creators-heading" className="studio-section">
+          <h2 id="studio-creators-heading">Creator applications</h2>
+          <p>Review applications here. Submitting an application does not publish a creator or their work.</p>
+          {creatorApplicationsError ? <p role="status">{creatorApplicationsError}</p> : creatorApplications.length ? <div className="studio-orders">{creatorApplications.map(application => <article className="studio-order" key={application.id}>
+            <div><strong>{application.name}</strong><span>{application.discipline}</span></div>
+            <p>{application.email} · <a href={application.portfolio_url} target="_blank" rel="noopener noreferrer">View portfolio ↗</a></p>
+            {application.message && <p style={{ whiteSpace: 'pre-wrap' }}>{application.message}</p>}
+            <small>{new Date(application.created_at).toLocaleString('en-GB')} · Email notification: {application.email_status}</small>
+          </article>)}</div> : <p>No creator applications yet.</p>}
+        </section>
         <section aria-labelledby="studio-editorials-heading" className="studio-section">
           <h2 id="studio-editorials-heading">Public editorials</h2>
           <p>Write and publish public shoot stories here. These photographs are separate from the paid Muse catalogue. Draft uploads stay in private storage until you publish.</p>

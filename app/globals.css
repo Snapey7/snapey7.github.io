@@ -4062,3 +4062,16 @@ button.under-link {
 .creators-invite { background: #16100f; }
 .creators-invite .outline-cta { margin-top: 2rem; }
 @media (max-width: 700px) { .creators-grid { grid-template-columns: 1fr; } .creators-card { min-height: 25rem; } .creators-section-heading { align-items: start; flex-direction: column; } }
+
+.creator-application-page { max-width: 720px; margin: auto; padding: 10rem 1.5rem 6rem; min-height: 75vh; }
+.creator-application-page h1 { font: 400 clamp(3.5rem,7vw,6rem)/1 var(--font-display), Georgia, serif; margin: 1rem 0; }
+.creator-application-page > p:not(.eyebrow) { color: #c5bdb8; line-height: 1.7; margin: 1.2rem 0; }
+.creator-application-form { display: grid; gap: 1.1rem; margin-top: 2rem; }
+.creator-application-form label { display: grid; gap: .5rem; color: #f8efe8; font-size: .9rem; }
+.creator-application-form input, .creator-application-form select, .creator-application-form textarea { width: 100%; padding: .9rem; background: #181413; border: 1px solid #716460; color: #fff; font: inherit; }
+.creator-application-form label span, .creator-application-form > p { color: #bbb1ad; font-size: .82rem; line-height: 1.6; }
+.creator-application-form a { color: #ff9292; text-decoration: underline; }
+.creator-application-form .outline-cta { justify-self: start; }
+.creator-application-error { color: #ff8c8c !important; }
+.creator-application-success { color: #f8efe8; padding: 1.5rem; border: 1px solid #ff7779; }
+.creator-application-honeypot { position: absolute; left: -10000px; }
