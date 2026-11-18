@@ -12,7 +12,7 @@ export async function approveCreator(form: FormData) {
   if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error('Invalid application.');
   const application = (await sql('SELECT name,email FROM creator_applications WHERE id=?', [id])).results[0];
   if (!application) throw new Error('Application not found.');
-  await sql("INSERT INTO creator_memberships(application_id,status,approved_at) VALUES(?, 'approved', ?) ON CONFLICT(application_id) DO NOTHING", [id, new Date().toISOString()]);
+  await sql("INSERT INTO creator_memberships(application_id,status,approved_at) SELECT ?, 'approved', ? WHERE NOT EXISTS (SELECT 1 FROM creator_memberships m JOIN creator_applications other ON other.id=m.application_id JOIN creator_applications current ON current.id=? WHERE other.user_id=current.user_id AND other.id<>current.id) ON CONFLICT(application_id) DO NOTHING", [id, new Date().toISOString(), id]);
   const membership = (await sql('SELECT status,notification_status FROM creator_memberships WHERE application_id=?', [id])).results[0];
   if (membership?.status === 'approved' && membership.notification_status !== 'sent') {
     try {
