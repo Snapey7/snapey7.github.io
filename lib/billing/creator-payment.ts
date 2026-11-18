@@ -4,7 +4,7 @@ export async function recordCreatorPayment(object: Record<string, unknown>, sql:
   const applicationId = String(metadata?.creator_application_id || ''), userId = String(metadata?.creator_user_id || '');
   if (object.payment_status !== 'paid') return 'unpaid';
   if (!/^[0-9a-f-]{36}$/i.test(applicationId) || !userId || object.amount_total !== 500 || (object.currency !== 'usd' && object.currency !== 'gbp') || typeof object.id !== 'string') return 'invalid';
-  const result = await sql("UPDATE creator_memberships SET status='paid',paid_at=?,stripe_session_id=? WHERE application_id=? AND status='approved' AND EXISTS (SELECT 1 FROM creator_applications WHERE id=? AND user_id=?) AND EXISTS (SELECT 1 FROM creator_checkout_attempts WHERE application_id=? AND currency=?)", [new Date().toISOString(), object.id, applicationId, applicationId, userId, applicationId, object.currency]);
+  const result = await sql("UPDATE creator_memberships SET status='paid',paid_at=?,stripe_session_id=? WHERE application_id=? AND status='approved' AND EXISTS (SELECT 1 FROM creator_applications WHERE id=? AND user_id=?) AND EXISTS (SELECT 1 FROM creator_checkout_attempts WHERE application_id=? AND currency=? AND (stripe_session_id IS NULL OR stripe_session_id=?))", [new Date().toISOString(), object.id, applicationId, applicationId, userId, applicationId, object.currency, object.id]);
   if (result.meta.changes) return 'recorded';
   const prior = (await sql("SELECT application_id FROM creator_memberships WHERE application_id=? AND status='paid' AND stripe_session_id=?", [applicationId, object.id])).results[0];
   return prior ? 'recorded' : 'review';

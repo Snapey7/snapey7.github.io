@@ -22,15 +22,19 @@ export async function startCreatorCheckout(form: FormData) {
     await sql('INSERT INTO creator_checkout_attempts(application_id,attempt_id,currency,created_at) VALUES(?,?,?,?) ON CONFLICT(application_id) DO NOTHING', [applicationId, crypto.randomUUID(), currency, new Date().toISOString()]);
     const attempt = (await sql('SELECT attempt_id,currency,created_at,stripe_session_id FROM creator_checkout_attempts WHERE application_id=?', [applicationId])).results[0];
     if (!attempt || !attempt.attempt_id) throw new Error('Checkout unavailable.');
-    if (attempt.currency !== currency) throw new Error('Please continue with the currency selected for your existing checkout.');
     if (attempt.stripe_session_id) {
       const existingResponse = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(String(attempt.stripe_session_id))}`, { headers: { Authorization: `Bearer ${key}` }, cache: 'no-store' });
       const existing = await existingResponse.json() as { status?: string; url?: string };
       if (!existingResponse.ok) throw new Error('Checkout unavailable.');
       if (existing.status === 'open' && existing.url) redirect(existing.url);
-      // An expired or completed session requires review before another payment is attempted.
+      if (existing.status === 'expired') {
+        await sql('DELETE FROM creator_checkout_attempts WHERE application_id=? AND attempt_id=? AND stripe_session_id=?', [applicationId, String(attempt.attempt_id), String(attempt.stripe_session_id)]);
+        redirect('/creators/apply?checkout=expired');
+      }
+      // Completed sessions can still be awaiting a delayed payment notification.
       throw new Error('Checkout session requires review.');
     }
+    if (attempt.currency !== currency) throw new Error('Checkout is still being prepared. Please retry in the original currency.');
     // Stripe can forget idempotency keys after 24 hours; fail closed if an earlier
     // request might have succeeded but its response was never stored.
     if (Date.now() - Date.parse(String(attempt.created_at)) > 23 * 60 * 60 * 1000) throw new Error('Checkout attempt requires review.');
