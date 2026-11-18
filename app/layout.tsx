@@ -16,6 +16,10 @@ const sans = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.impuravidamagazine.com'),
+  icons: {
+    icon: [{ url: '/impura-icon.png', type: 'image/png', sizes: '256x256' }],
+    apple: [{ url: '/impura-icon.png', sizes: '256x256' }],
+  },
   title: {
     default: 'IMPURA VIDA Magazine',
     template: '%s | IMPURA VIDA',
