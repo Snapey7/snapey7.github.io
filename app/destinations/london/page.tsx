@@ -3,34 +3,34 @@ import { PageShell } from '@/components/site/PageShell';
 
 const londonPlaces = [
   {
-    name: 'Westminster',
-    theme: 'Power & Pleasure',
-    image: '/assets/london-reference-westminster.png',
+    name: 'Soho',
+    theme: 'Sin & Neon',
+    image: '/assets/london-soho.jpg',
   },
   {
     name: 'Mayfair',
     theme: 'Luxury & Desire',
-    image: '/assets/london-reference-mayfair.png',
+    image: '/assets/london-mayfair.jpg',
   },
   {
     name: 'The City',
-    theme: 'Ambition & Excess',
-    image: '/assets/london-reference-the-city.png',
+    theme: 'Power & Pleasure',
+    image: '/assets/london-city.jpg',
   },
   {
-    name: 'Notting Hill',
-    theme: 'Beauty & Secrets',
-    image: '/assets/london-reference-notting-hill.png',
+    name: 'Hampstead',
+    theme: 'Private Affairs',
+    image: '/assets/london-hampstead.jpg',
   },
   {
     name: 'Shoreditch',
-    theme: 'Nights & Freedom',
-    image: '/assets/london-reference-shoreditch.png',
+    theme: 'Rebellion & Freedom',
+    image: '/assets/london-shoreditch.jpg',
   },
   {
     name: 'Richmond',
-    theme: 'Escape & Desire',
-    image: '/assets/london-reference-richmond.png',
+    theme: 'Escape & Romance',
+    image: '/assets/london-richmond.jpg',
   },
 ];
 
@@ -50,22 +50,17 @@ export default function LondonDestinationsPage() {
           </header>
           <div className="destination-grid london-destination-grid">
             {londonPlaces.map((place) => (
-              <Link
-                className="destination-card london-destination-card"
-                href="/members"
-                key={place.name}
-              >
-                <img
-                  alt={`${place.name}, ${place.theme}. Members only.`}
-                  src={place.image}
-                />
-              </Link>
+              <article className="destination-card london-destination-card" key={place.name}>
+                <img alt={`${place.name}, London`} src={place.image} />
+                <span className="destination-lock">COMING SOON</span>
+                <span className="destination-name london-destination-name"><strong>{place.name}</strong><small>{place.theme}</small><i aria-hidden="true" /></span>
+              </article>
             ))}
           </div>
           <footer className="destinations-cta london-destinations-cta">
-            <p>A darker side of the capital awaits.</p>
-            <Link className="outline-cta" href="/members">
-              DISCOVER YOUR ESCAPE
+            <p>More stories from London are coming soon.</p>
+            <Link className="outline-cta" href="/destinations/uk">
+              EXPLORE UK DESTINATIONS
             </Link>
           </footer>
         </section>
