@@ -957,7 +957,7 @@ button.under-link {
 }
 
 .london-destination-card::after {
-  content: none;
+  content: '';
 }
 
 .destination-card::after {
