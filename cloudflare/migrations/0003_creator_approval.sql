@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS creator_memberships (
 CREATE TABLE IF NOT EXISTS creator_checkout_attempts (
   application_id TEXT PRIMARY KEY REFERENCES creator_memberships(application_id),
   attempt_id TEXT NOT NULL,
+  currency TEXT NOT NULL CHECK (currency IN ('gbp', 'usd')),
   created_at TEXT NOT NULL,
   stripe_session_id TEXT
 );

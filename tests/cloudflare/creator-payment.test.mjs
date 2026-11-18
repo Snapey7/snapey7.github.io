@@ -15,8 +15,10 @@ test('creator joining payments require approval, the right account and exactly $
     const payment = { id: 'cs_test_creator', payment_status: 'paid', amount_total: 500, currency: 'usd', metadata: { creator_application_id: application, creator_user_id: user } };
     assert.equal(await recordCreatorPayment(payment, sql), 'review');
     await sql("INSERT INTO creator_memberships(application_id,status,approved_at) VALUES(?,'approved',?)", [application, new Date().toISOString()]);
+    await sql('INSERT INTO creator_checkout_attempts(application_id,attempt_id,currency,created_at) VALUES(?,?,?,?)', [application, randomUUID(), 'usd', new Date().toISOString()]);
     assert.equal(await recordCreatorPayment({ ...payment, payment_status: 'unpaid' }, sql), 'unpaid');
     assert.equal(await recordCreatorPayment({ ...payment, amount_total: 499 }, sql), 'invalid');
+    assert.equal(await recordCreatorPayment({ ...payment, currency: 'gbp' }, sql), 'review');
     assert.equal(await recordCreatorPayment({ ...payment, metadata: { ...payment.metadata, creator_user_id: randomUUID() } }, sql), 'review');
     assert.equal(await recordCreatorPayment(payment, sql), 'recorded');
     assert.equal(await recordCreatorPayment(payment, sql), 'recorded');
