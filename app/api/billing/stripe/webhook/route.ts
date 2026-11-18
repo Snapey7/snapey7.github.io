@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyStripeSignature } from '@/lib/billing/stripe';
+import { sql } from '@/lib/cloudflare/sql';
+import { recordCreatorPayment } from '@/lib/billing/creator-payment';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,6 +36,15 @@ export async function POST(request: NextRequest) {
 
   const object = event.data?.object;
   if (!object) return new Response('Missing event object.', { status: 400 });
+  const metadata = object.metadata as Record<string, unknown> | null | undefined;
+  if ((event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') && metadata?.creator_application_id) {
+    try {
+      const result = await recordCreatorPayment(object, sql);
+      if (result === 'invalid') return new Response('Invalid creator payment.', { status: 400 });
+      if (result === 'review') return new Response('Creator payment requires review.', { status: 500 });
+      return new Response('OK', { status: 200 });
+    } catch { return new Response('Could not process creator payment.', { status: 500 }); }
+  }
   const { error } = await createAdminClient().rpc('apply_stripe_event', {
     p_event_id: event.id,
     p_event_type: event.type,

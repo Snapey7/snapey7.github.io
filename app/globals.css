@@ -4039,7 +4039,7 @@ button.under-link {
   }
 }
 
-.creators-page { background: #080706; color: #f8efe8; }
+.creators-page { background: #080706; color: #f8efe8; padding-top: 5rem; }
 .creators-masthead { padding: 1.25rem clamp(1.5rem, 5vw, 5rem); background: #110e0d; border-bottom: 1px solid #342323; }
 .creators-masthead > div { border-left: 3px solid #f27f7e; padding-left: 1rem; }
 .creators-masthead p { margin: 0 0 .25rem; color: #f27f7e; font-size: .62rem; font-weight: 700; letter-spacing: .2em; }
@@ -4100,7 +4100,7 @@ button.under-link {
 .creators-invite .outline-cta { margin-top: 2rem; }
 @media (max-width: 700px) { .creators-grid { grid-template-columns: 1fr; } .creators-card { min-height: 25rem; } .creators-section-heading { align-items: start; flex-direction: column; } }
 
-.creator-application-page { max-width: 720px; margin: auto; padding: 10rem 1.5rem 6rem; min-height: 75vh; }
+.creator-application-page { max-width: 720px; margin: auto; padding: 4rem 1.5rem 6rem; min-height: 75vh; }
 .creator-application-page h1 { font: 400 clamp(3.5rem,7vw,6rem)/1 var(--font-display), Georgia, serif; margin: 1rem 0; }
 .creator-application-page > p:not(.eyebrow) { color: #c5bdb8; line-height: 1.7; margin: 1.2rem 0; }
 .creator-application-form { display: grid; gap: 1.1rem; margin-top: 2rem; }

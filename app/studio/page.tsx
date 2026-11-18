@@ -9,6 +9,7 @@ import { createR2ReadUrl, R2_MEDIA_BUCKET_MARKER } from '@/lib/member-media-r2';
 import { CatalogueManager } from './CatalogueManager';
 import { EditorialManager } from './EditorialManager';
 import { ShopProductManager } from './ShopProductManager';
+import { approveCreator } from './creator-actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,10 +40,10 @@ export default async function StudioPage() {
     status: 'draft' | 'published';
     member_media: { id: string; title: string; alt_text: string; preview_url: string; position: number }[];
   }[] = [];
-  let creatorApplications: { id: string; name: string; email: string; discipline: string; portfolio_url: string; message: string; created_at: string; email_status: string }[] = [];
+  let creatorApplications: { id: string; name: string; email: string; discipline: string; portfolio_url: string; message: string; created_at: string; email_status: string; membership_status: string | null; notification_status: string | null }[] = [];
   let creatorApplicationsError = '';
   if (usesCloudflareBackend()) {
-    try { creatorApplications = (await sql('SELECT id,name,email,discipline,portfolio_url,message,created_at,email_status FROM creator_applications ORDER BY created_at DESC LIMIT 200')).results as typeof creatorApplications; }
+    try { creatorApplications = (await sql('SELECT a.id,a.name,a.email,a.discipline,a.portfolio_url,a.message,a.created_at,a.email_status,m.status AS membership_status,m.notification_status FROM creator_applications a LEFT JOIN creator_memberships m ON m.application_id=a.id ORDER BY a.created_at DESC LIMIT 200')).results as typeof creatorApplications; }
     catch { creatorApplicationsError = 'Creator applications are temporarily unavailable.'; }
   }
   let loadError = '';
@@ -180,6 +181,9 @@ export default async function StudioPage() {
             <p>{application.email} · <a href={application.portfolio_url} target="_blank" rel="noopener noreferrer">View portfolio ↗</a></p>
             {application.message && <p style={{ whiteSpace: 'pre-wrap' }}>{application.message}</p>}
             <small>{new Date(application.created_at).toLocaleString('en-GB')} · Email notification: {application.email_status}</small>
+            <p>Status: {application.membership_status === 'paid' ? 'Joining fee paid' : application.membership_status === 'approved' ? 'Approved — awaiting payment' : 'Awaiting review'}</p>
+            {!application.membership_status && <form action={approveCreator}><input type="hidden" name="application_id" value={application.id} /><button type="submit" className="outline-cta">APPROVE CREATOR</button></form>}
+            {application.membership_status === 'approved' && application.notification_status !== 'sent' && <form action={approveCreator}><p>Approval email was not sent. Please retry.</p><input type="hidden" name="application_id" value={application.id} /><button type="submit" className="outline-cta">RETRY APPROVAL EMAIL</button></form>}
           </article>)}</div> : <p>No creator applications yet.</p>}
         </section>
         <section aria-labelledby="studio-editorials-heading" className="studio-section">
