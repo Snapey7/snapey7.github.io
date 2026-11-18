@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PageShell } from '@/components/site/PageShell';
+import { CreatorsMasthead } from '@/components/site/CreatorsMasthead';
 import { editorials } from '@/lib/content';
 
 export default function CreatorsPage() {
@@ -14,7 +15,7 @@ export default function CreatorsPage() {
     ['What can I submit?', 'We welcome original creative work you have the rights and consent to share. Content must meet our editorial standards and payment-provider requirements. Submission tools and full guidelines are coming soon.'],
   ];
   return <PageShell><main className="creators-page">
-    <div className="creators-masthead"><div><p>IMPURA VIDA</p><h2>Creators</h2><span>Original work from our creative community</span></div></div>
+    <CreatorsMasthead />
     <section className="creators-hero">
       <p className="eyebrow">IMPURA VIDA · CREATIVE COMMUNITY</p>
       <h1>Make something<br /><em>worth feeling.</em></h1>
