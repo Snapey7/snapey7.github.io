@@ -4051,6 +4051,29 @@ button.under-link {
 .creators-hero h1 em { color: #ff7779; font-weight: 400; }
 .creators-hero > p:not(.eyebrow), .creators-intro > p:not(.eyebrow), .creators-invite > p:not(.eyebrow) { max-width: 38rem; color: #c5bdb8; line-height: 1.8; }
 .creators-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1.5rem; margin-top: 2rem; }
+.creators-visuals { max-width: 1280px; margin: -2rem auto 0; padding: 0 1.5rem 2rem; position: relative; }
+.creators-visuals-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.creators-visual { aspect-ratio: 3 / 4; overflow: hidden; position: relative; background: #1a1412; }
+.creators-visual img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+.creators-visual:hover img { transform: scale(1.04); }
+.creators-visual span { position: absolute; left: 0; right: 0; bottom: 0; padding: 3rem 1rem 1rem; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.85)); font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.creators-visuals > p { color: #aa9d97; font-size: .75rem; margin-top: 1rem; text-align: center; }
+.creators-benefits, .creators-faq { padding: 6rem 1.5rem; text-align: center; background: #110e0d; }
+.creators-benefits h2, .creators-faq h2 { font-family: var(--font-display), Georgia, serif; font-size: clamp(2.7rem, 5vw, 4.5rem); font-weight: 400; margin: 1rem 0; }
+.creators-benefits > p:not(.eyebrow) { color: #c5bdb8; }
+.creators-benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 1100px; margin: 3rem auto 0; text-align: left; }
+.creators-benefits-grid article { padding: 2rem; background: #191413; border: 1px solid #392a28; }
+.creators-benefits-grid span { color: #f27f7e; font-size: .7rem; letter-spacing: .15em; }
+.creators-benefits-grid h3 { font-family: var(--font-display), Georgia, serif; font-size: 1.7rem; font-weight: 400; margin: 1.5rem 0 1rem; }
+.creators-benefits-grid p, .creators-faq-list p { color: #c5bdb8; line-height: 1.7; }
+.creators-faq-list { max-width: 760px; margin: 3rem auto 0; text-align: left; }
+.creators-faq-list details { border-bottom: 1px solid #463332; }
+.creators-faq-list summary { cursor: pointer; padding: 1.25rem 2rem 1.25rem 0; font-weight: 600; position: relative; list-style: none; }
+.creators-faq-list summary::-webkit-details-marker { display: none; }
+.creators-faq-list summary::after { content: '+'; color: #f27f7e; position: absolute; right: .25rem; }
+.creators-faq-list details[open] summary::after { content: '−'; }
+.creators-faq-list p { margin: 0 0 1.5rem; }
+@media (max-width: 700px) { .creators-visuals-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; } .creators-benefits-grid { grid-template-columns: 1fr; } .creators-benefits, .creators-faq { padding: 4rem 1.5rem; } }
 .creators-text-link, .creators-section-heading > a { color: #f8efe8; font-size: .65rem; font-weight: 700; letter-spacing: .16em; }
 .creators-intro, .creators-invite { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 6rem 1.5rem; }
 .creators-offer { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(3rem, 8vw, 8rem); max-width: 76rem; margin: 0 auto; padding: 5rem 2rem 7rem; border-top: 1px solid #493132; }
